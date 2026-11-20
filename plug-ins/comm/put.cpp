@@ -16,6 +16,7 @@
 #include "merc.h"
 #include "def.h"
 #include "l10n.h"
+#include "item_progs.h"
 
 DLString get_pocket_argument( char *arg );
 
@@ -219,6 +220,16 @@ static bool oprog_put_money_msg(Object *container, Character *ch, int gold, int 
  * "in" and "on" do not sit in the same place in every language, and the
  * composed string could not be looked up in the catalog at all -- an English
  * player was told "Ты кладешь a monocle lens в a horn monocle rim." */
+/* Handoff stamps only for a container nobody carries: a bag in the putter's
+ * own inventory is not "let go of", and a chest on the floor is. */
+static bool container_unattended( Object *container )
+{
+    Object *top = container;
+    while (top->in_obj)
+        top = top->in_obj;
+    return top->carried_by == 0;
+}
+
 static bool put_obj_container( Character *ch, Object *obj, Object *container, 
                                DLString &pocket )
 {
@@ -258,6 +269,8 @@ static bool put_obj_container( Character *ch, Object *obj, Object *container,
                        obj, container, pocket.c_str( ) );
     }
 
+    if (container_unattended( container ))
+        oprog_handoff_stamp( obj, ch );
     return oprog_put( obj, ch, container );
 }
 
@@ -311,6 +324,12 @@ static void put_money_container(Character *ch, int amount, const char *currencyN
         }
     }
     
+    // Merged coins are not all the putter's: only a fresh pile gets stamped.
+    bool coinsThere = false;
+    for (Object *o = container->contains; o; o = o->next_content)
+        if (o->item_type == ITEM_MONEY)
+            coinsThere = true;
+
     // Add money to the container or merge with existing coins.
     ch->silver -= silver;
     ch->gold -= gold;
@@ -318,6 +337,8 @@ static void put_money_container(Character *ch, int amount, const char *currencyN
     extract_obj(money);
     money = Money::create( gold, silver );
     obj_to_obj(money, container);
+    if (!coinsThere && container_unattended( container ))
+        oprog_handoff_stamp( money, ch );
 }
 
 CMDRUNP( put )

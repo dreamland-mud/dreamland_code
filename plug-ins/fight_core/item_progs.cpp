@@ -1,4 +1,8 @@
+#include <map>
+
 #include "item_progs.h"
+#include "descriptor.h"
+#include "dreamland.h"
 #include "character.h"
 #include "npcharacter.h"
 #include "core/object.h"
@@ -39,12 +43,98 @@ static bool oprog_get_money( Character *ch, Object *obj )
     return true;
 }
 
+/*
+ * Handoff stamps: object ID -> the player who last let go of it. Keyed by ID,
+ * not pointer, so an extracted object leaves only a stale entry that the TTL
+ * sweep drops, never a dangling pointer.
+ */
+struct HandoffStamp {
+    DLString name;
+    DLString host;
+    time_t when;
+};
+
+static std::map<long long, HandoffStamp> handoffStamps;
+static const time_t HANDOFF_TTL = 6 * 60 * 60;
+static const size_t HANDOFF_SWEEP_SIZE = 2000;
+
+static void handoff_stamp_rec( Object *obj, const HandoffStamp &stamp )
+{
+    handoffStamps[obj->getID( )] = stamp;
+
+    for (Object *o = obj->contains; o; o = o->next_content)
+        handoff_stamp_rec( o, stamp );
+}
+
+static void handoff_clear_rec( Object *obj )
+{
+    handoffStamps.erase( obj->getID( ) );
+
+    for (Object *o = obj->contains; o; o = o->next_content)
+        handoff_clear_rec( o );
+}
+
+void oprog_handoff_stamp( Object *obj, Character *ch )
+{
+    if (!obj || !ch || ch->is_npc( ) || obj->extracted)
+        return;
+
+    time_t now = dreamland->getCurrentTime( );
+
+    if (handoffStamps.size( ) > HANDOFF_SWEEP_SIZE) {
+        for (auto it = handoffStamps.begin( ); it != handoffStamps.end( ); )
+            if (now - it->second.when > HANDOFF_TTL)
+                it = handoffStamps.erase( it );
+            else
+                ++it;
+    }
+
+    HandoffStamp stamp;
+    stamp.name = ch->getNameC( );
+    stamp.host = ch->desc ? ch->desc->getRealHost( ) : DLString::emptyString;
+    stamp.when = now;
+    handoff_stamp_rec( obj, stamp );
+}
+
+// Clears the stamps whoever takes the object (a scavenger mob too), so a stamp
+// always means "let go and not picked up since". Window: HANDOFF_TTL.
+static void handoff_check( Object *obj, Character *ch )
+{
+    if (handoffStamps.empty( ))
+        return;
+
+    // Clear the contents even when obj itself is unstamped: a bag handed over
+    // by give carries nothing stale out of the previous floor stay.
+    auto it = handoffStamps.find( obj->getID( ) );
+    if (it == handoffStamps.end( )) {
+        handoff_clear_rec( obj );
+        return;
+    }
+
+    HandoffStamp stamp = it->second;
+    handoff_clear_rec( obj );
+
+    if (ch->is_npc( ) || stamp.name == ch->getNameC( ))
+        return;
+
+    time_t now = dreamland->getCurrentTime( );
+    if (now - stamp.when > HANDOFF_TTL)
+        return;
+
+    gprog( "onHandoff", "COssi", ch, obj, stamp.name.c_str( ), stamp.host.c_str( ),
+           (int)(now - stamp.when) );
+}
+
 bool oprog_get( Object *obj, Character *ch )
 {
     // Named items go back on the floor no matter who tried to take them.
     // oprog_get itself is called last in the give chain, so a quest handler
     // that consumes what it was given has already had its say by now.
     if (!obj_owner_enforce( obj, ch ))
+        return true;
+
+    handoff_check( obj, ch );
+    if (obj->extracted)
         return true;
 
     aquest_trigger(obj, ch, "Get", "OC", obj, ch);
@@ -82,6 +172,8 @@ bool oprog_give_blocked( Object *obj, Character *ch, Character *victim )
 
 bool oprog_drop( Object *obj, Character *ch )
 {
+    oprog_handoff_stamp( obj, ch );
+
     if (behavior_trigger(obj, "Drop", "OC", obj, ch))
         return true;
 
