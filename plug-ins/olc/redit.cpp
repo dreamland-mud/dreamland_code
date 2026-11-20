@@ -49,6 +49,8 @@
 #include "descriptor.h"
 #include "stringlist.h"
 #include "json_utils.h"
+#include "roombehaviormanager.h"
+#include "xmldocument.h"
 
 #include "def.h"
 
@@ -202,39 +204,17 @@ REDIT(copy, "копировать", "скопировать описания, п
     StringList copied;
 
     if (copyDesc) {
-        pRoom->name = source->name;
-        pRoom->description = source->description;
-        pRoom->smell = source->smell;
-        pRoom->sound = source->sound;
-
-        pRoom->extraDescriptions.deallocate();
-        for (auto &ed: source->extraDescriptions) {
-            ExtraDescription *myed = new ExtraDescription();
-            myed->keyword = ed->keyword;
-            myed->description = ed->description;
-            pRoom->extraDescriptions.push_back(myed);
-        }
-
+        copyDescriptions(pRoom, source);
         copied.push_back("descriptions");
     }
 
     if (copyParam) {
-        pRoom->room_flags = source->room_flags;
-        pRoom->sector_type = source->sector_type;
-        pRoom->heal_rate = source->heal_rate;
-        pRoom->mana_rate = source->mana_rate;
-        pRoom->clan.assign(source->clan);
-        pRoom->guilds.clear();
-        pRoom->guilds.set(source->guilds);
-        pRoom->liquid.assign(source->liquid);
+        copyParameters(pRoom, source);
         copied.push_back("parameters");
     }
 
     if (copyBhv) {
-        pRoom->behaviors.clear();
-        pRoom->behaviors.set(source->behaviors);
-        pRoom->props.clear();
-        JsonUtils::copy(pRoom->props, source->props);
+        copyBehaviors(pRoom, source);
         copied.push_back("behaviors");
     }
 
@@ -1056,6 +1036,126 @@ void OLCStateRoom::registerRoom(RoomIndexData *pRoom)
     pRoom->areaIndex->roomIndexes[pRoom->vnum] = pRoom;
 
     pRoom->create();
+}
+
+void OLCStateRoom::copyDescriptions(RoomIndexData *pRoom, RoomIndexData *source)
+{
+    pRoom->name = source->name;
+    pRoom->description = source->description;
+    pRoom->smell = source->smell;
+    pRoom->sound = source->sound;
+
+    pRoom->extraDescriptions.deallocate();
+    for (auto &ed: source->extraDescriptions) {
+        ExtraDescription *myed = new ExtraDescription();
+        myed->keyword = ed->keyword;
+        myed->description = ed->description;
+        pRoom->extraDescriptions.push_back(myed);
+    }
+}
+
+void OLCStateRoom::copyParameters(RoomIndexData *pRoom, RoomIndexData *source)
+{
+    pRoom->room_flags = source->room_flags;
+    pRoom->sector_type = source->sector_type;
+    pRoom->heal_rate = source->heal_rate;
+    pRoom->mana_rate = source->mana_rate;
+    pRoom->clan.assign(source->clan);
+    pRoom->guilds.clear();
+    pRoom->guilds.set(source->guilds);
+    pRoom->liquid.assign(source->liquid);
+}
+
+void OLCStateRoom::copyBehaviors(RoomIndexData *pRoom, RoomIndexData *source)
+{
+    pRoom->behaviors.clear();
+    pRoom->behaviors.set(source->behaviors);
+    pRoom->props.clear();
+    JsonUtils::copy(pRoom->props, source->props);
+}
+
+void OLCStateRoom::replaceRoom(RoomIndexData *pRoom, RoomIndexData *fresh)
+{
+    copyDescriptions(pRoom, fresh);
+    copyParameters(pRoom, fresh);
+    copyBehaviors(pRoom, fresh);
+
+    // The replaced exits and resets stay allocated, as delete_exit and reset
+    // deletion leave them: a reset in progress or an exit editor may hold one.
+    for (int door = 0; door < DIR_SOMEWHERE; door++)
+        pRoom->exit[door] = fresh->exit[door];
+    pRoom->extra_exits.swap(fresh->extra_exits);
+    pRoom->resets.swap(fresh->resets);
+
+    bool behaviorChanged = !olc_same_xml(
+        pRoom->behavior ? pRoom->behavior->getFirstNode() : XMLNode::Pointer(),
+        fresh->behavior ? fresh->behavior->getFirstNode() : XMLNode::Pointer());
+    if (behaviorChanged)
+        pRoom->behavior = fresh->behavior;
+
+    fresh->extraDescriptions.deallocate();
+    delete fresh;
+
+    Room *room = pRoom->room;
+    if (!room)
+        return;
+
+    // Instance flags are the prototype's plus what room affects set.
+    room->room_flags = pRoom->room_flags;
+    for (auto &paf: room->affected)
+        if (paf->bitvector.getTable() == &room_flags)
+            SET_BIT(room->room_flags, paf->bitvector.getValue());
+
+    // Exits into this room from elsewhere point at the instance, which stays.
+    // Its own exits are rebuilt; a door whose default state didn't change keeps
+    // its current open/closed/locked state. Old instance exits stay allocated:
+    // footprints in the room history point at extra exits.
+    bool hasExit = false;
+
+    for (int door = 0; door < DIR_SOMEWHERE; door++) {
+        EXIT_DATA *old = room->exit[door];
+        room->exit[door] = 0;
+
+        if (!pRoom->exit[door])
+            continue;
+
+        EXIT_DATA *pexit = pRoom->exit[door]->create();
+        pexit->resolve();
+        if (old && old->exit_info_default == pexit->exit_info_default)
+            pexit->exit_info = old->exit_info;
+        if (pexit->u1.to_room)
+            hasExit = true;
+        room->exit[door] = pexit;
+    }
+
+    ExtraExitList oldExtra;
+    oldExtra.swap(room->extra_exits);
+
+    for (auto &eexit: pRoom->extra_exits) {
+        EXTRA_EXIT_DATA *peexit = eexit->create();
+        peexit->resolve();
+
+        EXTRA_EXIT_DATA *old = oldExtra.find(String::toString(peexit->keyword));
+        if (old && old->exit_info_default == peexit->exit_info_default)
+            peexit->exit_info = old->exit_info;
+
+        if (peexit->u1.to_room)
+            hasExit = true;
+        room->extra_exits.push_back(peexit);
+    }
+
+    // Boot marks a room nothing leads out of the same way.
+    if (!hasExit)
+        SET_BIT(room->room_flags, ROOM_NO_MOB);
+
+    if (behaviorChanged) {
+        if (pRoom->behavior)
+            RoomBehaviorManager::assign(room);
+        else if (room->behavior) {
+            room->behavior->unsetRoom();
+            room->behavior.clear();
+        }
+    }
 }
 
 // Rooms the engine or the world config names by vnum.

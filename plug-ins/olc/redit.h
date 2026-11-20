@@ -40,6 +40,14 @@ public:
     static void unregisterRoom(RoomIndexData *);
     static void show(PCharacter *ch, RoomIndexData *, bool showWeb);
     static void move(PCharacter *ch, RoomIndexData *roomToMove, AreaIndexData *targetArea);
+    /** The field groups of 'copy': names, descriptions, smell, sound, EDs;
+     *  sector, flags, rates, clan, guilds, liquid; behaviors and props. */
+    static void copyDescriptions(RoomIndexData *pRoom, RoomIndexData *source);
+    static void copyParameters(RoomIndexData *pRoom, RoomIndexData *source);
+    static void copyBehaviors(RoomIndexData *pRoom, RoomIndexData *source);
+    /** Every saved field of fresh (an unregistered XMLRoom::compat result)
+     *  onto pRoom in place, its instance synced. Deletes fresh. */
+    static void replaceRoom(RoomIndexData *pRoom, RoomIndexData *fresh);
 
     XML_VARIABLE XMLInteger originalRoom;
     XML_VARIABLE XMLInteger room;

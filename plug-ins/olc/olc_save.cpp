@@ -3,6 +3,11 @@
  * ruffina, 2004
  */
 #include <string.h>
+#include <fstream>
+
+#include "jsoncpp/json/json.h"
+#include "iconvmap.h"
+#include "arg_utils.h"
 
 #include "olc.h"
 #include "onlinecreation.h"
@@ -182,4 +187,61 @@ CMD(asave, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         return;
     }
     __do_asave(ch, const_cast<char *>(""));
+}
+
+/*
+ * 'olc status': what the live-to-git pusher (scripts/olc-push.py) last
+ * recorded. It runs from cron and keeps its state under the runtime.
+ */
+static const char *OLC_PUSH_STATE = "var/run/olc-push.json";
+static IconvMap utf2koi("utf-8", "koi8-u");
+
+CMD(olc, 50, "", POS_DEAD, 103, LOG_NORMAL,
+    "OLC sync status.")
+{
+    if (!ch->is_immortal()) {
+        stc("Это не для тебя.\n\r", ch);
+        return;
+    }
+
+    if (!arg_is_strict(argument, "status")) {
+        stc("Syntax: olc status\n\r", ch);
+        return;
+    }
+
+    std::ifstream in(OLC_PUSH_STATE);
+    if (!in) {
+        stc("OLC push: pusher not installed.\n\r", ch);
+        return;
+    }
+
+    Json::Value st;
+    Json::Reader reader;
+    if (!reader.parse(in, st) || !st.isObject()) {
+        ptc(ch, "OLC push: %s is unreadable.\n\r", OLC_PUSH_STATE);
+        return;
+    }
+
+    DLString head = st["head"].isString() ? DLString(st["head"].asString()).substr(0, 10) : DLString("?");
+    ptc(ch, "OLC push: areas master at %s.\n\r", head.c_str());
+
+    const Json::Value &held = st["held"];
+    if (!held.isObject() || held.empty())
+        stc("Held: none.\n\r", ch);
+    else {
+        ptc(ch, "Held, %d file(s):\n\r", (int)held.size());
+        for (auto &f: held.getMemberNames())
+            ptc(ch, "  %s: %s\n\r", utf2koi(f).c_str(),
+                utf2koi(held[f].isString() ? held[f].asString() : held[f].toStyledString()).c_str());
+    }
+
+    const Json::Value &skips = st["skips"];
+    if (!skips.isObject() || skips.empty())
+        stc("Skipped: none.\n\r", ch);
+    else {
+        ptc(ch, "Skipped, %d file(s):\n\r", (int)skips.size());
+        for (auto &f: skips.getMemberNames())
+            ptc(ch, "  %s: %d run(s) in a row\n\r", utf2koi(f).c_str(),
+                skips[f].isInt() ? skips[f].asInt() : 0);
+    }
 }

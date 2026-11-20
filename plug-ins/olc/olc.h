@@ -11,6 +11,7 @@
 #include "onlinecreation.h"
 #include "descriptor.h"
 #include "multimessage.h"
+#include "xmlnode.h"
 
 #define OLC_VERSION "ILAB Online Creation [Beta 1.0, ROM 2.3 modified]\n\r" \
                 "     Port a ROM 2.4 v1.00\n\r"
@@ -61,5 +62,9 @@ int save_changed_areas( Character *ch, std::list<AreaIndexData *> &saved );
 int next_obj_index( Character *ch, RoomIndexData *r );
 int next_room( Character *ch, RoomIndexData *r );
 int next_mob_index( Character *ch, RoomIndexData *r );
+
+/** Two optional XML nodes are both absent or equal: a put leaves an
+ *  unchanged behavior node alone, so its runtime state survives. */
+bool olc_same_xml( const XMLNode::Pointer &a, const XMLNode::Pointer &b );
 
 #endif /* __OLC_H__ */
