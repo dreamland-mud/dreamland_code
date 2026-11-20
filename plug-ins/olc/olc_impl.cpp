@@ -183,7 +183,7 @@ static void replay_area_file(PCharacter *actor, area_file *af, int &total, int &
         int i = err["op"].asInt();
         if (i < 0) {
             LogStream::sendError() << "Round trip replay: " << af->file_name
-                                   << " validators: " << err["error"].asString() << endl;
+                                   << " batch: " << err["error"].asString() << endl;
             continue;
         }
 

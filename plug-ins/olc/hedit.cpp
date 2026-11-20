@@ -116,6 +116,13 @@ void OLCStateHelp::statePrompt(Descriptor *d)
 void OLCStateHelp::changed( PCharacter *ch )
 {
     isChanged = true;
+
+    // An area help journals per subcommand, so its area is flagged the same
+    // way medit flags a mob's: the file is rewritten after every journaled line.
+    HelpArticle::Pointer article = helpManager->getArticle(id);
+    AreaHelp *help = article ? dynamic_cast<AreaHelp *>(article.getPointer()) : 0;
+    if (help && help->areafile && help->areafile->area)
+        help->areafile->area->changed = true;
 }
 
 /**

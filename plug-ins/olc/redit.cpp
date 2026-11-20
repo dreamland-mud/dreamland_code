@@ -1169,20 +1169,66 @@ void OLCStateRoom::resolveInstance(RoomIndexData *pRoom)
             hasExit = true;
     }
 
-    for (auto &peexit: room->extra_exits) {
-        EXTRA_EXIT_DATA *proto = pRoom->extra_exits.find(String::toString(peexit->keyword));
-        if (!proto)
-            continue;
+    // The instance list of a room put by the API is built in prototype
+    // order: pair by position, a keyword match can pick the wrong exit.
+    if (room->extra_exits.size() == pRoom->extra_exits.size()) {
+        auto proto = pRoom->extra_exits.begin();
+        for (auto &peexit: room->extra_exits) {
+            int target = (*proto)->u1.vnum;
+            peexit->u1.to_room = target > 0 ? get_room_instance(target) : 0;
+            proto++;
+        }
+    }
 
-        int target = proto->u1.vnum;
-        peexit->u1.to_room = target > 0 ? get_room_instance(target) : 0;
+    for (auto &peexit: room->extra_exits)
         if (peexit->u1.to_room)
             hasExit = true;
-    }
 
     // Boot marks a room nothing leads out of the same way.
     if (!hasExit)
         SET_BIT(room->room_flags, ROOM_NO_MOB);
+}
+
+StringList OLCStateRoom::dropDanglingExits(RoomIndexData *pRoom)
+{
+    StringList dropped;
+    Room *room = pRoom->room;
+
+    for (int door = 0; door < DIR_SOMEWHERE; door++) {
+        EXIT_DATA *pexit = pRoom->exit[door];
+        if (!pexit || pexit->u1.vnum <= 0 || get_room_index(pexit->u1.vnum))
+            continue;
+
+        dropped.push_back(DLString(dirs[door].name) + " to " + DLString(pexit->u1.vnum));
+        pRoom->exit[door] = 0;
+        if (room)
+            room->exit[door] = 0;
+    }
+
+    // Erased in step with the instance list; the instance exits stay
+    // allocated, footprints may point at them.
+    bool paired = room && room->extra_exits.size() == pRoom->extra_exits.size();
+    ExtraExitList::iterator inst;
+    if (paired)
+        inst = room->extra_exits.begin();
+
+    for (auto proto = pRoom->extra_exits.begin(); proto != pRoom->extra_exits.end(); ) {
+        int target = (*proto)->u1.vnum;
+
+        if (target <= 0 || get_room_index(target)) {
+            proto++;
+            if (paired)
+                inst++;
+            continue;
+        }
+
+        dropped.push_back("extra exit '" + String::toString((*proto)->keyword) + "' to " + DLString(target));
+        proto = pRoom->extra_exits.erase(proto);
+        if (paired)
+            inst = room->extra_exits.erase(inst);
+    }
+
+    return dropped;
 }
 
 // Rooms the engine or the world config names by vnum.

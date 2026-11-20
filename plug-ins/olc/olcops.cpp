@@ -231,6 +231,8 @@ struct OlcOpContext {
     // Every room the batch puts, collected up front: exits may lead to a
     // room put later in the same batch.
     std::set<int> batchRooms;
+    // Rooms a real run's put applied, checked for dangling exits at the end.
+    std::set<int> putRooms;
     // Quests whose steps this batch touched, checked for step pairing at the end.
     std::set<int> quests;
     // Prototypes a 'validate' op named; area vnums mean every prototype of the area.
@@ -1034,6 +1036,8 @@ static bool op_put(OlcOpContext &ctx, const DLString &kind, int vnum, const Json
 
         if (ctx.dryRun)
             return true;
+
+        ctx.putRooms.insert(vnum);
 
         if (exists) {
             // In place: characters, objects, other rooms' exits and saved
@@ -2617,12 +2621,28 @@ Json::Value OlcOps::apply(PCharacter *actor, const Json::Value &ops,
 
     result["skipped"] = (int)(ops.size() - i);
 
-    // Exits to rooms the batch created after the room that leads to them.
+    // Exits to rooms the batch created after the room that leads to them get
+    // resolved now. An exit to a batch room whose put failed or never ran
+    // would save as target -1: it is removed and reported instead.
     if (!dryRun)
-        for (int vnum: ctx.batchRooms) {
+        for (int vnum: ctx.putRooms) {
             RoomIndexData *pRoom = get_room_index(vnum);
-            if (pRoom)
-                OLCStateRoom::resolveInstance(pRoom);
+            if (!pRoom)
+                continue;
+
+            StringList dropped = OLCStateRoom::dropDanglingExits(pRoom);
+            if (!dropped.empty()) {
+                DLString what = dropped.join(", ");
+                Json::Value err;
+                err["op"] = -1;
+                err["error"] = "Room " + DLString(vnum) + ": removed " + what
+                               + ": the batch did not create the target room";
+                result["errors"].append(err);
+                result["ok"] = false;
+                olc_journal(actor->getName(), policyName(policy), "api", "room", vnum, "delete", "exits " + what);
+            }
+
+            OLCStateRoom::resolveInstance(pRoom);
         }
 
     if (!dryRun)

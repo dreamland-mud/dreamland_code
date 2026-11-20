@@ -8,6 +8,7 @@
 
 #include "olcstate.h"
 #include "xmlindexdata.h"
+#include "stringlist.h"
 
 
 class OLCStateRoom : public OLCStateTemplate<OLCStateRoom>,
@@ -51,6 +52,9 @@ public:
     /** Point the instance's exits at the prototype's targets and recompute
      *  its flags (prototype, room affects, NO_MOB when nothing leads out). */
     static void resolveInstance(RoomIndexData *pRoom);
+    /** Remove the exits and extra exits that lead to a vnum with no room,
+     *  prototype and instance alike. What was dropped, for the report. */
+    static StringList dropDanglingExits(RoomIndexData *pRoom);
 
     XML_VARIABLE XMLInteger originalRoom;
     XML_VARIABLE XMLInteger room;
