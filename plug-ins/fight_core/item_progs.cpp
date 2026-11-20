@@ -96,13 +96,20 @@ void oprog_handoff_stamp( Object *obj, Character *ch )
     handoff_stamp_rec( obj, stamp );
 }
 
-// Clears the stamp whoever takes the object (a scavenger mob too), so a stamp
-// always means "let go and not picked up since".
+// Clears the stamps whoever takes the object (a scavenger mob too), so a stamp
+// always means "let go and not picked up since". Window: HANDOFF_TTL.
 static void handoff_check( Object *obj, Character *ch )
 {
-    auto it = handoffStamps.find( obj->getID( ) );
-    if (it == handoffStamps.end( ))
+    if (handoffStamps.empty( ))
         return;
+
+    // Clear the contents even when obj itself is unstamped: a bag handed over
+    // by give carries nothing stale out of the previous floor stay.
+    auto it = handoffStamps.find( obj->getID( ) );
+    if (it == handoffStamps.end( )) {
+        handoff_clear_rec( obj );
+        return;
+    }
 
     HandoffStamp stamp = it->second;
     handoff_clear_rec( obj );
