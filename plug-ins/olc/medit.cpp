@@ -856,17 +856,17 @@ MEDIT(clan)
 
 MEDIT(long)
 {
-    return editor(argument, mob.long_descr[EN], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_ADD_NEWLINE));
+    return editor(argument, mob.long_descr[EN], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));
 }
 
 MEDIT(ualong)
 {
-    return editor(argument, mob.long_descr[UA], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_ADD_NEWLINE));
+    return editor(argument, mob.long_descr[UA], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));
 }
 
 MEDIT(rulong)
 {
-    return editor(argument, mob.long_descr[RU], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_ADD_NEWLINE));
+    return editor(argument, mob.long_descr[RU], (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));
 }
 
 MEDIT(short)
