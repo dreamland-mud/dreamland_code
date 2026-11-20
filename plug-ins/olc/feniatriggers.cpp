@@ -22,6 +22,7 @@
 #include "areaquestutils.h"
 #include "qedit.h"
 #include "behaviorloader.h"
+#include "codesourcerepo.h"
 #include "merc.h"
 
 #include "act.h"
@@ -233,6 +234,29 @@ void FeniaTriggerLoader::showTriggers(PCharacter *ch, WrapperBase *wrapper, cons
 }
 
 
+// Area of a mob/obj/room prototype, null if there is no such vnum.
+static AreaIndexData * index_data_area(const DLString &type, int vnum)
+{
+    if (type == "mob" && get_mob_index(vnum))
+        return get_mob_index(vnum)->area;
+    if (type == "obj" && get_obj_index(vnum))
+        return get_obj_index(vnum)->area;
+    if (type == "room" && get_room_index(vnum))
+        return get_room_index(vnum)->areaIndex;
+    return 0;
+}
+
+// Codesource name the in-game editor gives a prototype trigger.
+static DLString index_trigger_cs_name(const DLString &type, int vnum, const DLString &trigName)
+{
+    AreaIndexData *pArea = index_data_area(type, vnum);
+    if (!pArea)
+        return DLString::emptyString;
+
+    return fmt(0, "areas/%s/%s/%d.%s",
+               pArea->area_file->file_name.c_str(), type.c_str(), vnum, trigName.c_str());
+}
+
 Register get_wrapper_for_index_data(int vnum, const DLString &type)
 {
     Register w;
@@ -326,11 +350,7 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, XMLIndexData &indexData, con
 
         std::vector<DLString> parms(2);
         // Create codesource subject.
-        parms[0] = fmt(0, "areas/%s/%s/%d.%s", 
-                        indexData.getArea()->area_file->file_name.c_str(), 
-                        indexData.getIndexType(),
-                        indexData.getVnum(),
-                        methodName.c_str());   
+        parms[0] = index_trigger_cs_name(indexData.getIndexType(), indexData.getVnum(), methodName);
 
         // Create codesource body with example code.
         DLString tmpl;
@@ -682,14 +702,8 @@ vector<DLString> FeniaTriggerLoader::createQuestStepParams(
     tmpl.replaces("@quest.step@", s.toString());
     parms[1] = tmpl;
 
-    AreaIndexData *pArea;
-    if (type == "mob" && get_mob_index(vnum.toInt()))
-        pArea = get_mob_index(vnum.toInt())->area;
-    else if (type == "obj" && get_obj_index(vnum.toInt()))
-        pArea = get_obj_index(vnum.toInt())->area;
-    else if (type == "room" && get_room_index(vnum.toInt()))
-        pArea = get_room_index(vnum.toInt())->areaIndex;
-    else
+    AreaIndexData *pArea = index_data_area(type, vnum.toInt());
+    if (!pArea)
         return parms;
 
     // Create codesource subject.
@@ -777,3 +791,95 @@ bool FeniaTriggerLoader::openQuestEditor(PCharacter *ch, AreaQuest *q, const Int
 }
 
 PluginInitializer<FeniaTriggerLoader> initFeniaTriggerLoader;
+
+void FeniaTriggerLoader::copyTriggers(PCharacter *ch, const DLString &type, int srcVnum, int dstVnum) const
+{
+    Register srcW = get_wrapper_for_index_data(srcVnum, type);
+    Register dstW = get_wrapper_for_index_data(dstVnum, type);
+    WrapperBase *src = srcW.type == Register::NONE ? 0 : get_wrapper(srcW.toObject());
+
+    if (dstW.type == Register::NONE || index_data_area(type, dstVnum) == 0) {
+        ch->pecho("Не могу найти wrapper для %d.", dstVnum);
+        return;
+    }
+
+    StringSet triggers, miscMethods;
+    if (src)
+        src->collectTriggers(triggers, miscMethods);
+
+    if (triggers.empty()) {
+        ch->pecho("У %d нет феневых триггеров.", srcVnum);
+        return;
+    }
+
+    DLString getter = ".get_" + type + "_index(";
+    DLString srcBinding = getter + DLString(srcVnum) + ").";
+    Register thiz = WrapperManager::getThis()->getWrapper(ch);
+    int copied = 0;
+
+    for (auto &trigName: triggers) {
+        Register method = findMethodOnWrapper(srcW, trigName);
+        if (method.type != Register::FUNCTION)
+            continue;
+
+        if (method.toFunction()->isBroken()) {
+            ch->pecho("  %s: нет исходника, пропускаю.", trigName.c_str());
+            continue;
+        }
+
+        if (findMethodOnWrapper(dstW, trigName).type != Register::NONE) {
+            ch->pecho("  %s: уже есть у %d, пропускаю.", trigName.c_str(), dstVnum);
+            continue;
+        }
+
+        // Only a file the editor made for this one trigger is safe to re-evaluate:
+        // a shared file would also rebind its other triggers onto the new codesource.
+        const CodeSource::Pointer &cs = method.toFunction()->getFunction()->source.source;
+        if (cs->name != index_trigger_cs_name(type, srcVnum, trigName)) {
+            ch->pecho("  %s: общий сценарий '%s', копируй руками.", trigName.c_str(), cs->name.c_str());
+            continue;
+        }
+
+        DLString content = cs->content;
+        DLString srcGetter = getter + DLString(srcVnum) + ")";
+        DLString::size_type pos = content.find(srcBinding + trigName);
+        if (pos == DLString::npos
+            || content.find(srcGetter) != pos
+            || content.find(srcGetter, pos + 1) != DLString::npos)
+        {
+            ch->pecho("  %s: сценарий ссылается на %d не только в привязке, копируй руками.", trigName.c_str(), srcVnum);
+            continue;
+        }
+
+        content.replaces(srcBinding + trigName, getter + DLString(dstVnum) + ")." + trigName);
+
+        DLString csName = index_trigger_cs_name(type, dstVnum, trigName);
+        CodeSource *csReuse = CodeSource::manager->findByName(csName);
+        CodeSource &newCs = csReuse ? *csReuse : CodeSource::manager->allocate();
+        newCs.author = ch->getName();
+        newCs.name = csName;
+        newCs.content = content;
+
+        try {
+            newCs.eval(thiz);
+            CodeSourceRepo::getThis()->save(newCs);
+        } catch (const ::Exception &e) {
+            ch->pecho("  %s: ошибка: %s", trigName.c_str(), e.what());
+            continue;
+        }
+
+        if (findMethodOnWrapper(dstW, trigName).type != Register::FUNCTION) {
+            ch->pecho("  %s: сценарий выполнен, но триггер не появился.", trigName.c_str());
+            continue;
+        }
+
+        if (content.find(DLString(srcVnum)) != DLString::npos)
+            ch->pecho("  %s: скопирован, но в тексте осталось число %d, проверь.", trigName.c_str(), srcVnum);
+        else
+            ch->pecho("  %s: скопирован.", trigName.c_str());
+
+        copied++;
+    }
+
+    ch->pecho("Скопировано триггеров: %d. Действует сразу, cancel их не отменит (удалить: fenia <trig> clear).", copied);
+}

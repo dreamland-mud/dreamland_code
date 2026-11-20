@@ -1090,6 +1090,7 @@ OEDIT(copy)
         COPY_DESC,
         COPY_PARAM,
         COPY_BHV,
+        COPY_FENIA,
         COPY_ERROR
     } mode;
     
@@ -1099,6 +1100,8 @@ OEDIT(copy)
         mode = COPY_PARAM;
     else if (arg_is(arg1, "behavior"))
         mode = COPY_BHV;
+    else if (arg_is(arg1, "fenia"))
+        mode = COPY_FENIA;
     else 
         mode = COPY_ERROR;
             
@@ -1106,6 +1109,7 @@ OEDIT(copy)
         ch->pecho("Syntax: \r\n"
                     "  copy param <vnum> -- copy affects, level, flags and other parameters from <vnum> obj index.\r\n"
                     "  copy behav <vnum> -- copy behaviors and props.\r\n"
+                    "  copy fenia <vnum> -- copy Fenia triggers (one-trigger scenarios), live at once, no undo.\r\n"
                     "  copy desc <vnum>  -- copy name, short, long and extra descriptions from <vnum> obj index.\r\n" );
         return false;
     }
@@ -1135,6 +1139,13 @@ OEDIT(copy)
         copyBehaviors(original);
         report = "behaviors";
         break;
+    case COPY_FENIA:
+        if (original->vnum == obj.vnum) {
+            ch->pecho("Это тот же vnum.");
+            return false;
+        }
+        feniaTriggers->copyTriggers(ch, "obj", original->vnum, obj.vnum);
+        return false;
     default:
         return false;
     }

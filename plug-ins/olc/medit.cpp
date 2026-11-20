@@ -1355,6 +1355,7 @@ MEDIT(copy)
         COPY_DESC,
         COPY_PARAM,
         COPY_BHV,
+        COPY_FENIA,
         COPY_ERROR
     } mode;
     
@@ -1364,6 +1365,8 @@ MEDIT(copy)
         mode = COPY_PARAM;
     else if (arg_is(arg1, "behavior"))
         mode = COPY_BHV;
+    else if (arg_is(arg1, "fenia"))
+        mode = COPY_FENIA;
     else 
         mode = COPY_ERROR;
             
@@ -1371,6 +1374,7 @@ MEDIT(copy)
         ch->pecho("Syntax: \r\n"
                     "  copy param <vnum> -- copy race, hit, damage and other parameters from <vnum> mob index.\r\n"
                     "  copy behav <vnum> -- copy behaviors and props.\r\n"
+                    "  copy fenia <vnum> -- copy Fenia triggers (one-trigger scenarios), live at once, no undo.\r\n"
                     "  copy desc <vnum>  -- copy name, description, short and long description from <vnum> mob index.\r\n" );
         return false;
     }
@@ -1400,6 +1404,13 @@ MEDIT(copy)
         copyBehaviors(original);
         report = "behaviors";
         break;
+    case COPY_FENIA:
+        if (original->vnum == mob.vnum) {
+            ch->pecho("Это тот же vnum.");
+            return false;
+        }
+        feniaTriggers->copyTriggers(ch, "mob", original->vnum, mob.vnum);
+        return false;
     default:
         return false;
     }
