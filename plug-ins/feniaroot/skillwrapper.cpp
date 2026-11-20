@@ -282,7 +282,7 @@ NMI_INVOKE( SkillWrapper, improve, "(ch,success[,victim]): попытаться 
     return Register( );
 }
 
-NMI_INVOKE( SkillWrapper, giveTemporary, "(ch[,learned[,days[,origin]]]): присвоить временное умение персонажу, разученное на learned % (или на 75%), работающее days дней (или вечно), помеченное как origin (или fenia). Вернет true, если присвоено успешно.")
+NMI_INVOKE( SkillWrapper, giveTemporary, "(ch[,learned[,days[,origin[,overNative]]]]): присвоить временное умение персонажу, разученное на learned % (или на 75%), работающее days дней (или вечно), помеченное как origin (или fenia). Вернет true, если присвоено успешно. overNative=true (только origin fenia, days -1): если умение уже разучено, поднять его до learned % до конца сессии, не трогая разученный процент.")
 {
     Character *ach = argnum2character(args, 1);
     if (ach->is_npc())
@@ -312,10 +312,20 @@ NMI_INVOKE( SkillWrapper, giveTemporary, "(ch[,learned[,days[,origin]]]): при
     if (learned <= 0)
         throw Scripting::Exception("learned param cannot be negative");
 
-    // Do nothing for already available permanent or temporary skills.
+    bool overNative = args.size() >= 5 && argnum2boolean(args, 5);
+    if (overNative && (origin != SKILL_FENIA || end != PCSkillData::END_NEVER))
+        throw Scripting::Exception("overNative needs origin fenia and days -1");
+
+    // Do nothing for already available permanent or temporary skills,
+    // unless asked to lift a practiced one: then raise its session floor.
     Skill *skill = getTarget();
-    if (skill->available(ch))
-        return Register(false);
+    if (skill->available(ch)) {
+        PCSkillData &data = ch->getSkillData(skill->getIndex());
+        if (!overNative || data.isTemporary() || data.feniaFloor >= learned)
+            return Register(false);
+        data.feniaFloor = learned;
+        return Register(true);
+    }
     
     // Do nothing for magic skills of the battlerager clan.
     if (rage_skill_forbidden(ch, skill))
@@ -363,8 +373,13 @@ NMI_INVOKE( SkillWrapper, removeTemporary, "(ch[,origin]): очистить вр
     else
         origin = SKILL_FENIA;
 
-    if (!data.isTemporary())
-        return Register(false);
+    // A session floor from giveTemporary overNative is a fenia grant too.
+    if (!data.isTemporary()) {
+        if (origin != SKILL_FENIA || data.feniaFloor <= 0)
+            return Register(false);
+        data.feniaFloor = 0;
+        return Register(true);
+    }
     if (data.origin != origin)
         return Register(false);
 

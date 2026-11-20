@@ -20,7 +20,8 @@ long PCSkillData::END_NEVER = -1;
 
 PCSkillData::PCSkillData( )
                     : forgetting( false ), temporary( false ), 
-                      origin( SKILL_PRACTICE, &skill_origin_table )
+                      origin( SKILL_PRACTICE, &skill_origin_table ),
+                      feniaFloor( 0 )
 {
 }
 
@@ -40,6 +41,7 @@ void PCSkillData::clear()
     start = 0;
     end = 0;
     learned = 0;
+    feniaFloor = 0;
 }
 
 PCSkills::PCSkills() 
