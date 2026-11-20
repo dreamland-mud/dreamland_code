@@ -63,5 +63,10 @@ public:
     virtual const char * getIndexType() const;
 };
 
+// Boot-time normalizer for RU mob long / object ground line (defined in plug-ins/areas):
+// strips trailing EOL and whitespace and Latin (keyword) groups. Editors apply it at
+// commit so a save matches what the next boot loads.
+DLString format_longdescr(const DLString &longdescr);
+
 #endif
 
