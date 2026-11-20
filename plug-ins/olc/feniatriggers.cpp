@@ -792,8 +792,16 @@ bool FeniaTriggerLoader::openQuestEditor(PCharacter *ch, AreaQuest *q, const Int
 
 PluginInitializer<FeniaTriggerLoader> initFeniaTriggerLoader;
 
+bool has_fenia_security(PCMemoryInterface *pch);
+
 void FeniaTriggerLoader::copyTriggers(PCharacter *ch, const DLString &type, int srcVnum, int dstVnum) const
 {
+    // Installing live Fenia code needs the same right as saving it in the web editor.
+    if (!has_fenia_security(ch)) {
+        ch->pecho("Ты не ботаешь по фене.");
+        return;
+    }
+
     Register srcW = get_wrapper_for_index_data(srcVnum, type);
     Register dstW = get_wrapper_for_index_data(dstVnum, type);
     WrapperBase *src = srcW.type == Register::NONE ? 0 : get_wrapper(srcW.toObject());
@@ -843,11 +851,20 @@ void FeniaTriggerLoader::copyTriggers(PCharacter *ch, const DLString &type, int 
         DLString content = cs->content;
         DLString srcGetter = getter + DLString(srcVnum) + ")";
         DLString::size_type pos = content.find(srcBinding + trigName);
+        // Also no other prototype lookup at all: a second binding in the file would be
+        // re-run and move that trigger onto the new codesource.
+        int getters = 0;
+        for (const char *g: { ".get_mob_index(", ".get_obj_index(", ".get_room_index(" })
+            for (DLString::size_type p = content.find(g); p != DLString::npos; p = content.find(g, p + 1))
+                getters++;
+        bool otherGetter = getters != 1;
+
         if (pos == DLString::npos
+            || otherGetter
             || content.find(srcGetter) != pos
             || content.find(srcGetter, pos + 1) != DLString::npos)
         {
-            ch->pecho("  %s: сценарий ссылается на %d не только в привязке, копируй руками.", trigName.c_str(), srcVnum);
+            ch->pecho("  %s: сценарий ссылается на прототипы не только в привязке, копируй руками.", trigName.c_str());
             continue;
         }
 
@@ -855,6 +872,8 @@ void FeniaTriggerLoader::copyTriggers(PCharacter *ch, const DLString &type, int 
 
         DLString csName = index_trigger_cs_name(type, dstVnum, trigName);
         CodeSource *csReuse = CodeSource::manager->findByName(csName);
+        if (csReuse)
+            ch->pecho("  %s: перезаписываю существующий сценарий '%s'.", trigName.c_str(), csName.c_str());
         CodeSource &newCs = csReuse ? *csReuse : CodeSource::manager->allocate();
         newCs.author = ch->getName();
         newCs.name = csName;
