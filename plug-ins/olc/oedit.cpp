@@ -210,6 +210,8 @@ void OLCStateObject::commit()
     
     original->keyword = obj.keyword;
     original->short_descr = obj.short_descr;
+    // Same normalization as the boot loader, so a save matches what the next boot loads.
+    obj.description[RU] = format_longdescr(obj.description[RU]);
     original->description = obj.description;
     original->sound        = obj.sound;
     original->smell        = obj.smell;
