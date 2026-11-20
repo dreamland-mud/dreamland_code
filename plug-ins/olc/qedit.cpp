@@ -279,6 +279,18 @@ int qedit_step_pairing(AreaQuest *q, int s)
     return result;
 }
 
+DLString aquest_finale_trigger(AreaQuest *q)
+{
+    if (q->steps.empty())
+        return DLString::emptyString;
+
+    const DLString &endTrigger = q->steps.back()->endTrigger;
+    if (!DLString("on").strPrefix(endTrigger))
+        return DLString::emptyString;
+
+    return "post" + trigger_type(endTrigger);
+}
+
 // Display any warnings for this step, such as mismatched begin/end triggers
 static DLString show_step_errors(PCharacter *ch, AreaQuest *q, int s)
 { 
@@ -350,6 +362,32 @@ static void show_step(PCharacter *ch, AreaQuest *q, int s)
     ch->send_to(buf);
 }
 
+// Closing scene after the last step, see aquest_trigger.
+static void show_finale(PCharacter *ch, AreaQuest *q)
+{
+    DLString trigName = aquest_finale_trigger(q);
+    if (trigName.empty())
+        return;
+
+    auto &lastStep = q->steps.back();
+    Integer s((int)q->steps.size());
+    DLString methodId = aquest_method_id(q, s, true, trigName);
+    ostringstream buf, trigBuf;
+
+    buf << endl << "{CФинал{x     {D(finale help){x" << endl
+        << "{WСцена{w:   триггер {y" << trigName << "{w после завершения квеста, "
+        << show_step_target(ch, lastStep->endType, lastStep->endValue) << endl;
+
+    show_active_triggers(ch, trigBuf, s, methodId, lastStep->endType, lastStep->endValue, true);
+    if (!trigBuf.str().empty()) {
+        buf << "{gУстановлен{x:  " << trigBuf.str() << endl;
+    } else {
+        buf << "{WДоступен{x:    {W" << web_cmd(ch, "finale", methodId) << "{w" << endl;
+    }
+
+    ch->send_to(buf);
+}
+
 static void show_steps(PCharacter *ch, AreaQuest *q)
 {
     ostringstream buf;
@@ -358,6 +396,8 @@ static void show_steps(PCharacter *ch, AreaQuest *q)
 
     for (unsigned int s = 0; s < q->steps.size(); s++)
         show_step(ch, q, s);
+
+    show_finale(ch, q);
 }
 
 void OLCStateAreaQuest::show( PCharacter *ch )
@@ -406,6 +446,7 @@ static void qedit_step_usage(PCharacter *ch)
     ch->pecho("step <num> begin|end trigger <onXXX> - задать название тригера для начала или завершения шага");
     ch->pecho("step <num> begin|end trigger <onXXX> clear - удалить тригер для начала или завершения шага");
     ch->pecho("step <num> begin|end fenia - открыть редактор феневого сценария");
+    ch->pecho("finale [clear] - сценарий после завершения квеста, см. {y{hcfinale help{x");
     ch->pecho("step <num> info <строка> - установить описание шага, видное по 'квест инфо'");
     ch->pecho("step <num> qp|gold|exp|item <число> - награда за выполнение шага в кп/золоте/экспе или внум предмета");
     ch->pecho("step <num> up  - передвинуть шаг выше");
@@ -435,6 +476,22 @@ bool OLCStateAreaQuest::parseStepNumber(PCharacter *ch, const DLString &arg, Int
     return false;
 }
 
+AQEDIT(finale, "финал", "сценарий после завершения квеста")
+{
+    AreaQuest *q = getOriginal();
+    DLString args = argument;
+
+    if (arg_is_help(args)) {
+        ch->pecho("finale - открыть редактор финальной сцены (post-триггер на цели конца последнего шага,");
+        ch->pecho("         срабатывает сразу после завершения квеста, когда награды уже выданы)");
+        ch->pecho("finale clear - удалить финальную сцену");
+        return false;
+    }
+
+    feniaTriggers->openFinaleEditor(ch, q, args);
+    return false;
+}
+
 AQEDIT(fenia, "феня", "редактировать тригера")
 {
     feniaTriggers->openEditor(ch, getOriginal(), argument);
@@ -451,6 +508,10 @@ static void clear_step_begin_trigger(PCharacter *ch, AreaQuest *q, int step)
 static void clear_step_end_trigger(PCharacter *ch, AreaQuest *q, int step)
 {
     feniaTriggers->openEditor(ch, q, step, false, "kill");
+
+    // The finale hangs off the last step's end: target or trigger change makes it stale.
+    if (step == (int)q->steps.size() - 1)
+        feniaTriggers->openFinaleEditor(ch, q, "kill");
 }
 
 // Clears all triggers for this step, when the steps are swapped.
@@ -514,6 +575,13 @@ AQEDIT(step, "шаг", "редактор шагов квеста")
 
     // 'step 3 del'
     if (arg_is(cmd, "del")) {
+        // Deleting the last step: its begin trigger would land in the finale slot, and the
+        // old finale would dangle one step past the end. Remove both.
+        if (step == (int)q->steps.size() - 1) {
+            feniaTriggers->openFinaleEditor(ch, q, "kill");
+            clear_step_begin_trigger(ch, q, step);
+        }
+
         q->steps.erase(q->steps.begin() + step);
         ch->pecho("Шаг %d удален. Не забудь почистить старые тригера ({y{hccs search %d{x).", 
                   step.getValue(), q->vnum.getValue());

@@ -46,6 +46,10 @@ enum {
 };
 int qedit_step_pairing(AreaQuest *q, int s);
 
+/** Finale trigger name (postX for a last step ending in onX), empty if the quest
+ *  has no steps or the last step does not end in an on-trigger. */
+DLString aquest_finale_trigger(AreaQuest *q);
+
 #define AQEDIT(C, cname, help) OLC_CMD(OLCStateAreaQuest, C, cname, help)
 
 
