@@ -24,6 +24,8 @@ public:
     
     virtual void commit();
     virtual void changed( PCharacter * );
+    virtual DLString getJournalKind( ) const;
+    virtual int getJournalVnum( ) const;
     void show( PCharacter * ) const;
 
     XML_VARIABLE XMLInteger id, level;

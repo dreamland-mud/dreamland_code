@@ -67,6 +67,9 @@ list<HelpArticle::Pointer> help_find_by_keywords(const DLString &keywords)
 void OLCStateHelp::commit() 
 {
     HelpArticle::Pointer original = helpManager->getArticle(id);
+    // An area help can be deleted over the API while this editor is open.
+    if (!original)
+        return;
 
     original->keyword = keyword;
     original->setLevel(level);
@@ -88,6 +91,23 @@ void OLCStateHelp::commit()
     help_save_ids();
 }
 
+// Area helps live in area files and journal like the API's help ops;
+// the rest stay "olc", 0.
+DLString OLCStateHelp::getJournalKind( ) const
+{
+    HelpArticle::Pointer article = helpManager->getArticle(id);
+    if (article && dynamic_cast<AreaHelp *>(article.getPointer()))
+        return "help";
+    return OLCState::getJournalKind();
+}
+
+int OLCStateHelp::getJournalVnum( ) const
+{
+    if (getJournalKind() == "help")
+        return id.getValue();
+    return OLCState::getJournalVnum();
+}
+
 void OLCStateHelp::statePrompt(Descriptor *d) 
 {
     d->send( "Help> " );
@@ -107,8 +127,10 @@ StringSet OLCStateHelp::allKeywords() const
     StringSet kw;
 
     HelpArticle::Pointer article = helpManager->getArticle(id);
-    const StringSet &autoKeywords = article->getAutoKeywords();
-    kw.insert(autoKeywords.begin(), autoKeywords.end());
+    if (article) {
+        const StringSet &autoKeywords = article->getAutoKeywords();
+        kw.insert(autoKeywords.begin(), autoKeywords.end());
+    }
 
     kw.fromString(keyword.get(EN));
     kw.fromString(keyword.get(RU));
@@ -122,6 +144,10 @@ void OLCStateHelp::show( PCharacter *ch ) const
         labels.empty() ? "-" : labels.c_str(), 
         labelsAuto.empty() ? "-" : labelsAuto.c_str());     
     HelpArticle::Pointer article = helpManager->getArticle(id);
+    if (!article) {
+        ptc(ch, "{RСтатьи %d больше нет{x.\r\n", id.getValue());
+        return;
+    }
     DLString category = article->getCategory();
     ptc(ch, "{WКатегория{x:            [{C%s{x] %s{D(по сохранённым меткам){x\r\n",
         category.empty() ? "-" : category.c_str(),
@@ -318,6 +344,10 @@ HEDIT(alias, "псевдоним", "сделать статью псевдони
 {
     DLString arg = argument;
     HelpArticle::Pointer article = helpManager->getArticle(id);
+    if (!article) {
+        ptc(ch, "Статьи %d больше нет.\n\r", id.getValue());
+        return false;
+    }
 
     if (arg.empty()) {
         stc("Синтаксис:   alias <id>   - справка по этой статье открывает статью <id>\n\r", ch);

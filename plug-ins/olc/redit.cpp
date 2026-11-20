@@ -1100,18 +1100,10 @@ void OLCStateRoom::replaceRoom(RoomIndexData *pRoom, RoomIndexData *fresh)
     if (!room)
         return;
 
-    // Instance flags are the prototype's plus what room affects set.
-    room->room_flags = pRoom->room_flags;
-    for (auto &paf: room->affected)
-        if (paf->bitvector.getTable() == &room_flags)
-            SET_BIT(room->room_flags, paf->bitvector.getValue());
-
     // Exits into this room from elsewhere point at the instance, which stays.
     // Its own exits are rebuilt; a door whose default state didn't change keeps
     // its current open/closed/locked state. Old instance exits stay allocated:
     // footprints in the room history point at extra exits.
-    bool hasExit = false;
-
     for (int door = 0; door < DIR_SOMEWHERE; door++) {
         EXIT_DATA *old = room->exit[door];
         room->exit[door] = 0;
@@ -1120,11 +1112,8 @@ void OLCStateRoom::replaceRoom(RoomIndexData *pRoom, RoomIndexData *fresh)
             continue;
 
         EXIT_DATA *pexit = pRoom->exit[door]->create();
-        pexit->resolve();
         if (old && old->exit_info_default == pexit->exit_info_default)
             pexit->exit_info = old->exit_info;
-        if (pexit->u1.to_room)
-            hasExit = true;
         room->exit[door] = pexit;
     }
 
@@ -1133,20 +1122,15 @@ void OLCStateRoom::replaceRoom(RoomIndexData *pRoom, RoomIndexData *fresh)
 
     for (auto &eexit: pRoom->extra_exits) {
         EXTRA_EXIT_DATA *peexit = eexit->create();
-        peexit->resolve();
 
         EXTRA_EXIT_DATA *old = oldExtra.find(String::toString(peexit->keyword));
         if (old && old->exit_info_default == peexit->exit_info_default)
             peexit->exit_info = old->exit_info;
 
-        if (peexit->u1.to_room)
-            hasExit = true;
         room->extra_exits.push_back(peexit);
     }
 
-    // Boot marks a room nothing leads out of the same way.
-    if (!hasExit)
-        SET_BIT(room->room_flags, ROOM_NO_MOB);
+    resolveInstance(pRoom);
 
     if (behaviorChanged) {
         if (pRoom->behavior)
@@ -1156,6 +1140,49 @@ void OLCStateRoom::replaceRoom(RoomIndexData *pRoom, RoomIndexData *fresh)
             room->behavior.clear();
         }
     }
+}
+
+void OLCStateRoom::resolveInstance(RoomIndexData *pRoom)
+{
+    Room *room = pRoom->room;
+    if (!room)
+        return;
+
+    // Instance flags are the prototype's plus what room affects set.
+    room->room_flags = pRoom->room_flags;
+    for (auto &paf: room->affected)
+        if (paf->bitvector.getTable() == &room_flags)
+            SET_BIT(room->room_flags, paf->bitvector.getValue());
+
+    // Targets come from the prototype: resolving an instance exit to a room
+    // that isn't there yet overwrites its vnum with a null room.
+    bool hasExit = false;
+
+    for (int door = 0; door < DIR_SOMEWHERE; door++) {
+        EXIT_DATA *pexit = room->exit[door];
+        if (!pexit || !pRoom->exit[door])
+            continue;
+
+        int target = pRoom->exit[door]->u1.vnum;
+        pexit->u1.to_room = target > 0 ? get_room_instance(target) : 0;
+        if (pexit->u1.to_room)
+            hasExit = true;
+    }
+
+    for (auto &peexit: room->extra_exits) {
+        EXTRA_EXIT_DATA *proto = pRoom->extra_exits.find(String::toString(peexit->keyword));
+        if (!proto)
+            continue;
+
+        int target = proto->u1.vnum;
+        peexit->u1.to_room = target > 0 ? get_room_instance(target) : 0;
+        if (peexit->u1.to_room)
+            hasExit = true;
+    }
+
+    // Boot marks a room nothing leads out of the same way.
+    if (!hasExit)
+        SET_BIT(room->room_flags, ROOM_NO_MOB);
 }
 
 // Rooms the engine or the world config names by vnum.

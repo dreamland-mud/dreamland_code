@@ -48,6 +48,9 @@ public:
     /** Every saved field of fresh (an unregistered XMLRoom::compat result)
      *  onto pRoom in place, its instance synced. Deletes fresh. */
     static void replaceRoom(RoomIndexData *pRoom, RoomIndexData *fresh);
+    /** Point the instance's exits at the prototype's targets and recompute
+     *  its flags (prototype, room affects, NO_MOB when nothing leads out). */
+    static void resolveInstance(RoomIndexData *pRoom);
 
     XML_VARIABLE XMLInteger originalRoom;
     XML_VARIABLE XMLInteger room;

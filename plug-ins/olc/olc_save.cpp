@@ -191,7 +191,7 @@ CMD(asave, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 
 /*
  * 'olc status': what the live-to-git pusher (scripts/olc-push.py) last
- * recorded. It runs from cron and keeps its state under the runtime.
+ * recorded. It runs from cron and keeps its state under the runtime base.
  */
 static const char *OLC_PUSH_STATE = "var/run/olc-push.json";
 static IconvMap utf2koi("utf-8", "koi8-u");
@@ -209,7 +209,7 @@ CMD(olc, 50, "", POS_DEAD, 103, LOG_NORMAL,
         return;
     }
 
-    std::ifstream in(OLC_PUSH_STATE);
+    std::ifstream in(DLFile(dreamland->getBasePath(), OLC_PUSH_STATE).getPath().c_str());
     if (!in) {
         stc("OLC push: pusher not installed.\n\r", ch);
         return;
@@ -223,7 +223,7 @@ CMD(olc, 50, "", POS_DEAD, 103, LOG_NORMAL,
     }
 
     DLString head = st["head"].isString() ? DLString(st["head"].asString()).substr(0, 10) : DLString("?");
-    ptc(ch, "OLC push: areas master at %s.\n\r", head.c_str());
+    ptc(ch, "OLC push: live HEAD %s.\n\r", head.c_str());
 
     const Json::Value &held = st["held"];
     if (!held.isObject() || held.empty())

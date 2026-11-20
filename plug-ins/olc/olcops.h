@@ -54,6 +54,9 @@ enum OlcPolicy {
  *     area of its vnum, or "area")
  *   help, an area help by help id in "vnum": get, delete, put ("xml": the
  *     one node of <helps>; replaced in place, a new id needs "area")
+ *   Every put and delete is refused while a connected builder has that kind
+ *   and vnum open in an editor ("<kind> <vnum> is open in <name>'s editor").
+ *   Room puts may lead exits to any room another put of the same batch names.
  *   validate  room | mob | obj by "vnum", area by area "vnum" (every prototype
  *     in it): runs the validator chain at the end of the batch, applies nothing,
  *     writes no journal line

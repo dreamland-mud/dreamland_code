@@ -228,6 +228,9 @@ struct OlcOpContext {
     std::map<DLString, int> refs;
     // Dry run: the vnums this batch's creates would take, per kind.
     std::map<DLString, std::set<int> > planned;
+    // Every room the batch puts, collected up front: exits may lead to a
+    // room put later in the same batch.
+    std::set<int> batchRooms;
     // Quests whose steps this batch touched, checked for step pairing at the end.
     std::set<int> quests;
     // Prototypes a 'validate' op named; area vnums mean every prototype of the area.
@@ -292,6 +295,25 @@ static bool direct_result(OlcOpContext &ctx, bool ok, std::string::size_type mar
 static bool is_planned(OlcOpContext &ctx, const DLString &kind, int vnum)
 {
     return ctx.dryRun && ctx.planned[kind].count(vnum) > 0;
+}
+
+// A whole-node put or a delete under an open editor would be undone by the
+// editor's 'done' (medit/oedit commit their copy) or crash it (a deleted
+// help). Editors journal as the same kind and vnum the ops use.
+static bool editor_refusal(const DLString &kind, int vnum, DLString &error)
+{
+    for (Descriptor *d = descriptor_list; d; d = d->next)
+        for (auto &h: d->handle_input) {
+            OLCState::Pointer state = h.getDynamicPointer<OLCState>();
+            if (!state || state->getJournalKind() != kind || state->getJournalVnum() != vnum)
+                continue;
+
+            DLString name = d->character && d->character->getPC() ? d->character->getPC()->getName() : DLString("somebody");
+            error = kind + " " + DLString(vnum) + " is open in " + name + "'s editor";
+            return false;
+        }
+
+    return true;
 }
 
 // The editors' 'behaviors X' replaces the whole list and drops the props of
@@ -914,12 +936,19 @@ static int create_vnum(OlcOpContext &ctx, const DLString &kind, AreaIndexData *n
     return vnum;
 }
 
-/** A room from XML may only point at rooms, mobs and objects that exist. */
+static bool room_target_known(OlcOpContext &ctx, int target)
+{
+    return target > 0
+           && (get_room_index(target) || is_planned(ctx, "room", target) || ctx.batchRooms.count(target));
+}
+
+/** A room from XML may only point at rooms, mobs and objects that exist or
+ *  that this batch puts. */
 static bool room_xml_refusal(OlcOpContext &ctx, XMLRoom &xr, int vnum, DLString &error)
 {
     for (auto &e: xr.exits) {
         int target = e.second.target.getValue();
-        if (target != vnum && (target <= 0 || (!get_room_index(target) && !is_planned(ctx, "room", target)))) {
+        if (target != vnum && !room_target_known(ctx, target)) {
             error = "Exit " + e.first + " leads to room " + DLString(target) + ", which doesn't exist";
             return false;
         }
@@ -927,7 +956,7 @@ static bool room_xml_refusal(OlcOpContext &ctx, XMLRoom &xr, int vnum, DLString 
 
     for (auto &e: xr.extraExits) {
         int target = e.second.target.getValue();
-        if (target != vnum && (target <= 0 || (!get_room_index(target) && !is_planned(ctx, "room", target)))) {
+        if (target != vnum && !room_target_known(ctx, target)) {
             error = "Extra exit " + e.first + " leads to room " + DLString(target) + ", which doesn't exist";
             return false;
         }
@@ -1013,15 +1042,10 @@ static bool op_put(OlcOpContext &ctx, const DLString &kind, int vnum, const Json
         } else {
             RoomIndexData *pRoom = xr.compat(vnum);
             OLCStateRoom::registerRoom(pRoom);
-
             // Boot resolves every exit after the whole world loads; this room
-            // joins a world that is already there.
-            Room *room = pRoom->room;
-            for (int door = 0; door < DIR_SOMEWHERE; door++)
-                if (room->exit[door])
-                    room->exit[door]->resolve();
-            for (auto &eexit: room->extra_exits)
-                eexit->resolve();
+            // joins a world that is already there. Rooms later in the batch
+            // are resolved again when it ends.
+            OLCStateRoom::resolveInstance(pRoom);
         }
     }
 
@@ -1281,6 +1305,9 @@ static bool op_delete(OlcOpContext &ctx, const DLString &kind, int vnum, const J
 static bool prototype_op(OlcOpContext &ctx, const DLString &kind, const DLString &action,
                          int vnum, const Json::Value &op, Json::Value &res, DLString &error)
 {
+    if ((action == "put" || action == "delete") && !editor_refusal(kind, vnum, error))
+        return false;
+
     if (action == "put")
         return op_put(ctx, kind, vnum, op, res, error);
 
@@ -1696,7 +1723,7 @@ static bool area_op(OlcOpContext &ctx, const DLString &action, int vnum, const J
     }
 
     if (action == "put")
-        return area_put(ctx, pArea, op, res, error);
+        return editor_refusal("area", vnum, error) && area_put(ctx, pArea, op, res, error);
 
     Room *limbo = get_room_instance(ROOM_VNUM_LIMBO);
     if (!limbo) {
@@ -2035,6 +2062,9 @@ static bool quest_op(OlcOpContext &ctx, const DLString &action, const Json::Valu
         return false;
     res["vnum"] = vnum;
 
+    if ((action == "put" || action == "delete") && !editor_refusal("quest", vnum, error))
+        return false;
+
     if (action == "put")
         return quest_put(ctx, vnum, op, res, error);
 
@@ -2290,6 +2320,9 @@ static bool help_op(OlcOpContext &ctx, const DLString &action, int id, const Jso
         return false;
     }
 
+    if ((action == "put" || action == "delete") && !editor_refusal("help", id, error))
+        return false;
+
     AreaHelp *help = area_help(id, error);
     if (!error.empty())
         return false;
@@ -2527,6 +2560,10 @@ Json::Value OlcOps::apply(PCharacter *actor, const Json::Value &ops,
     ctx.opIndex = 0;
     ctx.warnings = &result["warnings"];
 
+    for (auto &op: ops)
+        if (op.isObject() && op["kind"] == "room" && op["action"] == "put" && op["vnum"].isInt())
+            ctx.batchRooms.insert(op["vnum"].asInt());
+
     std::set<std::pair<DLString, int> > changed;
     Json::Value::ArrayIndex i;
 
@@ -2579,6 +2616,14 @@ Json::Value OlcOps::apply(PCharacter *actor, const Json::Value &ops,
     }
 
     result["skipped"] = (int)(ops.size() - i);
+
+    // Exits to rooms the batch created after the room that leads to them.
+    if (!dryRun)
+        for (int vnum: ctx.batchRooms) {
+            RoomIndexData *pRoom = get_room_index(vnum);
+            if (pRoom)
+                OLCStateRoom::resolveInstance(pRoom);
+        }
 
     if (!dryRun)
         quest_pairing_warnings(ctx);
