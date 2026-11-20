@@ -394,7 +394,7 @@ void OLCStateMobile::commit()
 
     original->keyword = mob.keyword;
     original->short_descr = mob.short_descr;
-    // Same normalization as the boot loader; buffer too, so show displays what was saved.
+    // Same normalization as the boot loader, so a save matches what the next boot loads.
     mob.long_descr[RU] = format_longdescr(mob.long_descr[RU]);
     original->long_descr = mob.long_descr;
     original->description = mob.description;
