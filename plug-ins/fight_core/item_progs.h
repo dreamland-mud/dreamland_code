@@ -21,4 +21,11 @@ bool oprog_give_blocked( Object *obj, Character *ch, Character *victim );
 // returns true if anything along it claimed or took back the item.
 bool omprog_give( Object *obj, Character *ch, Character *victim );
 
+// A player let go of obj (dropped it, put it in a container): remember who and
+// from which host, for obj and everything inside it. The next get compares
+// that holder with the taker and hands the pair to the global onHandoff
+// trigger (mule detection: drop, quit, pick up on an unregistered alt).
+// In memory only: a reboot or plugin reload forgets every stamp.
+void oprog_handoff_stamp( Object *obj, Character *ch );
+
 #endif

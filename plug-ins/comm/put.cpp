@@ -16,6 +16,7 @@
 #include "merc.h"
 #include "def.h"
 #include "l10n.h"
+#include "item_progs.h"
 
 DLString get_pocket_argument( char *arg );
 
@@ -258,6 +259,7 @@ static bool put_obj_container( Character *ch, Object *obj, Object *container,
                        obj, container, pocket.c_str( ) );
     }
 
+    oprog_handoff_stamp( obj, ch );
     return oprog_put( obj, ch, container );
 }
 
@@ -318,6 +320,7 @@ static void put_money_container(Character *ch, int amount, const char *currencyN
     extract_obj(money);
     money = Money::create( gold, silver );
     obj_to_obj(money, container);
+    oprog_handoff_stamp( money, ch );
 }
 
 CMDRUNP( put )
