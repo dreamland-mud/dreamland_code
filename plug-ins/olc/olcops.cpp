@@ -18,6 +18,9 @@
 #include "oedit.h"
 #include "aedit.h"
 #include "qedit.h"
+#include "hedit.h"
+#include "areahelp.h"
+#include "helpmanager.h"
 #include "resetops.h"
 #include "wearlocation.h"
 #include "olc.h"
@@ -45,6 +48,8 @@
 #include "merc.h"
 #include "vnum.h"
 #include "def.h"
+
+extern void help_save_ids();
 
 static IconvMap utf2koi("utf-8", "koi8-u");
 static IconvMap koi2utf("koi8-u", "utf-8");
@@ -223,6 +228,11 @@ struct OlcOpContext {
     std::map<DLString, int> refs;
     // Dry run: the vnums this batch's creates would take, per kind.
     std::map<DLString, std::set<int> > planned;
+    // Every room the batch puts, collected up front: exits may lead to a
+    // room put later in the same batch.
+    std::set<int> batchRooms;
+    // Rooms a real run's put applied, checked for dangling exits at the end.
+    std::set<int> putRooms;
     // Quests whose steps this batch touched, checked for step pairing at the end.
     std::set<int> quests;
     // Prototypes a 'validate' op named; area vnums mean every prototype of the area.
@@ -287,6 +297,25 @@ static bool direct_result(OlcOpContext &ctx, bool ok, std::string::size_type mar
 static bool is_planned(OlcOpContext &ctx, const DLString &kind, int vnum)
 {
     return ctx.dryRun && ctx.planned[kind].count(vnum) > 0;
+}
+
+// A whole-node put or a delete under an open editor would be undone by the
+// editor's 'done' (medit/oedit commit their copy) or crash it (a deleted
+// help). Editors journal as the same kind and vnum the ops use.
+static bool editor_refusal(const DLString &kind, int vnum, DLString &error)
+{
+    for (Descriptor *d = descriptor_list; d; d = d->next)
+        for (auto &h: d->handle_input) {
+            OLCState::Pointer state = h.getDynamicPointer<OLCState>();
+            if (!state || state->getJournalKind() != kind || state->getJournalVnum() != vnum)
+                continue;
+
+            DLString name = d->character && d->character->getPC() ? d->character->getPC()->getName() : DLString("somebody");
+            error = kind + " " + DLString(vnum) + " is open in " + name + "'s editor";
+            return false;
+        }
+
+    return true;
 }
 
 // The editors' 'behaviors X' replaces the whole list and drops the props of
@@ -909,12 +938,19 @@ static int create_vnum(OlcOpContext &ctx, const DLString &kind, AreaIndexData *n
     return vnum;
 }
 
-/** A room from XML may only point at rooms, mobs and objects that exist. */
+static bool room_target_known(OlcOpContext &ctx, int target)
+{
+    return target > 0
+           && (get_room_index(target) || is_planned(ctx, "room", target) || ctx.batchRooms.count(target));
+}
+
+/** A room from XML may only point at rooms, mobs and objects that exist or
+ *  that this batch puts. */
 static bool room_xml_refusal(OlcOpContext &ctx, XMLRoom &xr, int vnum, DLString &error)
 {
     for (auto &e: xr.exits) {
         int target = e.second.target.getValue();
-        if (target != vnum && (target <= 0 || (!get_room_index(target) && !is_planned(ctx, "room", target)))) {
+        if (target != vnum && !room_target_known(ctx, target)) {
             error = "Exit " + e.first + " leads to room " + DLString(target) + ", which doesn't exist";
             return false;
         }
@@ -922,7 +958,7 @@ static bool room_xml_refusal(OlcOpContext &ctx, XMLRoom &xr, int vnum, DLString 
 
     for (auto &e: xr.extraExits) {
         int target = e.second.target.getValue();
-        if (target != vnum && (target <= 0 || (!get_room_index(target) && !is_planned(ctx, "room", target)))) {
+        if (target != vnum && !room_target_known(ctx, target)) {
             error = "Extra exit " + e.first + " leads to room " + DLString(target) + ", which doesn't exist";
             return false;
         }
@@ -958,11 +994,6 @@ static bool op_put(OlcOpContext &ctx, const DLString &kind, int vnum, const Json
     node->insertAttribute("vnum", DLString(vnum));
 
     bool exists = index_exists(kind, vnum);
-
-    if (kind == "room" && (exists || is_planned(ctx, kind, vnum))) {
-        error = "put replaces whole rooms only under a free vnum for now: edit a live room with set/cmd ops";
-        return false;
-    }
 
     // A new vnum gets its rights check from create_vnum below.
     if (exists && !OLCState::can_edit(ctx.ch, vnum)) {
@@ -1006,17 +1037,20 @@ static bool op_put(OlcOpContext &ctx, const DLString &kind, int vnum, const Json
         if (ctx.dryRun)
             return true;
 
-        RoomIndexData *pRoom = xr.compat(vnum);
-        OLCStateRoom::registerRoom(pRoom);
+        ctx.putRooms.insert(vnum);
 
-        // Boot resolves every exit after the whole world loads; this room
-        // joins a world that is already there.
-        Room *room = pRoom->room;
-        for (int door = 0; door < DIR_SOMEWHERE; door++)
-            if (room->exit[door])
-                room->exit[door]->resolve();
-        for (auto &eexit: room->extra_exits)
-            eexit->resolve();
+        if (exists) {
+            // In place: characters, objects, other rooms' exits and saved
+            // rooms all hold this prototype and its instance.
+            OLCStateRoom::replaceRoom(get_room_index(vnum), xr.compat(vnum));
+        } else {
+            RoomIndexData *pRoom = xr.compat(vnum);
+            OLCStateRoom::registerRoom(pRoom);
+            // Boot resolves every exit after the whole world loads; this room
+            // joins a world that is already there. Rooms later in the batch
+            // are resolved again when it ends.
+            OLCStateRoom::resolveInstance(pRoom);
+        }
     }
 
     OLCState::get_vnum_area(vnum)->changed = true;
@@ -1275,6 +1309,9 @@ static bool op_delete(OlcOpContext &ctx, const DLString &kind, int vnum, const J
 static bool prototype_op(OlcOpContext &ctx, const DLString &kind, const DLString &action,
                          int vnum, const Json::Value &op, Json::Value &res, DLString &error)
 {
+    if ((action == "put" || action == "delete") && !editor_refusal(kind, vnum, error))
+        return false;
+
     if (action == "put")
         return op_put(ctx, kind, vnum, op, res, error);
 
@@ -1579,16 +1616,88 @@ static bool reset_op(OlcOpContext &ctx, const DLString &action, int vnum, const 
  * Area header
  *-------------------------------------------------------------------------*/
 
+/** The whole <areadata> onto the existing header through the aedit state,
+ *  the fields XMLAreaHeader::compat reads at boot. The file name stays. */
+static bool area_put(OlcOpContext &ctx, AreaIndexData *pArea, const Json::Value &op,
+                     Json::Value &res, DLString &error)
+{
+    XMLDocument::Pointer doc;
+    XMLNode::Pointer node = parse_xml(op, doc, error);
+    if (!node)
+        return false;
+
+    XMLAreaHeader header;
+    header.fromXML(node);
+
+    OLCStateArea::Pointer state(NEW, pArea);
+    state->name = header.name;
+    if (!header.credits.empty())
+        state->name[LANG_EN] = header.credits;
+    state->altname = header.altname;
+    state->authors.setValue(header.authors.getValue());
+    state->translator.setValue(header.translator.getValue());
+    state->speedwalk = header.speedwalk;
+    state->resetMessage = header.resetMessage;
+    state->preposition = header.preposition;
+    state->security = header.security.getValue();
+    state->min_vnum = header.vnumLow.getValue();
+    state->max_vnum = header.vnumHigh.getValue();
+    state->low_range = header.levelLow.getValue();
+    state->high_range = header.levelHigh.getValue();
+    state->area_flag.setValue(header.flags.getValue());
+    // Applied below and only when it differs: commit would rebuild the
+    // behavior from its string and drop its runtime state on every put.
+    state->behavior.setValue(DLString::emptyString);
+
+    int lower = state->min_vnum.getValue(), upper = state->max_vnum.getValue();
+    if (!state->checkOverlap(lower, upper)) {
+        error = "Vnums " + DLString(lower) + "-" + DLString(upper) + " overlap another area";
+        return false;
+    }
+
+    DLString refusal = state->commitRefusal();
+    if (!refusal.empty()) {
+        error = refusal;
+        return false;
+    }
+
+    if (ctx.dryRun)
+        return true;
+
+    XMLAreaHeader current;
+    current.init(pArea);
+    XMLNode::Pointer behavior = header.behavior.getNode();
+    bool behaviorChanged = !olc_same_xml(current.behavior.getNode(), behavior);
+
+    state->commit();
+
+    if (behaviorChanged) {
+        if (pArea->behavior)
+            pArea->behavior->unsetArea();
+        pArea->behavior.clear();
+
+        if (behavior) {
+            pArea->behavior.fromXML(behavior);
+            if (pArea->behavior)
+                pArea->behavior->setArea(pArea);
+        }
+    }
+
+    op_journal(ctx, "area", pArea->vnum, "put", "replace");
+    res["changed"] = true;
+    return true;
+}
+
 static bool area_op(OlcOpContext &ctx, const DLString &action, int vnum, const Json::Value &op,
                     Json::Value &res, DLString &error)
 {
-    if (action != "get" && action != "cmd" && action != "set") {
-        error = "area action must be get, cmd or set";
+    if (action != "get" && action != "cmd" && action != "set" && action != "put") {
+        error = "area action must be get, cmd, set or put";
         return false;
     }
 
     OlcOpLine line;
-    if (action != "get" && !op_line(ctx, op, action, line, error))
+    if (action != "get" && action != "put" && !op_line(ctx, op, action, line, error))
         return false;
 
     AreaIndexData *pArea = AreaUtils::getByVnum(vnum);
@@ -1616,6 +1725,9 @@ static bool area_op(OlcOpContext &ctx, const DLString &action, int vnum, const J
         extra["quests"] = quests;
         return get_result(ctx, op, to_node(header, "areadata"), extra, res, error);
     }
+
+    if (action == "put")
+        return editor_refusal("area", vnum, error) && area_put(ctx, pArea, op, res, error);
 
     Room *limbo = get_room_instance(ROOM_VNUM_LIMBO);
     if (!limbo) {
@@ -1862,6 +1974,88 @@ static bool quest_step(OlcOpContext &ctx, AreaQuest *q, int vnum, const Json::Va
     return true;
 }
 
+/** The whole <quest> node onto quest vnum, created when it doesn't exist.
+ *  An existing AreaQuest object stays: its Fenia wrapper hangs on it. */
+static bool quest_put(OlcOpContext &ctx, int vnum, const Json::Value &op,
+                      Json::Value &res, DLString &error)
+{
+    XMLDocument::Pointer doc;
+    XMLNode::Pointer node = parse_xml(op, doc, error);
+    if (!node)
+        return false;
+
+    AreaQuest::Pointer fresh(NEW);
+    fresh->fromXML(node);
+
+    AreaQuest *q = 0;
+    auto qi = areaQuests.find(vnum);
+    if (qi != areaQuests.end())
+        q = qi->second;
+
+    AreaIndexData *pArea = 0;
+    if (q)
+        pArea = q->pAreaIndex;
+    else {
+        if (!op_area(ctx, op, pArea, error))
+            return false;
+        if (!pArea)
+            pArea = OLCState::get_vnum_area(vnum);
+    }
+
+    if (!pArea) {
+        error = "Quest vnum " + DLString(vnum) + " is in no area";
+        return false;
+    }
+
+    if (!OLCState::can_edit(ctx.ch, pArea)) {
+        error = "You can't build in area " + DLString(pArea->vnum);
+        return false;
+    }
+
+    if (!q && (vnum < pArea->min_vnum || vnum > pArea->max_vnum)) {
+        error = "Quest vnum " + DLString(vnum) + " is outside the vnums of area " + DLString(pArea->vnum);
+        return false;
+    }
+
+    if (ctx.dryRun) {
+        if (!q)
+            ctx.planned["quest"].insert(vnum);
+        return true;
+    }
+
+    bool exists = q != 0;
+    if (!q) {
+        std::string::size_type mark = capture_mark(ctx);
+        q = OLCStateArea::questCreate(ctx.ch, pArea, DLString(vnum));
+        if (!q) {
+            error = captured(ctx, mark);
+            if (error.empty())
+                error = "Refused";
+            return false;
+        }
+    }
+
+    q->title = fresh->title;
+    q->description = fresh->description;
+    q->minLevel = fresh->minLevel;
+    q->maxLevel = fresh->maxLevel;
+    q->limitPerLife = fresh->limitPerLife;
+    q->oncePerDay = fresh->oncePerDay;
+    q->steps = fresh->steps;
+    q->flags = fresh->flags;
+    q->prereq = fresh->prereq;
+    q->align = fresh->align;
+    q->hometowns = fresh->hometowns;
+    q->classes = fresh->classes;
+    q->lootVnums = fresh->lootVnums;
+
+    pArea->changed = true;
+    ctx.quests.insert(vnum);
+    op_journal(ctx, "quest", vnum, "put", exists ? "replace" : "new");
+    res["changed"] = true;
+    return true;
+}
+
 static bool quest_op(OlcOpContext &ctx, const DLString &action, const Json::Value &op,
                      Json::Value &res, int &vnum, DLString &error)
 {
@@ -1872,8 +2066,14 @@ static bool quest_op(OlcOpContext &ctx, const DLString &action, const Json::Valu
         return false;
     res["vnum"] = vnum;
 
+    if ((action == "put" || action == "delete") && !editor_refusal("quest", vnum, error))
+        return false;
+
+    if (action == "put")
+        return quest_put(ctx, vnum, op, res, error);
+
     if (action != "get" && action != "cmd" && action != "set" && action != "step" && action != "delete") {
-        error = "quest action must be get, create, cmd, set, step or delete";
+        error = "quest action must be get, create, cmd, set, step, put or delete";
         return false;
     }
 
@@ -2100,6 +2300,141 @@ static int run_validators(OlcOpContext &ctx, const std::set<std::pair<DLString, 
 }
 
 /*--------------------------------------------------------------------------
+ * Area helps, by help id
+ *-------------------------------------------------------------------------*/
+
+/** The article under id when it is an area help, else 0 with the reason. */
+static AreaHelp * area_help(int id, DLString &error)
+{
+    HelpArticle::Pointer article = helpManager->getArticle(id);
+    if (article.isEmpty())
+        return 0;
+
+    AreaHelp *help = dynamic_cast<AreaHelp *>(article.getPointer());
+    if (!help || !help->areafile || !help->areafile->area)
+        error = "Help " + DLString(id) + " is not an area help";
+    return help;
+}
+
+static bool help_op(OlcOpContext &ctx, const DLString &action, int id, const Json::Value &op,
+                    Json::Value &res, DLString &error)
+{
+    if (action != "get" && action != "put" && action != "delete") {
+        error = "help action must be get, put or delete";
+        return false;
+    }
+
+    if ((action == "put" || action == "delete") && !editor_refusal("help", id, error))
+        return false;
+
+    AreaHelp *help = area_help(id, error);
+    if (!error.empty())
+        return false;
+
+    AreaIndexData *pArea = help ? help->areafile->area : 0;
+    AreaIndexData *opArea;
+    if (!op_area(ctx, op, opArea, error))
+        return false;
+
+    if (pArea && opArea && pArea != opArea) {
+        error = "Help " + DLString(id) + " belongs to area " + DLString(pArea->vnum);
+        return false;
+    }
+
+    if (!pArea && action == "put" && is_planned(ctx, "help", id))
+        return true;
+
+    if (!pArea && action != "put") {
+        error = "Help " + DLString(id) + " not found";
+        return false;
+    }
+
+    if (!pArea && !opArea) {
+        error = "A new help needs 'area': the area vnum whose file keeps it";
+        return false;
+    }
+
+    if (!pArea)
+        pArea = opArea;
+
+    if (!OLCState::can_edit(ctx.ch, pArea)) {
+        error = "You can't build in area " + DLString(pArea->vnum);
+        return false;
+    }
+
+    if (action == "get") {
+        XMLAreaHelp xh;
+        xh.init(help);
+        Json::Value extra(Json::objectValue);
+        extra["id"] = id;
+        extra["area"] = pArea->vnum;
+        return get_result(ctx, op, to_node(xh, "help"), extra, res, error);
+    }
+
+    if (action == "delete") {
+        if (ctx.dryRun)
+            return true;
+
+        HelpArticle::Pointer article = helpManager->getArticle(id);
+        helpManager->unregistrate(article);
+        for (auto h = pArea->helps.begin(); h != pArea->helps.end(); h++)
+            if (h->getPointer() == help) {
+                pArea->helps.erase(h);
+                break;
+            }
+
+        pArea->changed = true;
+        help_save_ids();
+        op_journal(ctx, "help", id, "delete", "");
+        res["changed"] = true;
+        return true;
+    }
+
+    XMLDocument::Pointer doc;
+    XMLNode::Pointer node = parse_xml(op, doc, error);
+    if (!node)
+        return false;
+
+    XMLAreaHelp xh;
+    xh.fromXML(node);
+    // The op's id wins over whatever the XML says.
+    xh.id = id;
+
+    if (ctx.dryRun) {
+        if (!help)
+            ctx.planned["help"].insert(id);
+        return true;
+    }
+
+    if (help) {
+        // In place: re-registering the id would throw "Duplicate help ID".
+        OLCStateHelp::Pointer state(NEW, help);
+        state->keyword = xh.keyword;
+        state->title = xh.title;
+        state->extra = xh.extra;
+        state->text = xh.text;
+        state->level = xh.level;
+        state->labels.setValue(xh.labels);
+        state->seeAlso.setValue(HelpArticle::seeAlsoToString(xh.seeAlso));
+        state->seeAlsoEdited = true;
+        state->commit();
+        // Self-help detection reads the keywords.
+        help->setAreaIndex(pArea);
+    } else {
+        AreaHelp::Pointer fresh = xh.compat();
+        fresh->setAreaIndex(pArea);
+        helpManager->registrate(fresh);
+        pArea->helps.push_back(XMLPersistent<HelpArticle>(fresh.getPointer()));
+        help_save_ids();
+    }
+
+    pArea->changed = true;
+    op_journal(ctx, "help", id, "put", help ? "replace" : "new");
+    res["changed"] = true;
+    return true;
+}
+
+/*--------------------------------------------------------------------------
  * Dispatch
  *-------------------------------------------------------------------------*/
 
@@ -2143,8 +2478,15 @@ static bool apply_one(OlcOpContext &ctx, const Json::Value &op, Json::Value &res
     if (kind == "quest")
         return quest_op(ctx, action, op, res, vnum, error);
 
+    if (kind == "help") {
+        if (!op_number(ctx, op, "vnum", vnum, error))
+            return false;
+        res["vnum"] = vnum;
+        return help_op(ctx, action, vnum, op, res, error);
+    }
+
     if (!prototype && kind != "area" && kind != "reset") {
-        error = "kind must be room, mob, obj, reset, area or quest";
+        error = "kind must be room, mob, obj, reset, area, quest or help";
         return false;
     }
 
@@ -2222,6 +2564,10 @@ Json::Value OlcOps::apply(PCharacter *actor, const Json::Value &ops,
     ctx.opIndex = 0;
     ctx.warnings = &result["warnings"];
 
+    for (auto &op: ops)
+        if (op.isObject() && op["kind"] == "room" && op["action"] == "put" && op["vnum"].isInt())
+            ctx.batchRooms.insert(op["vnum"].asInt());
+
     std::set<std::pair<DLString, int> > changed;
     Json::Value::ArrayIndex i;
 
@@ -2274,6 +2620,30 @@ Json::Value OlcOps::apply(PCharacter *actor, const Json::Value &ops,
     }
 
     result["skipped"] = (int)(ops.size() - i);
+
+    // Exits to rooms the batch created after the room that leads to them get
+    // resolved now. An exit to a batch room whose put failed or never ran
+    // would save as target -1: it is removed and reported instead.
+    if (!dryRun)
+        for (int vnum: ctx.putRooms) {
+            RoomIndexData *pRoom = get_room_index(vnum);
+            if (!pRoom)
+                continue;
+
+            StringList dropped = OLCStateRoom::dropDanglingExits(pRoom);
+            if (!dropped.empty()) {
+                DLString what = dropped.join(", ");
+                Json::Value err;
+                err["op"] = -1;
+                err["error"] = "Room " + DLString(vnum) + ": removed " + what
+                               + ": the batch did not create the target room";
+                result["errors"].append(err);
+                result["ok"] = false;
+                olc_journal(actor->getName(), policyName(policy), "api", "room", vnum, "delete", "exits " + what);
+            }
+
+            OLCStateRoom::resolveInstance(pRoom);
+        }
 
     if (!dryRun)
         quest_pairing_warnings(ctx);

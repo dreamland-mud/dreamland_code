@@ -722,3 +722,11 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
     }
 }
 
+
+bool olc_same_xml( const XMLNode::Pointer &a, const XMLNode::Pointer &b )
+{
+    if (!a || !b)
+        return !a && !b;
+
+    return a->equal(**b);
+}

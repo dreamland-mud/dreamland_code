@@ -36,7 +36,8 @@ enum OlcPolicy {
  *             it or came from it), or one part of it:
  *             "exit": <dir> [+ "unlink": true], "eexit": <keyword>, "ed": <keyword>
  *     put     "xml": a whole prototype as the area file writes it; mob and obj
- *             are replaced or created, a room only created under a free vnum
+ *             are replaced or created; a room is created, or replaced in place (the
+ *             prototype and its instance stay, the instance's exits are rebuilt)
  *   reset, by room "vnum":
  *     get, add ("mob" + "max", "maxRoom" | "obj" + "to": room | inside (+
  *     "container", "limit" (0 = no limit), "count") | <wearloc>; "after": <n> places it),
@@ -44,10 +45,18 @@ enum OlcPolicy {
  *     "value"), randomize (shuffle exits)
  *   area, by area "vnum": get, set, cmd (names, levels, vnums, flags, authors,
  *     speedwalk, 'reset'...); a new vnum range that leaves out a live
- *     prototype, or a file another area saves into, is refused
+ *     prototype, or a file another area saves into, is refused;
+ *     put ("xml": the whole <areadata>, as aedit commits it; the file name stays)
  *   quest, by quest "vnum": get, create ("vnum" | "next" + "area"), set, cmd,
  *     delete, step ("step": <n> | "add", "begin"/"end": {type, vnum, trigger},
- *     "info": {en, ru, ua}, "qp", "gold", "exp", "item", "delete": true)
+ *     "info": {en, ru, ua}, "qp", "gold", "exp", "item", "delete": true),
+ *     put ("xml": the whole quest node; a missing quest is created in the
+ *     area of its vnum, or "area")
+ *   help, an area help by help id in "vnum": get, delete, put ("xml": the
+ *     one node of <helps>; replaced in place, a new id needs "area")
+ *   Every put and delete is refused while a connected builder has that kind
+ *   and vnum open in an editor ("<kind> <vnum> is open in <name>'s editor").
+ *   Room puts may lead exits to any room another put of the same batch names.
  *   validate  room | mob | obj by "vnum", area by area "vnum" (every prototype
  *     in it): runs the validator chain at the end of the batch, applies nothing,
  *     writes no journal line

@@ -49,6 +49,8 @@
 #include "descriptor.h"
 #include "stringlist.h"
 #include "json_utils.h"
+#include "roombehaviormanager.h"
+#include "xmldocument.h"
 
 #include "def.h"
 
@@ -202,39 +204,17 @@ REDIT(copy, "копировать", "скопировать описания, п
     StringList copied;
 
     if (copyDesc) {
-        pRoom->name = source->name;
-        pRoom->description = source->description;
-        pRoom->smell = source->smell;
-        pRoom->sound = source->sound;
-
-        pRoom->extraDescriptions.deallocate();
-        for (auto &ed: source->extraDescriptions) {
-            ExtraDescription *myed = new ExtraDescription();
-            myed->keyword = ed->keyword;
-            myed->description = ed->description;
-            pRoom->extraDescriptions.push_back(myed);
-        }
-
+        copyDescriptions(pRoom, source);
         copied.push_back("descriptions");
     }
 
     if (copyParam) {
-        pRoom->room_flags = source->room_flags;
-        pRoom->sector_type = source->sector_type;
-        pRoom->heal_rate = source->heal_rate;
-        pRoom->mana_rate = source->mana_rate;
-        pRoom->clan.assign(source->clan);
-        pRoom->guilds.clear();
-        pRoom->guilds.set(source->guilds);
-        pRoom->liquid.assign(source->liquid);
+        copyParameters(pRoom, source);
         copied.push_back("parameters");
     }
 
     if (copyBhv) {
-        pRoom->behaviors.clear();
-        pRoom->behaviors.set(source->behaviors);
-        pRoom->props.clear();
-        JsonUtils::copy(pRoom->props, source->props);
+        copyBehaviors(pRoom, source);
         copied.push_back("behaviors");
     }
 
@@ -1056,6 +1036,199 @@ void OLCStateRoom::registerRoom(RoomIndexData *pRoom)
     pRoom->areaIndex->roomIndexes[pRoom->vnum] = pRoom;
 
     pRoom->create();
+}
+
+void OLCStateRoom::copyDescriptions(RoomIndexData *pRoom, RoomIndexData *source)
+{
+    pRoom->name = source->name;
+    pRoom->description = source->description;
+    pRoom->smell = source->smell;
+    pRoom->sound = source->sound;
+
+    pRoom->extraDescriptions.deallocate();
+    for (auto &ed: source->extraDescriptions) {
+        ExtraDescription *myed = new ExtraDescription();
+        myed->keyword = ed->keyword;
+        myed->description = ed->description;
+        pRoom->extraDescriptions.push_back(myed);
+    }
+}
+
+void OLCStateRoom::copyParameters(RoomIndexData *pRoom, RoomIndexData *source)
+{
+    pRoom->room_flags = source->room_flags;
+    pRoom->sector_type = source->sector_type;
+    pRoom->heal_rate = source->heal_rate;
+    pRoom->mana_rate = source->mana_rate;
+    pRoom->clan.assign(source->clan);
+    pRoom->guilds.clear();
+    pRoom->guilds.set(source->guilds);
+    pRoom->liquid.assign(source->liquid);
+}
+
+void OLCStateRoom::copyBehaviors(RoomIndexData *pRoom, RoomIndexData *source)
+{
+    pRoom->behaviors.clear();
+    pRoom->behaviors.set(source->behaviors);
+    pRoom->props.clear();
+    JsonUtils::copy(pRoom->props, source->props);
+}
+
+void OLCStateRoom::replaceRoom(RoomIndexData *pRoom, RoomIndexData *fresh)
+{
+    copyDescriptions(pRoom, fresh);
+    copyParameters(pRoom, fresh);
+    copyBehaviors(pRoom, fresh);
+
+    // The replaced exits and resets stay allocated, as delete_exit and reset
+    // deletion leave them: a reset in progress or an exit editor may hold one.
+    for (int door = 0; door < DIR_SOMEWHERE; door++)
+        pRoom->exit[door] = fresh->exit[door];
+    pRoom->extra_exits.swap(fresh->extra_exits);
+    pRoom->resets.swap(fresh->resets);
+
+    bool behaviorChanged = !olc_same_xml(
+        pRoom->behavior ? pRoom->behavior->getFirstNode() : XMLNode::Pointer(),
+        fresh->behavior ? fresh->behavior->getFirstNode() : XMLNode::Pointer());
+    if (behaviorChanged)
+        pRoom->behavior = fresh->behavior;
+
+    fresh->extraDescriptions.deallocate();
+    delete fresh;
+
+    Room *room = pRoom->room;
+    if (!room)
+        return;
+
+    // Exits into this room from elsewhere point at the instance, which stays.
+    // Its own exits are rebuilt; a door whose default state didn't change keeps
+    // its current open/closed/locked state. Old instance exits stay allocated:
+    // footprints in the room history point at extra exits.
+    for (int door = 0; door < DIR_SOMEWHERE; door++) {
+        EXIT_DATA *old = room->exit[door];
+        room->exit[door] = 0;
+
+        if (!pRoom->exit[door])
+            continue;
+
+        EXIT_DATA *pexit = pRoom->exit[door]->create();
+        if (old && old->exit_info_default == pexit->exit_info_default)
+            pexit->exit_info = old->exit_info;
+        room->exit[door] = pexit;
+    }
+
+    ExtraExitList oldExtra;
+    oldExtra.swap(room->extra_exits);
+
+    for (auto &eexit: pRoom->extra_exits) {
+        EXTRA_EXIT_DATA *peexit = eexit->create();
+
+        EXTRA_EXIT_DATA *old = oldExtra.find(String::toString(peexit->keyword));
+        if (old && old->exit_info_default == peexit->exit_info_default)
+            peexit->exit_info = old->exit_info;
+
+        room->extra_exits.push_back(peexit);
+    }
+
+    resolveInstance(pRoom);
+
+    if (behaviorChanged) {
+        if (pRoom->behavior)
+            RoomBehaviorManager::assign(room);
+        else if (room->behavior) {
+            room->behavior->unsetRoom();
+            room->behavior.clear();
+        }
+    }
+}
+
+void OLCStateRoom::resolveInstance(RoomIndexData *pRoom)
+{
+    Room *room = pRoom->room;
+    if (!room)
+        return;
+
+    // Instance flags are the prototype's plus what room affects set.
+    room->room_flags = pRoom->room_flags;
+    for (auto &paf: room->affected)
+        if (paf->bitvector.getTable() == &room_flags)
+            SET_BIT(room->room_flags, paf->bitvector.getValue());
+
+    // Targets come from the prototype: resolving an instance exit to a room
+    // that isn't there yet overwrites its vnum with a null room.
+    bool hasExit = false;
+
+    for (int door = 0; door < DIR_SOMEWHERE; door++) {
+        EXIT_DATA *pexit = room->exit[door];
+        if (!pexit || !pRoom->exit[door])
+            continue;
+
+        int target = pRoom->exit[door]->u1.vnum;
+        pexit->u1.to_room = target > 0 ? get_room_instance(target) : 0;
+        if (pexit->u1.to_room)
+            hasExit = true;
+    }
+
+    // The instance list of a room put by the API is built in prototype
+    // order: pair by position, a keyword match can pick the wrong exit.
+    if (room->extra_exits.size() == pRoom->extra_exits.size()) {
+        auto proto = pRoom->extra_exits.begin();
+        for (auto &peexit: room->extra_exits) {
+            int target = (*proto)->u1.vnum;
+            peexit->u1.to_room = target > 0 ? get_room_instance(target) : 0;
+            proto++;
+        }
+    }
+
+    for (auto &peexit: room->extra_exits)
+        if (peexit->u1.to_room)
+            hasExit = true;
+
+    // Boot marks a room nothing leads out of the same way.
+    if (!hasExit)
+        SET_BIT(room->room_flags, ROOM_NO_MOB);
+}
+
+StringList OLCStateRoom::dropDanglingExits(RoomIndexData *pRoom)
+{
+    StringList dropped;
+    Room *room = pRoom->room;
+
+    for (int door = 0; door < DIR_SOMEWHERE; door++) {
+        EXIT_DATA *pexit = pRoom->exit[door];
+        if (!pexit || pexit->u1.vnum <= 0 || get_room_index(pexit->u1.vnum))
+            continue;
+
+        dropped.push_back(DLString(dirs[door].name) + " to " + DLString(pexit->u1.vnum));
+        pRoom->exit[door] = 0;
+        if (room)
+            room->exit[door] = 0;
+    }
+
+    // Erased in step with the instance list; the instance exits stay
+    // allocated, footprints may point at them.
+    bool paired = room && room->extra_exits.size() == pRoom->extra_exits.size();
+    ExtraExitList::iterator inst;
+    if (paired)
+        inst = room->extra_exits.begin();
+
+    for (auto proto = pRoom->extra_exits.begin(); proto != pRoom->extra_exits.end(); ) {
+        int target = (*proto)->u1.vnum;
+
+        if (target <= 0 || get_room_index(target)) {
+            proto++;
+            if (paired)
+                inst++;
+            continue;
+        }
+
+        dropped.push_back("extra exit '" + String::toString((*proto)->keyword) + "' to " + DLString(target));
+        proto = pRoom->extra_exits.erase(proto);
+        if (paired)
+            inst = room->extra_exits.erase(inst);
+    }
+
+    return dropped;
 }
 
 // Rooms the engine or the world config names by vnum.

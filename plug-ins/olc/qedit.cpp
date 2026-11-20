@@ -86,6 +86,12 @@ int OLCStateAreaQuest::getJournalVnum( ) const
 void OLCStateAreaQuest::changed( PCharacter *ch )
 {
     isChanged = true;
+
+    // qedit edits the quest in place: the autosave picks it up at once, as
+    // for medit and aedit, and every journaled line reaches the file.
+    auto q = areaQuests.find(vnum);
+    if (q != areaQuests.end() && q->second->pAreaIndex)
+        q->second->pAreaIndex->changed = true;
 }
 
 // Output step target's name with a clickable link to OLC editor.
