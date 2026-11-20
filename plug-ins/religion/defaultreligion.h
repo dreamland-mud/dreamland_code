@@ -41,6 +41,7 @@ public:
 
     virtual DLString getTitle(const DLString &label) const;
     virtual DLString getTitle(const DLString &label, lang_t lang) const;
+    virtual bool visible( Character * ) const;
     virtual void getRawText( Character *, ostringstream & ) const;
     inline virtual const DLString & getType( ) const;
     static const DLString TYPE;
@@ -88,6 +89,9 @@ public:
     virtual const DLString &getDescription( lang_t lang = LANG_DEFAULT ) const;
     virtual bool available(Character *) const;
     DLString reasonWhy(Character *) const;
+    /** A hidden religion exists only for its followers and for those who learned
+     *  its name: PC attribute knows_<name>, a string so it survives remort. */
+    bool knownBy(Character *) const;
     virtual const DLString& getNameFor( Character * ) const;
     virtual const DLString& getNameFor( lang_t ) const;
 

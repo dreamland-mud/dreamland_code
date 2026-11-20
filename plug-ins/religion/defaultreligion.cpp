@@ -188,6 +188,19 @@ static DLString religion_patrons_line(const DefaultReligion *religion, Character
     return result.join(", ");
 }
 
+// The website and the public help MCP dump what a fresh level-1 character sees,
+// so a hidden god's article stays out of both with no exporter of its own.
+bool ReligionHelp::visible( Character *ch ) const
+{
+    if (!HelpArticle::visible(ch))
+        return false;
+
+    if (!religion || !religion->flags.isSet(RELIG_HIDDEN))
+        return true;
+
+    return ch->is_immortal() || religion->knownBy(ch);
+}
+
 void ReligionHelp::getRawText( Character *ch, ostringstream &in ) const
 {
     // One name, the reader's own. Drops the always-English shortDescr in parens:
@@ -264,11 +277,24 @@ bool DefaultReligion::available( Character *ch ) const
     return reasonWhy(ch).empty();
 }
 
+bool DefaultReligion::knownBy(Character *ch) const
+{
+    // Followers keep their god even without the attribute: marks and patron
+    // checks call available() on them.
+    if (ch->getReligion() == *this)
+        return true;
+
+    return !ch->is_npc() && ch->getPC()->getAttributes().isAvailable("knows_" + getName());
+}
+
 DLString DefaultReligion::reasonWhy(Character *ch) const
 {
     static const DLString OK = DLString::emptyString;
 
     if (flags.isSet(RELIG_SYSTEM))
+        return "hidden";
+
+    if (flags.isSet(RELIG_HIDDEN) && !knownBy(ch))
         return "hidden";
 
     if (!clans.empty() && !clans.isSet(ch->getClan()))
