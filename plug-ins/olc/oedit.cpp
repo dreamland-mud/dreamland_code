@@ -148,6 +148,12 @@ void OLCStateObject::commit()
 
     original = get_obj_index(obj.vnum);
 
+    // See OLCStateMobile::commit: case forms for an edited bare nominative.
+    commitNotice.clear();
+    if (pendingDone)
+        olc_cases_fill(obj.short_descr, olc_cases_gender_obj(obj.gram_gender),
+                       false, false, true, true, commitNotice);
+
     if(!original) {
         int iHash;
         
@@ -264,6 +270,14 @@ void OLCStateObject::commit()
 void OLCStateObject::statePrompt(Descriptor *d)
 {
     d->send( "Editing obj> " );
+}
+
+// Defined before every other subcommand: the chain matches the last defined
+// first, so 'c', 'ca' and the rest keep resolving to what they did before.
+OEDIT(cases)
+{
+    return olc_cases_command(ch, argument, obj.short_descr,
+                             olc_cases_gender_obj(obj.gram_gender), false);
 }
 
 OEDIT(show)
@@ -1297,6 +1311,7 @@ OEDIT(commands)
 OEDIT(done) 
 {
     commit();
+    ch->send_to(commitNotice);
     olc_validate_print(ch, "obj", obj.vnum);
     detach(ch);
     return true;

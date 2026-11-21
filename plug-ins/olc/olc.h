@@ -67,4 +67,28 @@ int next_mob_index( Character *ch, RoomIndexData *r );
  *  unchanged behavior node alone, so its runtime state survives. */
 bool olc_same_xml( const XMLNode::Pointer &a, const XMLNode::Pointer &b );
 
+class XMLMultiString;
+
+/** Case forms of a prototype short description, RU and UA (medit/oedit
+ *  'cases' and the autofill when an edit commits). gender is the morphology
+ *  sidecar's masc|femn|neut|plur, anim is true for mobiles. */
+DLString olc_cases_gender_mob( int sex, bool plural );
+DLString olc_cases_gender_obj( int multiGender );
+
+/** Decline a Cyrillic nominative into a Flexer pad through the morphology
+ *  sidecar. Without force only a short with no '|' is filled; with force an
+ *  existing pad is re-declined from its nominative. A short with colour codes,
+ *  an unreachable sidecar or an answer that would change the nominative leaves
+ *  the text as typed. One line per language goes to report. True if a value
+ *  changed. */
+bool olc_cases_fill( XMLMultiString &shortDescr, const DLString &gender, bool anim,
+                     bool force, bool ru, bool ua, DLString &report );
+
+/** The six cases of the RU and UA short, one line each. */
+void olc_cases_show( PCharacter *ch, const XMLMultiString &shortDescr );
+
+/** The 'cases [auto [ru|ua]]' editor command. True if a value changed. */
+bool olc_cases_command( PCharacter *ch, const char *argument, XMLMultiString &shortDescr,
+                        const DLString &gender, bool anim );
+
 #endif /* __OLC_H__ */

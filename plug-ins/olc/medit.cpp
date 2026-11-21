@@ -288,6 +288,15 @@ void OLCStateMobile::commit()
 
     original = get_mob_index(mob.vnum);
 
+    // An edited prototype gets the case forms of a short typed as a bare
+    // nominative. pendingDone keeps it to real edits: a put or an API read
+    // commits too, and must not rewrite text nobody touched.
+    commitNotice.clear();
+    if (pendingDone)
+        olc_cases_fill(mob.short_descr,
+                       olc_cases_gender_mob(mob.sex, mob.gram_number == Grammar::Number::PLURAL),
+                       true, false, true, true, commitNotice);
+
     // Rebuild the edited body and numbers before anything is copied back.
     refresh_body(mob);
 
@@ -463,6 +472,15 @@ void OLCStateMobile::statePrompt(Descriptor *d)
 }
 
 // Mobile Editor Functions.
+
+// Defined before every other subcommand: the chain matches the last defined
+// first, so 'c', 'ca' and the rest keep resolving to what they did before.
+MEDIT(cases)
+{
+    return olc_cases_command(ch, argument, mob.short_descr,
+                             olc_cases_gender_mob(mob.sex, mob.gram_number == Grammar::Number::PLURAL), true);
+}
+
 MEDIT(show)
 {
     bool showWeb = !arg_is_strict(argument, "noweb");
@@ -1321,6 +1339,7 @@ MEDIT(commands)
 MEDIT(done) 
 {
     commit();
+    ch->send_to(commitNotice);
     olc_validate_print(ch, "mob", mob.vnum);
     detach(ch);
     return true;

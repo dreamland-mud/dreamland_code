@@ -107,6 +107,9 @@ public:
     bool pendingDone;
     /** Journal profile and source: "immortal"/"editor" in game, OlcOps sets its own. */
     DLString journalProfile, journalSource;
+    /** What the last commit did beyond the edits themselves (medit/oedit
+     *  case autofill), for 'done' and the API op echo. Empty when nothing. */
+    DLString commitNotice;
 
 protected:
     virtual void statePrompt( Descriptor *d ) = 0;

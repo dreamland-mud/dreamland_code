@@ -477,9 +477,19 @@ static bool run_on_state(::Pointer<State> state, OlcOpContext &ctx, OlcOpLine &l
     if (ctx.capture)
         output = DLString(ctx.capture->getString().substr(mark)).colourStrip();
 
-    // Read-only and refused subcommands answer in the editor's own words.
-    if (ctx.verbose || !state->lastChanged)
+    // Read-only and refused subcommands answer in the editor's own words, and
+    // so does 'cases', whose answer is the forms it filled.
+    if (ctx.verbose || !state->lastChanged || name == "cases")
         res["output"] = output;
+
+    // What the commit filled in on its own (medit/oedit case forms) is news
+    // to the caller even when the edit itself goes without saying.
+    if (!state->commitNotice.empty()) {
+        DLString shown = res.isMember("output") ? DLString(res["output"].asString()) : DLString();
+        if (!shown.empty() && shown.at(shown.size() - 1) != '\n')
+            shown += "\n";
+        res["output"] = shown + state->commitNotice.colourStrip();
+    }
 
     // A 'set' the editor turned down is a failed op, not a no-op.
     if (!line.requiredName.empty() && !state->lastChanged) {
