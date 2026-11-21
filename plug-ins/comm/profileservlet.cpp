@@ -131,37 +131,6 @@ static Json::Value profile_class_json(Profession &prof)
     return c;
 }
 
-// The most hours one life can honestly hold: the character's age, but never
-// less than PROFILE_LIFE_MAX (old characters carry an estimated creation date). A longer life is a corrupt record
-// (one pfile carries a 379637-hour life) and counts as 0. Fenia's
-// .tmp.achievements.charHours applies the same rule.
-static const long PROFILE_LIFE_MAX = 50000;
-
-static long profile_life_cap(PCMemoryInterface *pci)
-{
-    long created = pci->getCreated();
-    long cap = PROFILE_LIFE_MAX;
-    if (created > 0 && (dreamland->getCurrentTime() - created) / 3600 > cap)
-        cap = (dreamland->getCurrentTime() - created) / 3600;
-    return cap;
-}
-
-static long profile_life_hours(long hours, long cap)
-{
-    return (hours > 0 && hours <= cap) ? hours : 0;
-}
-
-// True hours of every life of a character: the current one plus the remorts.
-// Shared with accountservlet.cpp (roster order).
-int profile_char_hours(PCMemoryInterface *pci)
-{
-    long cap = profile_life_cap(pci);
-    long hours = profile_life_hours(pci->getPlayedHours(), cap);
-    for (auto &life : pci->getRemorts())
-        hours += profile_life_hours(life.time.getValue(), cap);
-    return (int)hours;
-}
-
 static Json::Value profile_char_entry(PCMemoryInterface *pci, bool online)
 {
     Json::Value c;
@@ -264,15 +233,15 @@ static Json::Value profile_account_stats(const list<PCMemoryInterface *> &shown)
         else if (since == 0 || created < since)
             since = created;
 
-        long cap = profile_life_cap(pci);
-        long now = profile_life_hours(pci->getPlayedHours(), cap);
+        long cap = pc_life_hours_cap(pci);
+        long now = pc_life_hours(pci->getPlayedHours(), cap);
         hours += now;
         byClass[pci->getProfession()->getName()] += now;
         lives++;
 
         Remorts &r = pci->getRemorts();
         for (unsigned int i = 0; i < r.size(); i++) {
-            long t = profile_life_hours(r[i].time.getValue(), cap);
+            long t = pc_life_hours(r[i].time.getValue(), cap);
             hours += t;
             byClass[r[i].classCh.getValue()] += t;
             lives++;
@@ -505,7 +474,7 @@ static PCMemoryInterface *profile_main_char(const list<PCMemoryInterface *> &sho
     PCMemoryInterface *mainChar = 0;
     int mainHours = -1;
     for (PCMemoryInterface *pci : shown) {
-        int h = profile_char_hours(pci);
+        int h = pc_total_hours(pci);
         if (h > mainHours) {
             mainHours = h;
             mainChar = pci;

@@ -430,9 +430,6 @@ Json::Value account_roster_entry(const DLString &name)
     return entry;
 }
 
-// Defined in profileservlet.cpp: true hours across every life.
-int profile_char_hours(PCMemoryInterface *pci);
-
 // The account's characters, most played first (the main on top), ties by name.
 // A name with no loadable memory sinks to the bottom. Shared with account.cpp so
 // the login roster and the in-game settings roster list in the same order.
@@ -441,7 +438,7 @@ list<DLString> account_chars_by_played(const DLString &id)
     vector<pair<int, DLString> > ranked;
     for (const DLString &name : AccountManager::charsOf(id)) {
         PCMemoryInterface *pci = PCharacterManager::find(name);
-        ranked.push_back(make_pair(pci != 0 ? profile_char_hours(pci) : -1, name));
+        ranked.push_back(make_pair(pci != 0 ? pc_total_hours(pci) : -1, name));
     }
     sort(ranked.begin(), ranked.end(),
          [](const pair<int, DLString> &a, const pair<int, DLString> &b) {

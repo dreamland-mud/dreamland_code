@@ -2,10 +2,15 @@
  *
  * ruffina, 2004
  */
+#include <jsoncpp/json/json.h>
+
 #include "logstream.h"
 #include "globalchannel.h"
 #include "chatframe.h"
 #include "messengers.h"
+#include "configurable.h"
+#include "fenia_utils.h"
+#include "lang.h"
 
 #include "skillreference.h"
 #include "npcharacter.h"
@@ -46,8 +51,67 @@ bool has_nochannel(Character *ch)
 GlobalChannel::GlobalChannel( )
            : soap( false ), translate( false ), nochannel( false ), 
              deafenOther( false ), quiet( false ), 
-             nomob( false ), confirmed( false ), dig( false )
+             nomob( false ), confirmed( false ), dig( false ), grumble( false )
 {
+}
+
+/*-----------------------------------------------------------------------
+ * Old-man noises
+ *-----------------------------------------------------------------------*/
+// config/aging.json "grumble": odds by the speaker's true hours over all lives
+// ("tiers": [{hours, percent}], the highest reached tier wins) and one word list
+// per language. The lists are parallel: one index is the same joke for every
+// reader, whatever language each of them reads in.
+static Json::Value agingConfig;
+CONFIGURABLE_LOADED(config, aging)
+{
+    agingConfig = value;
+}
+
+static const Json::Value & grumble_config( )
+{
+    const Json::Value &root = agingConfig;
+    return root["grumble"];
+}
+
+int GlobalChannel::grumbleRoll( Character *ch ) const
+{
+    if (!grumble || ch->is_npc( ))
+        return -1;
+
+    if (IS_SET(ch->getPC( )->config, CONFIG_NOGRUMBLE))
+        return -1;
+
+    const Json::Value &cfg = grumble_config( );
+    const Json::Value &words = cfg["ru"];
+    if (!words.isArray( ) || words.empty( ))
+        return -1;
+
+    int hours = pc_total_hours( ch->getPC( ) );
+    int pct = 0;
+    for (const Json::Value &tier: cfg["tiers"])
+        if (hours >= tier["hours"].asInt( ))
+            pct = max( pct, tier["percent"].asInt( ) );
+
+    if (pct <= 0 || number_percent( ) > pct)
+        return -1;
+
+    return number_range( 0, (int)words.size( ) - 1 );
+}
+
+DLString GlobalChannel::grumbleText( int index, Character *reader ) const
+{
+    if (index < 0)
+        return DLString::emptyString;
+
+    const Json::Value &cfg = grumble_config( );
+    const Json::Value *words = &cfg[lang2attr( viewerLang( reader ) )];
+    if (!words->isArray( ) || words->empty( ))
+        words = &cfg["ru"];
+    if (!words->isArray( ) || words->empty( ))
+        return DLString::emptyString;
+
+    return DLString( " ... " ) + (*words)[(Json::ArrayIndex)index % words->size( )].asString( );
 }
 
 void GlobalChannel::run( Character *ch, const DLString &arg )
@@ -94,12 +158,15 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
     applyGarble(ch, argGarbled);
     stripWeb(ch, argGarbled);
 
+    // Readers get the noise, triggers and logs get the clean line.
+    int noise = arg.empty( ) ? -1 : grumbleRoll( ch );
+
     if (needOutputSelf( ch )) {
         bool fMild = (IS_SET(ch->comm, COMM_MILDCOLOR) && !msgSelfMild.empty( ));
         bool fEmpty = (!msgListEmpty.empty( ) && listeners.size( ) == 0);
         const DLString &fmtSelf = fEmpty ? msgListEmpty : fMild ? msgSelfMild : msgSelf;
 
-        DLString outSelf = argGarbled;
+        DLString outSelf = argGarbled + grumbleText( noise, ch );
         DLString message = outputSelf( ch, fmtSelf, outSelf );
         ch->pecho(message);
         postOutput(ch, message, ch);
@@ -121,7 +188,7 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
             bool fMild = (IS_SET((*i)->comm, COMM_MILDCOLOR) && !msgOtherMild.empty( ));
             const DLString &fmtVict = fNoarg ? msgOtherNoarg : fMild ? msgOtherMild : msgOther;
             
-            DLString outVict = argGarbled;
+            DLString outVict = argGarbled + grumbleText( noise, victim );
 
             DLString message = outputVict( ch, victim, fmtVict, outVict );
             victim->pecho(message);
@@ -134,6 +201,9 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
                 chat_emit(victim, ch, false, getName( ), webKind( ), message, webArea( victim, ch ));
         }
     }
+
+    if (noise >= 0)
+        achievement( ch, "back_in_my_day" );
 
     triggers( ch, argGarbled );
 }
