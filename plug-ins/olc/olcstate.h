@@ -107,8 +107,10 @@ public:
      *  "skill:fireball"), so a menu clicked from scrollback can't edit
      *  whatever is open now. Empty: menus are not bound. */
     virtual DLString getMenuKey( );
-    /** The key of the editor whose subcommand is running, empty outside one:
-     *  web_list_menu binds every menu it draws to it. */
+    /** The key of the editor drawing right now, empty outside one: web_list_menu
+     *  binds every menu it draws to it. Set by Command::run for each subcommand and
+     *  by each editor's show, so a child editor shown from a parent's subcommand,
+     *  or an editor opened by name, binds to itself. */
     static DLString currentMenuKey;
 
     /** Set by journal(): the last subcommand changed the edited entity. */
@@ -180,8 +182,12 @@ private:
     DLString saved;
 };
 
-/** A menu key part: spaces become '_', and nothing that could break the menu tag. */
+/** A menu key part: spaces become '_', and nothing that could break the menu tag
+ *  or the client's '$' substitution. */
 extern DLString olc_menu_key_part( const DLString &part );
+/** A web menu id bound to the entity being drawn ('olcpick <key> <cmd>'), or cmd
+ *  as is outside an editor. Hand-built menus use it, web_list_menu does it itself. */
+extern DLString olc_menu_id( const DLString &cmd );
 
 template <typename T>
 class OLCStateTemplate : public virtual OLCState {

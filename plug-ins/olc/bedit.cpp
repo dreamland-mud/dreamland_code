@@ -95,6 +95,7 @@ static void show_affect_message(const char *prefix, PCharacter *ch, const DLStri
 
 void OLCStateBehavior::show( PCharacter *ch )
 {
+    OLCMenuKeyScope menuScope( getMenuKey( ) );
     DefaultBehavior *bhv = getOriginal();
 
     ptc(ch, "Поведение {C%s{x\r\n", bhv->getName().c_str());

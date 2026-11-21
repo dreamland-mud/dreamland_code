@@ -148,7 +148,7 @@ static DLString menu_step_type(Integer step, const DLString &stepType, DLString 
     commands.push_back("$ room");
     DLString label = stepType;
 
-    buf << "{w[{y" << web_menu(commands, id, label) << "{w]";
+    buf << "{w[{y" << web_menu(commands, olc_menu_id(id), label) << "{w]";
     return buf.str();
 }
 
@@ -183,7 +183,7 @@ static DLString menu_step_trigger(Integer step, const DLString &stepType, const 
         
     DLString label = stepTrig;
 
-    buf << "{w[{y" << web_menu(commands, id, label) << "{w]";
+    buf << "{w[{y" << web_menu(commands, olc_menu_id(id), label) << "{w]";
     return buf.str();
 }
 
@@ -402,6 +402,7 @@ static void show_steps(PCharacter *ch, AreaQuest *q)
 
 void OLCStateAreaQuest::show( PCharacter *ch )
 {
+    OLCMenuKeyScope menuScope( getMenuKey( ) );
     AreaQuest *q = getOriginal();
     AreaIndexData *area = q->pAreaIndex;
 

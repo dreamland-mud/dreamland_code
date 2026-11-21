@@ -422,6 +422,8 @@ CMD(olist, 50, "", POS_DEAD, 103, LOG_NORMAL,
 void
 OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
 {
+    // Static: no state to ask, so the key is spelled the way getMenuKey spells it.
+    OLCMenuKeyScope menuScope( "room:" + DLString( pRoom->vnum ) );
     int door;
     const size_t descSize = 300;
 

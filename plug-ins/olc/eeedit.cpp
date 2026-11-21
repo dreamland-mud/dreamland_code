@@ -134,6 +134,7 @@ OLCStateExtraExit::statePrompt( Descriptor *d )
 
 void OLCStateExtraExit::show(PCharacter *ch)
 {
+    OLCMenuKeyScope menuScope( getMenuKey( ) );
     OBJ_INDEX_DATA *pKey = key > 0 ? get_obj_index(key) : 0;
     RoomIndexData *target = get_room_index(to_room);
 

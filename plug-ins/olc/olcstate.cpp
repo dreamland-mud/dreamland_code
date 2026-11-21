@@ -121,6 +121,10 @@ OLCInterpretLayer::process( InterpretArguments &iargs )
 
         iargs.cmdName = args.getOneArgument( );
         iargs.cmdArgs = args;
+
+        // An empty name would prefix-match the head of the command chain.
+        if (iargs.cmdName.empty( ))
+            iargs.cmdName = "show";
     }
 
     iargs.pCommand = state->findCommand( iargs.ch->getPC( ), iargs.cmdName );
@@ -173,13 +177,21 @@ OLCMenuKeyScope::~OLCMenuKeyScope( )
     OLCState::currentMenuKey = saved;
 }
 
+// Inside an editor the pick names the entity it was drawn for, see OLCInterpretLayer.
+DLString olc_menu_id( const DLString &cmd )
+{
+    if (OLCState::currentMenuKey.empty( ))
+        return cmd;
+    return "olcpick " + OLCState::currentMenuKey + " " + cmd;
+}
+
 DLString olc_menu_key_part( const DLString &part )
 {
     DLString result;
     for (auto c: part.colourStrip( )) {
         if (c == ' ')
             result += '_';
-        else if (c != ',' && c != '\'')
+        else if (c != ',' && c != '\'' && c != '$')
             result += c;
     }
     return result;
@@ -1233,10 +1245,7 @@ DLString web_list_menu(bool showWeb, const StringList &values, const DLString &c
         if (web_menu_value_ok(v))
             commands.push_back("$ " + v);
 
-    // Inside an editor the pick names the entity it was drawn for, see OLCInterpretLayer.
-    DLString id = cmd;
-    if (!OLCState::currentMenuKey.empty())
-        id = "olcpick " + OLCState::currentMenuKey + " " + cmd;
+    DLString id = olc_menu_id(cmd);
 
     // An empty label would leave nothing to click on. Web-only, so telnet keeps
     // seeing the empty field it always saw.
