@@ -131,11 +131,15 @@ void OLCStateCommand::show( PCharacter *ch )
             c->aliases[RU].c_str(),
             web_edit_button(ch, "rusaliases", "web").c_str());
     ptc(ch, "Уровень:     {Y%d {D(level){x\r\n", c->level.getValue());
-    ptc(ch, "Позиция:     {Y%s {D(position){x\r\n", c->position.name().c_str());
-    ptc(ch, "Флаги:       {Y%s {D(flags){x\r\n", c->extra.names().c_str());
+    ptc(ch, "Позиция:     {Y%s {D(position){x\r\n",
+            web_flag_menu(true, *c->position.getTable(), "position", c->position.name()).c_str());
+    ptc(ch, "Флаги:       {Y%s {D(flags){x\r\n",
+            web_flag_menu(true, *c->extra.getTable(), "flags", c->extra.names()).c_str());
     ptc(ch, "Приказ:      {Y%s {D(order){x\r\n", 
-            c->order == 0 ? "-" : c->order.names().c_str());
-    ptc(ch, "Категории:   {Y%s {D(category){x\r\n", c->cat.names().c_str());
+            web_flag_menu(true, *c->order.getTable(), "order",
+                          c->order == 0 ? DLString("-") : c->order.names()).c_str());
+    ptc(ch, "Категории:   {Y%s {D(category){x\r\n",
+            web_flag_menu(true, *c->cat.getTable(), "category", c->cat.names()).c_str());
     ptc(ch, "Подсказка:   {Y%s{x %s {D(hint help){x\r\n",
             c->hint[RU].c_str(),
             web_edit_button(ch, "hint", "web").c_str());        

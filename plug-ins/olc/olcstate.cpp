@@ -24,6 +24,7 @@
 #include "globalbitvector.h"
 #include "globalregistry.h"
 #include "material-table.h"
+#include "mobilespecial.h"
 
 
 /*--------------------------------------------------------------------------
@@ -1287,6 +1288,14 @@ DLString web_bitvector_menu(bool showWeb, const GlobalBitvector &field, const DL
     }
 
     return web_list_menu(showWeb, values, cmd, label);
+}
+
+StringList spec_function_names()
+{
+    StringList names;
+    for (int i = 0; spec_table[i].name != 0; i++)
+        names.push_back(spec_table[i].name);
+    return names;
 }
 
 DLString web_material_menu(bool showWeb, const DLString &cmd, const DLString &label)

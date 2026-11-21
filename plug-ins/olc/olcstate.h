@@ -302,6 +302,8 @@ extern DLString web_registry_menu(bool showWeb, GlobalRegistryBase *registry, co
 /** A set edited by globalBitvectorEdit as a web drop-down: a member sends '<cmd> -name',
  *  any other element '<cmd> +name'. */
 extern DLString web_bitvector_menu(bool showWeb, const GlobalBitvector &field, const DLString &cmd, const DLString &label);
+/** Full names of every mob special function (spec_...). */
+extern StringList spec_function_names();
 /** A material field (fight/material.json names) as a web drop-down: '<cmd> <name>'. */
 extern DLString web_material_menu(bool showWeb, const DLString &cmd, const DLString &label);
 /** A genderEdit field as an m/f/n/p web drop-down. */

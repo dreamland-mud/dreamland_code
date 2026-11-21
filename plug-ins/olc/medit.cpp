@@ -589,9 +589,7 @@ MEDIT(show)
     }
 
     if (!mob.spec_fun.name.empty() || webMenus) {
-        StringList specNames;
-        for (int i = 0; spec_table[i].name != 0; i++)
-            specNames.push_back(spec_table[i].name);
+        StringList specNames = spec_function_names();
         specNames.push_back("clear");
         ptc(ch, "{CSpec fun:{x    [{W%s{x] {D(? spec){x\n\r",
             web_list_menu(showWeb, specNames, "spec", mob.spec_fun.name).c_str());

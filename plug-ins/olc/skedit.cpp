@@ -188,23 +188,26 @@ void OLCStateSkill::show( PCharacter *ch )
     ptc(ch, "РуИмя:       {C%s{x %s {D(runame help){x\r\n",
             r->name[RU].c_str(),
             web_edit_button(ch, "runame", "web").c_str());
-    ptc(ch, "Группы:      {C%s {D(group){x\r\n", r->getGroups().toString().c_str());
+    ptc(ch, "Группы:      {C%s {D(group){x\r\n",
+            web_bitvector_menu(true, r->getGroups(), "group", r->getGroups().toString()).c_str());
     ptc(ch, "Дает:        {C%s {D(grants){x\r\n", r->getGrants().toString().c_str());
     ptc(ch, "Задержка:    {C%d{w пульсов {D(beats){x\r\n", r->getBeats());
     ptc(ch, "Цена, очки:  {C%d мана {D(mana) {C%d шаги {D(move){x \r\n", r->getMana(), r->move.getValue());
     ptc(ch, "Цена, %%:     {C%d%% мана {Dpmana) {C%d%% шаги {D(pmove) {C%d%% здоровье {D(phealth){x\r\n",
         r->manaPenalty.getValue(), r->movesPenalty.getValue(), r->healthPenalty.getValue());
     ptc(ch, "Характер:    {C%s {D(align) {C%s {D(ethos){x\r\n",
-        r->align.getValue() != 0 ? r->align.names().c_str() : "-",
-        r->ethos.getValue() != 0 ? r->ethos.names().c_str() : "-");
+        web_flag_menu(true, *r->align.getTable(), "align",
+                      r->align.getValue() != 0 ? r->align.names() : DLString("-")).c_str(),
+        web_flag_menu(true, *r->ethos.getTable(), "ethos",
+                      r->ethos.getValue() != 0 ? r->ethos.names() : DLString("-")).c_str());
     ptc(ch, "Негатив:     {C%s {D(negative){x\r\n",
-        r->isNegative() ? "да - дебафф, в aff красным" : "нет");
+        web_bool_menu(true, "negative", r->isNegative() ? "да - дебафф, в aff красным" : "нет").c_str());
     ptc(ch, "Автобафф:    {C%s {D(autobuff){x\r\n",
-        r->isAutobuff() ? "да - кастуется кнопкой автобаффа" : "нет");
+        web_bool_menu(true, "autobuff", r->isAutobuff() ? "да - кастуется кнопкой автобаффа" : "нет").c_str());
     ptc(ch, "Сообщение:   {C%s{x %s {D(dammsg) {C%s {D(damgender){x\r\n",
         r->getDammsg().getFullForm().c_str(),
         web_edit_button(ch, "dammsg", "web").c_str(),
-        r->getDammsg().getMultiGender().toString());
+        web_gender_menu(true, "damgender", r->getDammsg().getMultiGender().toString()).c_str());
 
     if (r->help)
         ptc(ch, "Справка:     %s {D(help или hedit %d){x\r\n",
@@ -222,29 +225,46 @@ void OLCStateSkill::show( PCharacter *ch )
         MobProfSkillData *pmob = dynamic_cast<MobProfSkillData *>(mob);
 
         mobBuf  << "разучено {c" << mob->dice << "{x*level+{c" << mob->bonus 
-                << "{x, атаки {c" << (mob->offense.getValue() == 0 ? "нет" : mob->offense.names()) << "{x";
+                << "{x, атаки {c"
+                << web_flag_menu(true, *mob->offense.getTable(), "mob offense",
+                                 mob->offense.getValue() == 0 ? DLString("нет") : mob->offense.names())
+                << "{x";
         if (pmob)
-            mobBuf << ", классовое {c" << (pmob->professional ? "да" : "нет") << "{x";
+            mobBuf << ", классовое {c" << web_bool_menu(true, "mob class", pmob->professional ? "да" : "нет") << "{x";
         
         ptc(ch, "Мобы:        %s {D({hcmob{hx){x\r\n", mobBuf.str().c_str());
     }
 
     if (s) {
         ptc(ch, ".............{YЗаклинание{x.............\r\n");
-        ptc(ch, "Цели:        {Y%s {D(target){x\r\n", s->target.names().c_str());                        
-        ptc(ch, "Позиция:     {Y%s {D(position){x\r\n", s->position.name().c_str());
-        ptc(ch, "Тип:         {Y%s {D(type){x\r\n", s->type.name().c_str());
-        ptc(ch, "Флаги:       {Y%s {D(flags){x\r\n", s->flags.names().c_str());
+        // With a command on the skill, 'position', 'flags' and 'order' edit the command.
+        bool spellOwns = !c;
+        ptc(ch, "Цели:        {Y%s {D(target){x\r\n",
+                web_flag_menu(true, *s->target.getTable(), "target", s->target.names()).c_str());
+        ptc(ch, "Позиция:     {Y%s {D(position){x\r\n",
+                web_flag_menu(spellOwns, *s->position.getTable(), "position", s->position.name()).c_str());
+        ptc(ch, "Тип:         {Y%s {D(type){x\r\n",
+                web_flag_menu(true, *s->type.getTable(), "type", s->type.name()).c_str());
+        ptc(ch, "Флаги:       {Y%s {D(flags){x\r\n",
+                web_flag_menu(spellOwns, *s->flags.getTable(), "flags", s->flags.names()).c_str());
         ptc(ch, "Приказ:      {Y%s {D(order){x\r\n",
-                s->order == 0 ? "-" : s->order.names().c_str());
+                web_flag_menu(spellOwns, *s->order.getTable(), "order",
+                              s->order == 0 ? DLString("-") : s->order.names()).c_str());
                 
         if (s->type == SPELL_OFFENSIVE) {
-            ptc(ch, "Тип урона:   {Y%s {D(damtype){x\r\n", s->damtype.name().c_str());
-            ptc(ch, "Флаги урона: {Y%s {D(damflags){x\r\n", s->damflags.names().c_str());
-            ptc(ch, "Крутость:    {Y%d {D(tier){x\r\n", s->tier.getValue());
+            StringList tiers;
+            for (int t = BEST_TIER; t <= WORST_TIER; t++)
+                tiers.push_back(DLString(t));
+            ptc(ch, "Тип урона:   {Y%s {D(damtype){x\r\n",
+                    web_flag_menu(true, damage_table, "damtype", s->damtype.name()).c_str());
+            ptc(ch, "Флаги урона: {Y%s {D(damflags){x\r\n",
+                    web_flag_menu(true, *s->damflags.getTable(), "damflags", s->damflags.names()).c_str());
+            ptc(ch, "Крутость:    {Y%s {D(tier){x\r\n",
+                    web_list_menu(true, tiers, "tier", DLString(s->tier.getValue())).c_str());
 
             if (s->targetIsRanged())
-                ptc(ch, "Ранговое:    {Y%s {D(ranged){x\r\n", s->ranged ? "yes" : "no");
+                ptc(ch, "Ранговое:    {Y%s {D(ranged){x\r\n",
+                        web_bool_menu(true, "ranged", s->ranged ? "yes" : "no").c_str());
         }
 
         ptc(ch, "Сообщения:   %s  %s {D(messages){x\r\n",
@@ -270,11 +290,15 @@ void OLCStateSkill::show( PCharacter *ch )
         ptc(ch, "РусСинонимы: {Y%s{x %s {D(rusaliases help){x\r\n",
                 c->aliases[RU].c_str(),
                 web_edit_button(ch, "rusaliases", "web").c_str());
-        ptc(ch, "Аргумент:    {Y%s {D(argtype){x\r\n", c->argtype.name().c_str());
-        ptc(ch, "Позиция:     {Y%s {D(position){x\r\n", c->position.name().c_str());
-        ptc(ch, "Флаги:       {Y%s {D(flags){x\r\n", c->extra.names().c_str());
+        ptc(ch, "Аргумент:    {Y%s {D(argtype){x\r\n",
+                web_flag_menu(true, *c->argtype.getTable(), "argtype", c->argtype.name()).c_str());
+        ptc(ch, "Позиция:     {Y%s {D(position){x\r\n",
+                web_flag_menu(true, *c->position.getTable(), "position", c->position.name()).c_str());
+        ptc(ch, "Флаги:       {Y%s {D(flags){x\r\n",
+                web_flag_menu(true, *c->extra.getTable(), "flags", c->extra.names()).c_str());
         ptc(ch, "Приказ:      {Y%s {D(order){x\r\n", 
-                c->order == 0 ? "-" : c->order.names().c_str());
+                web_flag_menu(true, *c->order.getTable(), "order",
+                              c->order == 0 ? DLString("-") : c->order.names()).c_str());
         ptc(ch, "Подсказка:   {Y%s{x %s {D(hint help){x\r\n",
                 c->hint[RU].c_str(),
                 web_edit_button(ch, "hint", "web").c_str());        
@@ -284,8 +308,10 @@ void OLCStateSkill::show( PCharacter *ch )
 
     if (a) {
         ptc(ch, ".............{GАффект{x.................\r\n");
-        ptc(ch, "Отменяется:  {G%s {D(cancelled){x\r\n", a->cancelled ? "yes" : "no");
-        ptc(ch, "Снимается:   {G%s {D(dispelled){x\r\n", a->dispelled ? "yes" : "no");
+        ptc(ch, "Отменяется:  {G%s {D(cancelled){x\r\n",
+                web_bool_menu(true, "cancelled", a->cancelled ? "yes" : "no").c_str());
+        ptc(ch, "Снимается:   {G%s {D(dispelled){x\r\n",
+                web_bool_menu(true, "dispelled", a->dispelled ? "yes" : "no").c_str());
         show_one_message("Спадает с тебя    ", ch, a->removeCharSelf, "removeCharSelf");
         show_one_message("Спадает с соседа  ", ch, a->removeCharOthers, "removeCharOthers");
         show_one_message("Спадает с предмета", ch, a->removeObj, "removeObj");
@@ -606,7 +632,13 @@ SKEDIT(beats, "задержка", "wait state в пульсах (секунды 
 SKEDIT(negative, "негатив", "аффект умения - дебафф (в 'aff' подсвечивается красным)")
 {
     BasicSkill *r = getOriginal();
-    r->negative.setValue(!r->negative.getValue());
+    // y/n sets it (the web menu sends these), a bare command toggles.
+    if (arg_is_yes(argument))
+        r->negative.setValue(true);
+    else if (arg_is_no(argument))
+        r->negative.setValue(false);
+    else
+        r->negative.setValue(!r->negative.getValue());
     ptc(ch, "Аффект умения теперь %s дебаффом.\n\r",
         r->negative.getValue() ? "считается" : "НЕ считается");
     return true;
@@ -615,7 +647,13 @@ SKEDIT(negative, "негатив", "аффект умения - дебафф (в
 SKEDIT(autobuff, "автобафф", "умение кастуется кнопкой автобаффа (self-buff)")
 {
     BasicSkill *r = getOriginal();
-    r->autobuff.setValue(!r->autobuff.getValue());
+    // y/n sets it (the web menu sends these), a bare command toggles.
+    if (arg_is_yes(argument))
+        r->autobuff.setValue(true);
+    else if (arg_is_no(argument))
+        r->autobuff.setValue(false);
+    else
+        r->autobuff.setValue(!r->autobuff.getValue());
     ptc(ch, "Умение теперь %s кнопкой автобаффа.\n\r",
         r->autobuff.getValue() ? "кастуется" : "НЕ кастуется");
     return true;
@@ -1222,14 +1260,14 @@ void OLCStateSkillGroup::show(PCharacter *ch)
             g->name[RU].c_str(),
             web_edit_button(ch, "runame", "web").c_str());
     ptc(ch, "Скрыта:      {C%s {D(hidden){x\r\n", 
-            g->hidden ? "yes" : "no");
+            web_bool_menu(true, "hidden", g->hidden ? "yes" : "no").c_str());
 
     MOB_INDEX_DATA *pMob = get_mob_index(g->getPracticer());
     ptc(ch, "Учитель:     {g%N1{x [%d] {D(practicer){x\r\n",
              (pMob ? pMob->getShortDescr(LANG_DEFAULT) : "-"),
              g->getPracticer());
     ptc(ch, "Боги:        {g%s {D(gods){x\r\n",
-        g->gods.empty() ? "-": g->gods.toString().c_str());
+        web_bitvector_menu(true, g->gods, "gods", g->gods.empty() ? DLString("-") : g->gods.toString()).c_str());
     ptc(ch, "Путь:        {g%s{x  %s {D(path help){x\r\n",
             g->path.c_str(), 
             web_edit_button(ch, "path", "web").c_str());
