@@ -37,6 +37,7 @@
 #include "vnum.h"
 #include "def.h"
 #include "l10n.h"
+#include "fenia_utils.h"
 
 CLAN(flowers);
 HOMETOWN(frigate);
@@ -130,6 +131,10 @@ CMDRUN( remort )
     remorts.resetBonuses( );
     new_ch->setRemorts( remorts );
     
+    /* Fenia snapshot of the finished life (soul memory and the like): it writes
+     * string attributes on pch, which the hand-over below carries into the new life. */
+    gprog( "onRemort", "C", static_cast<Character *>( pch ) );
+
     /* notify attributes */
     pch->getAttributes( ).handleEvent( RemortArguments( pch, &newAttributes ) );
     newAttributes.getAttr<XMLEmptyAttribute>( "remorting" );
