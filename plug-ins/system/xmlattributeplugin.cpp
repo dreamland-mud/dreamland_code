@@ -24,16 +24,11 @@ static void restub( XMLAttributes &attrs, const DLString &name, bool backup )
         }
 }
 
-/*
- * Players in the game that the registry does not hold under their own pointer,
- * e.g. the /api/sandbox TestBot. Their attributes must be stubbed as well,
- * otherwise they keep pointing into the unloaded plugin's code.
- */
-static void restub_unregistered( const DLString &name, bool backup )
+static void restub_list( Character *list, const DLString &name, bool backup )
 {
     const PCharacterMemoryList &pcm = PCharacterManager::getPCM();
 
-    for (Character *wch = char_list; wch; wch = wch->next) {
+    for (Character *wch = list; wch; wch = wch->next) {
         if (wch->is_npc( ))
             continue;
 
@@ -45,6 +40,18 @@ static void restub_unregistered( const DLString &name, bool backup )
 
         restub( pc->getAttributes( ), name, backup );
     }
+}
+
+/*
+ * Players the registry does not hold under their own pointer: in-game ones such
+ * as the /api/sandbox TestBot, and characters still in creation (newbie_list),
+ * which are freed on link close. Their attributes must be stubbed as well,
+ * otherwise they keep pointing into the unloaded plugin's code.
+ */
+static void restub_unregistered( const DLString &name, bool backup )
+{
+    restub_list( char_list, name, backup );
+    restub_list( newbie_list, name, backup );
 }
 
 void XMLAttributePlugin::initialization( )
