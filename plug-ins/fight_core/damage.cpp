@@ -990,17 +990,22 @@ bool Damage::canSeeMessage(Character *to)
         && (ch->fighting != 0 || victim->fighting != 0 || fightspam_cast_depth > 0))
         return false;
 
+    // The blow that kills the victim is always shown to them, even when they are
+    // stunned or asleep, so a death never comes without its cause.
+    bool killsViewer = (to == victim && dam > 0 && victim->hit - dam <= -11);
+
     // fightspam OFF: suppress the per-hit damage line; violence_update prints
     // one aggregated summary line per participant per round instead. Only in
     // combat: a hit outside any fight (a mine, a trap) gets no round summary,
     // so it keeps its own line.
     if (dam > 0
+        && !killsViewer
         && !to->is_npc( )
         && !IS_SET(to->getPC( )->config, CONFIG_FIGHTSPAM)
         && (ch->fighting != 0 || victim->fighting != 0 || fightspam_cast_depth > 0))
         return false;
 
-    if (!IS_AWAKE(to) || !to->can_sense( ch ) || !to->can_sense( victim ))
+    if ((!IS_AWAKE(to) && !killsViewer) || !to->can_sense( ch ) || !to->can_sense( victim ))
         return false;
 
     // Don't show affect damage to affect owners that are not here.
