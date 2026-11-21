@@ -21,6 +21,9 @@
 #include "websocketrpc.h"
 #include "stringlist.h"
 #include "olcops.h"
+#include "globalbitvector.h"
+#include "globalregistry.h"
+#include "material-table.h"
 
 
 /*--------------------------------------------------------------------------
@@ -103,6 +106,27 @@ OLCInterpretLayer::process( InterpretArguments &iargs )
     if(iargs.cmdName == "?")
         iargs.cmdName = "olchelp";
 
+    // A web menu pick: 'olcpick <key> <cmd> <args>'. Run it only on the entity
+    // the menu was drawn for.
+    if (iargs.cmdName == "olcpick") {
+        DLString args = iargs.cmdArgs;
+        DLString key = args.getOneArgument( );
+        DLString current = state->getMenuKey( );
+
+        if (key != current) {
+            iargs.ch->pecho( "Это меню было нарисовано для {W%s{x, а сейчас открыт {W%s{x. Набери {y{hcshow{x и выбери заново.",
+                             key.c_str( ), current.empty( ) ? "другой редактор" : current.c_str( ) );
+            return false;
+        }
+
+        iargs.cmdName = args.getOneArgument( );
+        iargs.cmdArgs = args;
+
+        // An empty name would prefix-match the head of the command chain.
+        if (iargs.cmdName.empty( ))
+            iargs.cmdName = "show";
+    }
+
     iargs.pCommand = state->findCommand( iargs.ch->getPC( ), iargs.cmdName );
 
     if (iargs.pCommand) 
@@ -130,6 +154,47 @@ void OLCState::journal( PCharacter *ch, const DLString &cmd, const DLString &arg
 DLString OLCState::getJournalKind( ) const
 {
     return "olc";
+}
+
+DLString OLCState::getMenuKey( )
+{
+    int vnum = getJournalVnum( );
+    if (vnum == 0)
+        return DLString::emptyString;
+    return olc_menu_key_part( getJournalKind( ) ) + ":" + DLString( vnum );
+}
+
+DLString OLCState::currentMenuKey;
+
+OLCMenuKeyScope::OLCMenuKeyScope( const DLString &key )
+        : saved( OLCState::currentMenuKey )
+{
+    OLCState::currentMenuKey = key;
+}
+
+OLCMenuKeyScope::~OLCMenuKeyScope( )
+{
+    OLCState::currentMenuKey = saved;
+}
+
+// Inside an editor the pick names the entity it was drawn for, see OLCInterpretLayer.
+DLString olc_menu_id( const DLString &cmd )
+{
+    if (OLCState::currentMenuKey.empty( ))
+        return cmd;
+    return "olcpick " + OLCState::currentMenuKey + " " + cmd;
+}
+
+DLString olc_menu_key_part( const DLString &part )
+{
+    DLString result;
+    for (auto c: part.colourStrip( )) {
+        if (c == ' ')
+            result += '_';
+        else if (c != ',' && c != '\'' && c != '$')
+            result += c;
+    }
+    return result;
 }
 
 int OLCState::getJournalVnum( ) const
@@ -1163,15 +1228,90 @@ DLString flag_table_all_names(const FlagTable &table)
     return names.join(" ");
 }
 
-DLString web_flag_menu(bool showWeb, const FlagTable &table, const DLString &cmd, const DLString &label)
+// A value can't break out of the menu tag: the client splits entries on commas
+// and the tag quotes its attributes with apostrophes.
+static bool web_menu_value_ok(const DLString &value)
+{
+    return !value.empty() && value.find_first_of(",'") == DLString::npos;
+}
+
+DLString web_list_menu(bool showWeb, const StringList &values, const DLString &cmd, const DLString &label)
 {
     if (!showWeb)
         return label;
 
     StringList commands;
-    for (int i = 0; i < table.size; i++)
-        commands.push_back("$ " + DLString(table.fields[i].name));
+    for (auto &v: values)
+        if (web_menu_value_ok(v))
+            commands.push_back("$ " + v);
 
-    // An empty label would leave nothing to click on.
-    return web_menu(commands, cmd, label.empty() ? DLString("none") : label);
+    DLString id = olc_menu_id(cmd);
+
+    // An empty label would leave nothing to click on. Web-only, so telnet keeps
+    // seeing the empty field it always saw.
+    return web_menu(commands, id, label.empty() ? DLString("{Iwnone{Ix") : label);
+}
+
+DLString web_flag_menu(bool showWeb, const FlagTable &table, const DLString &cmd, const DLString &label)
+{
+    StringList names;
+    for (int i = 0; i < table.size; i++)
+        names.push_back(table.fields[i].name);
+
+    return web_list_menu(showWeb, names, cmd, label);
+}
+
+DLString web_registry_menu(bool showWeb, GlobalRegistryBase *registry, const DLString &cmd, const DLString &label,
+                           const DLString &clearWord)
+{
+    StringList names;
+    for (int i = 0; i < registry->size(); i++) {
+        GlobalRegistryElement *elem = registry->find(i);
+        if (elem->isValid())
+            names.push_back(elem->getName());
+    }
+    if (!clearWord.empty())
+        names.push_back(clearWord);
+
+    return web_list_menu(showWeb, names, cmd, label);
+}
+
+DLString web_bitvector_menu(bool showWeb, const GlobalBitvector &field, const DLString &cmd, const DLString &label)
+{
+    GlobalRegistryBase *registry = field.getRegistry();
+    StringList values;
+    for (int i = 0; i < registry->size(); i++) {
+        GlobalRegistryElement *elem = registry->find(i);
+        if (elem->isValid())
+            values.push_back(DLString(field.isSet(i) ? "-" : "+") + elem->getName());
+    }
+
+    return web_list_menu(showWeb, values, cmd, label);
+}
+
+DLString web_material_menu(bool showWeb, const DLString &cmd, const DLString &label)
+{
+    StringList names;
+    for (auto &m: material_table)
+        names.push_back(m.name);
+
+    return web_list_menu(showWeb, names, cmd, label);
+}
+
+DLString web_gender_menu(bool showWeb, const DLString &cmd, const DLString &label)
+{
+    StringList values;
+    values.push_back("m");
+    values.push_back("f");
+    values.push_back("n");
+    values.push_back("p");
+    return web_list_menu(showWeb, values, cmd, label);
+}
+
+DLString web_bool_menu(bool showWeb, const DLString &cmd, const DLString &label)
+{
+    StringList values;
+    values.push_back("y");
+    values.push_back("n");
+    return web_list_menu(showWeb, values, cmd, label);
 }

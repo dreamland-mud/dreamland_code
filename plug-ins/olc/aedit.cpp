@@ -235,7 +235,8 @@ AEDIT(show, "показать", "показать все поля")
     ptc(ch, "File:       [{W%s{x]\n\r", file_name.getValue( ).c_str( ));
     ptc(ch, "Vnums:      [{W%u-%u{x]\n\r", min_vnum.getValue( ), max_vnum.getValue( ));
     ptc(ch, "Levels:     [{W%u-%u{x]\n\r", low_range.getValue( ), high_range.getValue( ));
-    ptc(ch, "Flags:      [{W%s{x] {D(? area_flags{w)\n\r", area_flags.names(area_flag).c_str());
+    ptc(ch, "Flags:      [{W%s{x] {D(? area_flags{w)\n\r",
+        web_flag_menu(true, area_flags, "flags", area_flags.names(area_flag)).c_str());
     ptc(ch, "Security:   [{W%d{x]\n\r", security.getValue( ));
     ptc(ch, "Speedwalk:  EN [{W%s{x] %s  UA [{W%s{x] %s  RU [{W%s{x] %s\n\r", 
           String::stripEOL(speedwalk.get(EN)).c_str(), web_edit_button(ch, "speedwalk", "web").c_str(),   

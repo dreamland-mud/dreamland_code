@@ -23,6 +23,7 @@ public:
 
     virtual void commit( );
     virtual void changed( PCharacter * );
+    virtual DLString getMenuKey( );
     void show(PCharacter *ch);
 
     XML_VARIABLE XMLInteger room, to_room, info, key;

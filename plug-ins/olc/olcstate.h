@@ -25,6 +25,8 @@ using namespace std;
 class Descriptor;
 struct AreaIndexData;
 class GlobalBitvector;
+class GlobalRegistryBase;
+class StringList;
 class XMLJsonValue;
 class ExtraDescription;
 
@@ -101,6 +103,16 @@ public:
     virtual DLString getJournalKind( ) const;
     virtual int getJournalVnum( ) const;
 
+    /** Names the edited entity inside web menu commands ("room:3001",
+     *  "skill:fireball"), so a menu clicked from scrollback can't edit
+     *  whatever is open now. Empty: menus are not bound. */
+    virtual DLString getMenuKey( );
+    /** The key of the editor drawing right now, empty outside one: web_list_menu
+     *  binds every menu it draws to it. Set by Command::run for each subcommand and
+     *  by each editor's show, so a child editor shown from a parent's subcommand,
+     *  or an editor opened by name, binds to itself. */
+    static DLString currentMenuKey;
+
     /** Set by journal(): the last subcommand changed the edited entity. */
     bool lastChanged;
     /** Set by journal(), cleared when 'done' journals: edits not yet committed. */
@@ -161,6 +173,22 @@ protected:
     XML_VARIABLE XMLString lastCmd, lastArgs;
 };
 
+/** Sets OLCState::currentMenuKey for the lifetime of one subcommand. */
+class OLCMenuKeyScope {
+public:
+    OLCMenuKeyScope( const DLString &key );
+    ~OLCMenuKeyScope( );
+private:
+    DLString saved;
+};
+
+/** A menu key part: spaces become '_', and nothing that could break the menu tag
+ *  or the client's '$' substitution. */
+extern DLString olc_menu_key_part( const DLString &part );
+/** A web menu id bound to the entity being drawn ('olcpick <key> <cmd>'), or cmd
+ *  as is outside an editor. Hand-built menus use it, web_list_menu does it itself. */
+extern DLString olc_menu_id( const DLString &cmd );
+
 template <typename T>
 class OLCStateTemplate : public virtual OLCState {
 public:    
@@ -191,6 +219,9 @@ public:
 
             // Handlers tokenize args in place: keep a copy for the journal.
             DLString argsCopy = args;
+
+            // Menus drawn by this subcommand are bound to the edited entity.
+            OLCMenuKeyScope menuScope( state->getMenuKey( ) );
 
             try {
                 if (((*state)->*method)( pch, args )) {
@@ -235,6 +266,15 @@ public:
     {
         Chain *cmd;
 
+        // An exact name wins over a prefix: otherwise 'tier' reaches 'tierstyle'
+        // and 'act' reaches 'actdel', whichever was registered later.
+        for (cmd = Chain::begin( ); cmd; cmd = cmd->getNext( ))
+            if ((name ^ cmd->getKey( )) || (!cmd->getVal().rname.empty() && (name ^ cmd->getVal().rname)))
+                return typename Command::Pointer( NEW, 
+                                         (T *)this, 
+                                         cmd->getKey( ), 
+                                         cmd->getVal( ).method );
+
         for (cmd = Chain::begin( ); cmd; cmd = cmd->getNext( ))
             if (name.strPrefix( cmd->getKey( ) ) || name.strPrefix(cmd->getVal().rname))
                 return typename Command::Pointer( NEW, 
@@ -252,6 +292,22 @@ extern DLString flag_table_all_names(const FlagTable &table);
 /** A field value as a web drop-down of every flag in the table: picking one sends
  *  '<cmd> <flag>'. Telnet and showWeb=false see only the label. */
 extern DLString web_flag_menu(bool showWeb, const FlagTable &table, const DLString &cmd, const DLString &label);
+/** A field value as a web drop-down of fixed values: picking one sends '<cmd> <value>'. */
+extern DLString web_list_menu(bool showWeb, const StringList &values, const DLString &cmd, const DLString &label);
+/** A field value as a web drop-down of every valid registry element (races, liquids,
+ *  clans...): picking one sends '<cmd> <name>'. A non-empty clearWord is offered last
+ *  (liquids: 'none'). */
+extern DLString web_registry_menu(bool showWeb, GlobalRegistryBase *registry, const DLString &cmd, const DLString &label,
+                                  const DLString &clearWord = DLString::emptyString);
+/** A set edited by globalBitvectorEdit as a web drop-down: a member sends '<cmd> -name',
+ *  any other element '<cmd> +name'. */
+extern DLString web_bitvector_menu(bool showWeb, const GlobalBitvector &field, const DLString &cmd, const DLString &label);
+/** A material field (fight/material.json names) as a web drop-down: '<cmd> <name>'. */
+extern DLString web_material_menu(bool showWeb, const DLString &cmd, const DLString &label);
+/** A genderEdit field as an m/f/n/p web drop-down. */
+extern DLString web_gender_menu(bool showWeb, const DLString &cmd, const DLString &label);
+/** A boolEdit field as a y/n web drop-down. */
+extern DLString web_bool_menu(bool showWeb, const DLString &cmd, const DLString &label);
 
 #define OLC_STATE(State) \
 template <> \
@@ -272,6 +328,7 @@ bool OLCState::globalBitvectorEdit(GlobalBitvector &field)
 
     if (args.empty()) {
         ch->pecho("Использование:\r\n{W%1$s{x значения - установить новые значения\r\n"
+                   "{W%1$s +значение{x, {W%1$s -значение{x -- добавить или убрать одно значение\r\n"
                    "{W%1$s clear{x - очистить поле\r\n"
                    "{W? %1$s{x - показать таблицу значений", cmd);
         return false;
@@ -284,7 +341,35 @@ bool OLCState::globalBitvectorEdit(GlobalBitvector &field)
     }
 
     GlobalRegistry<E> *registry = static_cast<GlobalRegistry<E>*>(field.getRegistry());
-    
+
+    // '+name' adds and '-name' removes one element, the rest stays: the web menus
+    // send these. The name may contain spaces ('+storm giant').
+    if (args.at(0) == '+' || args.at(0) == '-') {
+        bool fSet = args.at(0) == '+';
+        DLString name = args.substr(1);
+        name.stripWhiteSpace();
+
+        // findExisting also returns placeholders of retired names.
+        E *elem = registry->findExisting(name);
+        if (elem && !elem->isValid())
+            elem = 0;
+        if (!elem)
+            elem = registry->findUnstrict(name);
+
+        if (!elem) {
+            ch->pecho("Значение '%s' не найдено.", name.c_str());
+            return false;
+        }
+
+        if (fSet)
+            field.set(elem->getIndex());
+        else
+            field.remove(elem->getIndex());
+
+        ch->pecho("Новое значение: {g%s{x", field.toString().c_str());
+        return true;
+    }
+
     GlobalBitvector newField(registry);
     StringSet values;
     values.fromString(args);

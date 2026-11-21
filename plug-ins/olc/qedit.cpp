@@ -148,7 +148,7 @@ static DLString menu_step_type(Integer step, const DLString &stepType, DLString 
     commands.push_back("$ room");
     DLString label = stepType;
 
-    buf << "{w[{y" << web_menu(commands, id, label) << "{w]";
+    buf << "{w[{y" << web_menu(commands, olc_menu_id(id), label) << "{w]";
     return buf.str();
 }
 
@@ -183,7 +183,7 @@ static DLString menu_step_trigger(Integer step, const DLString &stepType, const 
         
     DLString label = stepTrig;
 
-    buf << "{w[{y" << web_menu(commands, id, label) << "{w]";
+    buf << "{w[{y" << web_menu(commands, olc_menu_id(id), label) << "{w]";
     return buf.str();
 }
 
@@ -402,6 +402,7 @@ static void show_steps(PCharacter *ch, AreaQuest *q)
 
 void OLCStateAreaQuest::show( PCharacter *ch )
 {
+    OLCMenuKeyScope menuScope( getMenuKey( ) );
     AreaQuest *q = getOriginal();
     AreaIndexData *area = q->pAreaIndex;
 
@@ -419,14 +420,19 @@ void OLCStateAreaQuest::show( PCharacter *ch )
     ptc(ch, "Мин. уровень:  {c%d {D(minlevel){x\r\n", q->minLevel.getValue());
     ptc(ch, "Макс. уровень: {c%d {D(maxlevel){x\r\n", q->maxLevel.getValue());
     ptc(ch, "Натура:        {c%s{x {D(? align){x\r\n",
-        q->align.getValue() != 0 ? q->align.names().c_str() : "-");
+        web_flag_menu(true, *q->align.getTable(), "align",
+                      q->align.getValue() != 0 ? q->align.names() : DLString("-")).c_str());
     ptc(ch, "Классы:        {c%s{x {D(? classes){x\r\n",
-            q->classes.empty() ? "-": q->classes.toString().c_str());
+            web_bitvector_menu(true, q->classes, "classes",
+                               q->classes.empty() ? DLString("-") : q->classes.toString()).c_str());
     ptc(ch, "Города:        {c%s{x {D(? hometowns){x\r\n",
-            q->hometowns.empty() ? "-": q->hometowns.toString().c_str());
+            web_bitvector_menu(true, q->hometowns, "hometowns",
+                               q->hometowns.empty() ? DLString("-") : q->hometowns.toString()).c_str());
     ptc(ch, "Раз за жизнь:  {c%d {D(perlife){x\r\n", q->limitPerLife.getValue());
-    ptc(ch, "Раз в день:    {c%s {D(perday){x\r\n", (q->oncePerDay ? "да" : "нет"));
-    ptc(ch, "Флаги:         {c%s {D(flags){x\r\n", q->flags.names().c_str());
+    ptc(ch, "Раз в день:    {c%s {D(perday){x\r\n",
+            web_bool_menu(true, "perday", q->oncePerDay ? "да" : "нет").c_str());
+    ptc(ch, "Флаги:         {c%s {D(flags){x\r\n",
+            web_flag_menu(true, *q->flags.getTable(), "flags", q->flags.names()).c_str());
     ptc(ch, "Предыдущий:    {c%d{x %s {D(prereq){x\r\n", 
              q->prereq.getValue(), aquest_title(q->prereq).c_str());
     

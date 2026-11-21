@@ -59,6 +59,19 @@ static DLString show_reset_wearloc(Character *ch, int iReset, RESET_DATA *pReset
     return buf.str();
 }
 
+static DLString show_reset_flags(int iReset, RESET_DATA *pReset, RoomIndexData *pRoom)
+{
+    // Built by hand like the wear menu: the 'at <room>' id already names the room,
+    // and it must stay a plain command outside any editor.
+    DLString id = "at " + DLString(pRoom->vnum) + " reset " + DLString(iReset) + " flag";
+    StringList commands;
+    for (int i = 0; i < reset_flags.size; i++)
+        commands.push_back("$ " + DLString(reset_flags.fields[i].name));
+
+    DLString label = pReset->flags.names();
+    return web_menu(commands, id, label.empty() ? DLString("{Iwnone{Ix") : label);
+}
+
 static DLString show_reset_rand(Character *ch, int iReset, RESET_DATA *pReset, OBJ_INDEX_DATA *pObjIndex, RoomIndexData *pRoom)
 {
     ostringstream buf;
@@ -192,7 +205,7 @@ static void display_resets(ostringstream &result, Character * ch, RoomIndexData 
                         pMob->getShortDescr(LANG_DEFAULT),
                         pReset->arg2, 
                         pReset->arg4,
-                        pReset->flags.names().c_str());
+                        show_reset_flags(iReset+1, pReset, pRoom).c_str());
             }
             break;
 
@@ -664,7 +677,8 @@ CMD(resets, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         }
 
         if (arg_is(arg2, "flag")) {
-            reset_toggle_flags(ch, pRoom, number, argument);
+            if (reset_toggle_flags(ch, pRoom, number, argument))
+                __do_resets(ch, const_cast<char *>(""));
             return;
         }
 

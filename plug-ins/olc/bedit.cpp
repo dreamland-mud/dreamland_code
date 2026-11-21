@@ -82,6 +82,11 @@ void OLCStateBehavior::changed(PCharacter *ch)
     isChanged = true;
 }
 
+DLString OLCStateBehavior::getMenuKey( )
+{
+    return "behavior:" + olc_menu_key_part( original.getName( ) );
+}
+
 // Display one affect removal message read-only; it is edited from skedit.
 static void show_affect_message(const char *prefix, PCharacter *ch, const DLString &message)
 {
@@ -90,6 +95,7 @@ static void show_affect_message(const char *prefix, PCharacter *ch, const DLStri
 
 void OLCStateBehavior::show( PCharacter *ch )
 {
+    OLCMenuKeyScope menuScope( getMenuKey( ) );
     DefaultBehavior *bhv = getOriginal();
 
     ptc(ch, "Поведение {C%s{x\r\n", bhv->getName().c_str());
@@ -103,7 +109,8 @@ void OLCStateBehavior::show( PCharacter *ch )
     ptc(ch, "Описание:        %s {D(desc help){x\r\n{c%s{x\r\n",
             web_edit_button(ch, "desc", "web").c_str(),
             bhv->getDescription().c_str());
-    ptc(ch, "Цель:            {c%s {D(target){x\r\n", bhv->target.name().c_str());
+    ptc(ch, "Цель:            {c%s {D(target){x\r\n",
+            web_flag_menu(true, *bhv->target.getTable(), "target", bhv->target.name()).c_str());
     ptc(ch, "Подкоманды:      {c%s {D(subcommand){x\r\n", bhv->cmd.c_str());
 
     if (bhv->help) {

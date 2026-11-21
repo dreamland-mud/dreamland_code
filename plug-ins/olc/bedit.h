@@ -20,6 +20,7 @@ public:
 
     virtual void commit();
     virtual void changed( PCharacter * );
+    virtual DLString getMenuKey( );
     void show( PCharacter * );
 
     XML_VARIABLE XMLBehaviorReference original;
