@@ -288,15 +288,6 @@ void OLCStateMobile::commit()
 
     original = get_mob_index(mob.vnum);
 
-    // An edited prototype gets the case forms of a short typed as a bare
-    // nominative. pendingDone keeps it to real edits: a put or an API read
-    // commits too, and must not rewrite text nobody touched.
-    commitNotice.clear();
-    if (pendingDone)
-        olc_cases_fill(mob.short_descr,
-                       olc_cases_gender_mob(mob.sex, mob.gram_number == Grammar::Number::PLURAL),
-                       true, false, true, true, commitNotice);
-
     // Rebuild the edited body and numbers before anything is copied back.
     refresh_body(mob);
 
@@ -1338,8 +1329,16 @@ MEDIT(commands)
 
 MEDIT(done) 
 {
+    // Case forms for a short this run typed as a bare nominative, with the
+    // sex and number the run ended with. The API fills at the end of a batch.
+    MOB_INDEX_DATA *original = get_mob_index(mob.vnum);
+    DLString report;
+    olc_cases_autofill(mob.short_descr, original ? &original->short_descr : 0,
+                       olc_cases_gender_mob(mob.sex, mob.gram_number == Grammar::Number::PLURAL),
+                       true, report);
+
     commit();
-    ch->send_to(commitNotice);
+    ch->send_to(report);
     olc_validate_print(ch, "mob", mob.vnum);
     detach(ch);
     return true;

@@ -75,14 +75,13 @@ class XMLMultiString;
 DLString olc_cases_gender_mob( int sex, bool plural );
 DLString olc_cases_gender_obj( int multiGender );
 
-/** Decline a Cyrillic nominative into a Flexer pad through the morphology
- *  sidecar. Without force only a short with no '|' is filled; with force an
- *  existing pad is re-declined from its nominative. A short with colour codes,
- *  an unreachable sidecar or an answer that would change the nominative leaves
- *  the text as typed. One line per language goes to report. True if a value
- *  changed. */
-bool olc_cases_fill( XMLMultiString &shortDescr, const DLString &gender, bool anim,
-                     bool force, bool ru, bool ua, DLString &report );
+/** Autofill: decline the RU and UA short that this edit run changed (it
+ *  differs from 'before', the prototype's short when the run started; null
+ *  for a new prototype) and that has Cyrillic, no '|' and no colour code.
+ *  A short nobody touched is left alone, however bare. One line per
+ *  language goes to report. True if a value changed. */
+bool olc_cases_autofill( XMLMultiString &shortDescr, const XMLMultiString *before,
+                         const DLString &gender, bool anim, DLString &report );
 
 /** The six cases of the RU and UA short, one line each. */
 void olc_cases_show( PCharacter *ch, const XMLMultiString &shortDescr );

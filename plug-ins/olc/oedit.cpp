@@ -148,12 +148,6 @@ void OLCStateObject::commit()
 
     original = get_obj_index(obj.vnum);
 
-    // See OLCStateMobile::commit: case forms for an edited bare nominative.
-    commitNotice.clear();
-    if (pendingDone)
-        olc_cases_fill(obj.short_descr, olc_cases_gender_obj(obj.gram_gender),
-                       false, false, true, true, commitNotice);
-
     if(!original) {
         int iHash;
         
@@ -1310,8 +1304,14 @@ OEDIT(commands)
 
 OEDIT(done) 
 {
+    // See MEDIT(done): case forms for a short this run typed bare.
+    OBJ_INDEX_DATA *original = get_obj_index(obj.vnum);
+    DLString report;
+    olc_cases_autofill(obj.short_descr, original ? &original->short_descr : 0,
+                       olc_cases_gender_obj(obj.gram_gender), false, report);
+
     commit();
-    ch->send_to(commitNotice);
+    ch->send_to(report);
     olc_validate_print(ch, "obj", obj.vnum);
     detach(ch);
     return true;

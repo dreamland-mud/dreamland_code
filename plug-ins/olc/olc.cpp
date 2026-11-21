@@ -805,21 +805,35 @@ static bool olc_cases_fill_lang( DLString &value, lang_t lang, const DLString &g
 
     value = pad;
     report << label << " cases filled: " << pad << "\r\n";
+    if (!force)
+        report << "  To keep it undeclined, type it with a trailing |||||.\r\n";
     return true;
 }
 
-bool olc_cases_fill( XMLMultiString &shortDescr, const DLString &gender, bool anim,
-                     bool force, bool ru, bool ua, DLString &report )
+static bool olc_cases_fill( XMLMultiString &shortDescr, const XMLMultiString *before,
+                            const DLString &gender, bool anim, bool force,
+                            bool ru, bool ua, DLString &report )
 {
     bool changed = false;
 
     for (auto &l: shortDescr) {
-        if ((l.first == LANG_RU && ru) || (l.first == LANG_UA && ua))
-            if (olc_cases_fill_lang( l.second, l.first, gender, anim, force, report ))
-                changed = true;
+        if (!((l.first == LANG_RU && ru) || (l.first == LANG_UA && ua)))
+            continue;
+
+        if (before && before->get( l.first ) == l.second)
+            continue;
+
+        if (olc_cases_fill_lang( l.second, l.first, gender, anim, force, report ))
+            changed = true;
     }
 
     return changed;
+}
+
+bool olc_cases_autofill( XMLMultiString &shortDescr, const XMLMultiString *before,
+                         const DLString &gender, bool anim, DLString &report )
+{
+    return olc_cases_fill( shortDescr, before, gender, anim, false, true, true, report );
 }
 
 void olc_cases_show( PCharacter *ch, const XMLMultiString &shortDescr )
@@ -868,7 +882,7 @@ bool olc_cases_command( PCharacter *ch, const char *argument, XMLMultiString &sh
     }
 
     DLString report;
-    bool changed = olc_cases_fill( shortDescr, gender, anim, true, ru, ua, report );
+    bool changed = olc_cases_fill( shortDescr, 0, gender, anim, true, ru, ua, report );
 
     if (report.empty( ))
         report = "Nothing to decline: no Cyrillic short.\r\n";
