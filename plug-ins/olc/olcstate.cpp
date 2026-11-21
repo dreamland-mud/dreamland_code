@@ -106,6 +106,23 @@ OLCInterpretLayer::process( InterpretArguments &iargs )
     if(iargs.cmdName == "?")
         iargs.cmdName = "olchelp";
 
+    // A web menu pick: 'olcpick <key> <cmd> <args>'. Run it only on the entity
+    // the menu was drawn for.
+    if (iargs.cmdName == "olcpick") {
+        DLString args = iargs.cmdArgs;
+        DLString key = args.getOneArgument( );
+        DLString current = state->getMenuKey( );
+
+        if (key != current) {
+            iargs.ch->pecho( "Это меню было нарисовано для {W%s{x, а сейчас открыт {W%s{x. Набери {y{hcshow{x и выбери заново.",
+                             key.c_str( ), current.empty( ) ? "другой редактор" : current.c_str( ) );
+            return false;
+        }
+
+        iargs.cmdName = args.getOneArgument( );
+        iargs.cmdArgs = args;
+    }
+
     iargs.pCommand = state->findCommand( iargs.ch->getPC( ), iargs.cmdName );
 
     if (iargs.pCommand) 
@@ -133,6 +150,39 @@ void OLCState::journal( PCharacter *ch, const DLString &cmd, const DLString &arg
 DLString OLCState::getJournalKind( ) const
 {
     return "olc";
+}
+
+DLString OLCState::getMenuKey( )
+{
+    int vnum = getJournalVnum( );
+    if (vnum == 0)
+        return DLString::emptyString;
+    return olc_menu_key_part( getJournalKind( ) ) + ":" + DLString( vnum );
+}
+
+DLString OLCState::currentMenuKey;
+
+OLCMenuKeyScope::OLCMenuKeyScope( const DLString &key )
+        : saved( OLCState::currentMenuKey )
+{
+    OLCState::currentMenuKey = key;
+}
+
+OLCMenuKeyScope::~OLCMenuKeyScope( )
+{
+    OLCState::currentMenuKey = saved;
+}
+
+DLString olc_menu_key_part( const DLString &part )
+{
+    DLString result;
+    for (auto c: part.colourStrip( )) {
+        if (c == ' ')
+            result += '_';
+        else if (c != ',' && c != '\'')
+            result += c;
+    }
+    return result;
 }
 
 int OLCState::getJournalVnum( ) const
@@ -1183,9 +1233,14 @@ DLString web_list_menu(bool showWeb, const StringList &values, const DLString &c
         if (web_menu_value_ok(v))
             commands.push_back("$ " + v);
 
+    // Inside an editor the pick names the entity it was drawn for, see OLCInterpretLayer.
+    DLString id = cmd;
+    if (!OLCState::currentMenuKey.empty())
+        id = "olcpick " + OLCState::currentMenuKey + " " + cmd;
+
     // An empty label would leave nothing to click on. Web-only, so telnet keeps
     // seeing the empty field it always saw.
-    return web_menu(commands, cmd, label.empty() ? DLString("{Iwnone{Ix") : label);
+    return web_menu(commands, id, label.empty() ? DLString("{Iwnone{Ix") : label);
 }
 
 DLString web_flag_menu(bool showWeb, const FlagTable &table, const DLString &cmd, const DLString &label)
@@ -1197,7 +1252,8 @@ DLString web_flag_menu(bool showWeb, const FlagTable &table, const DLString &cmd
     return web_list_menu(showWeb, names, cmd, label);
 }
 
-DLString web_registry_menu(bool showWeb, GlobalRegistryBase *registry, const DLString &cmd, const DLString &label)
+DLString web_registry_menu(bool showWeb, GlobalRegistryBase *registry, const DLString &cmd, const DLString &label,
+                           const DLString &clearWord)
 {
     StringList names;
     for (int i = 0; i < registry->size(); i++) {
@@ -1205,6 +1261,8 @@ DLString web_registry_menu(bool showWeb, GlobalRegistryBase *registry, const DLS
         if (elem->isValid())
             names.push_back(elem->getName());
     }
+    if (!clearWord.empty())
+        names.push_back(clearWord);
 
     return web_list_menu(showWeb, names, cmd, label);
 }

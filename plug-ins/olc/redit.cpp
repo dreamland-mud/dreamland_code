@@ -442,7 +442,7 @@ OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
             web_bitvector_menu(showWeb, pRoom->guilds, "guilds", pRoom->guilds.toString()).c_str());
     ptc(ch, "Sector:  [{W%s{x] {D(? sector_table){x  Liquid: [{W%s{x] {D(? liquid){x\n\r", 
             web_flag_menu(showWeb, sector_table, "sector", sector_table.name(pRoom->sector_type)).c_str(),
-            web_registry_menu(showWeb, liquidManager, "liquid", pRoom->liquid->getName()).c_str());
+            web_registry_menu(showWeb, liquidManager, "liquid", pRoom->liquid->getName(), "none").c_str());
     ptc(ch, "Smell:   [{W%s{x] %s [{W%s{x] %s [{W%s{x] %s\n\r", 
           String::stripEOL(pRoom->smell.get(EN)).c_str(), web_edit_button(showWeb, ch, "smell", "web").c_str(),   
           String::stripEOL(pRoom->smell.get(UA)).c_str(), web_edit_button(showWeb, ch, "uasmell", "web").c_str(),   
@@ -1408,6 +1408,8 @@ REDIT(clan, "клан", "установить клановую принадле�
 
     // Exact name first, so a menu pick never lands on a longer clan name.
     clan = ClanManager::getThis( )->findExisting( argument );
+    if (clan && !clan->isValid( ))
+        clan = 0;
     if (!clan)
         clan = ClanManager::getThis( )->findUnstrict( argument );
     if (!clan) {
@@ -1449,6 +1451,8 @@ REDIT(guilds, "гильдии", "установить гильдию для кл
     name.stripWhiteSpace();
 
     prof = professionManager->findExisting( name );
+    if (prof && !prof->isValid( ))
+        prof = 0;
     if (!prof)
         prof = professionManager->findUnstrict( name );
     if (!prof) {

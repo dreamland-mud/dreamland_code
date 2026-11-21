@@ -82,6 +82,11 @@ void OLCStateBehavior::changed(PCharacter *ch)
     isChanged = true;
 }
 
+DLString OLCStateBehavior::getMenuKey( )
+{
+    return "behavior:" + olc_menu_key_part( original.getName( ) );
+}
+
 // Display one affect removal message read-only; it is edited from skedit.
 static void show_affect_message(const char *prefix, PCharacter *ch, const DLString &message)
 {

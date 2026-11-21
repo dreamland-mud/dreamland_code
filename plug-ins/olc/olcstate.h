@@ -103,6 +103,14 @@ public:
     virtual DLString getJournalKind( ) const;
     virtual int getJournalVnum( ) const;
 
+    /** Names the edited entity inside web menu commands ("room:3001",
+     *  "skill:fireball"), so a menu clicked from scrollback can't edit
+     *  whatever is open now. Empty: menus are not bound. */
+    virtual DLString getMenuKey( );
+    /** The key of the editor whose subcommand is running, empty outside one:
+     *  web_list_menu binds every menu it draws to it. */
+    static DLString currentMenuKey;
+
     /** Set by journal(): the last subcommand changed the edited entity. */
     bool lastChanged;
     /** Set by journal(), cleared when 'done' journals: edits not yet committed. */
@@ -163,6 +171,18 @@ protected:
     XML_VARIABLE XMLString lastCmd, lastArgs;
 };
 
+/** Sets OLCState::currentMenuKey for the lifetime of one subcommand. */
+class OLCMenuKeyScope {
+public:
+    OLCMenuKeyScope( const DLString &key );
+    ~OLCMenuKeyScope( );
+private:
+    DLString saved;
+};
+
+/** A menu key part: spaces become '_', and nothing that could break the menu tag. */
+extern DLString olc_menu_key_part( const DLString &part );
+
 template <typename T>
 class OLCStateTemplate : public virtual OLCState {
 public:    
@@ -193,6 +213,9 @@ public:
 
             // Handlers tokenize args in place: keep a copy for the journal.
             DLString argsCopy = args;
+
+            // Menus drawn by this subcommand are bound to the edited entity.
+            OLCMenuKeyScope menuScope( state->getMenuKey( ) );
 
             try {
                 if (((*state)->*method)( pch, args )) {
@@ -266,8 +289,10 @@ extern DLString web_flag_menu(bool showWeb, const FlagTable &table, const DLStri
 /** A field value as a web drop-down of fixed values: picking one sends '<cmd> <value>'. */
 extern DLString web_list_menu(bool showWeb, const StringList &values, const DLString &cmd, const DLString &label);
 /** A field value as a web drop-down of every valid registry element (races, liquids,
- *  clans...): picking one sends '<cmd> <name>'. */
-extern DLString web_registry_menu(bool showWeb, GlobalRegistryBase *registry, const DLString &cmd, const DLString &label);
+ *  clans...): picking one sends '<cmd> <name>'. A non-empty clearWord is offered last
+ *  (liquids: 'none'). */
+extern DLString web_registry_menu(bool showWeb, GlobalRegistryBase *registry, const DLString &cmd, const DLString &label,
+                                  const DLString &clearWord = DLString::emptyString);
 /** A set edited by globalBitvectorEdit as a web drop-down: a member sends '<cmd> -name',
  *  any other element '<cmd> +name'. */
 extern DLString web_bitvector_menu(bool showWeb, const GlobalBitvector &field, const DLString &cmd, const DLString &label);
@@ -297,7 +322,7 @@ bool OLCState::globalBitvectorEdit(GlobalBitvector &field)
 
     if (args.empty()) {
         ch->pecho("Использование:\r\n{W%1$s{x значения - установить новые значения\r\n"
-                   "{W%1$s +значение{x, {W%1$s -значение{x - добавить или убрать одно значение\r\n"
+                   "{W%1$s +значение{x, {W%1$s -значение{x -- добавить или убрать одно значение\r\n"
                    "{W%1$s clear{x - очистить поле\r\n"
                    "{W? %1$s{x - показать таблицу значений", cmd);
         return false;
@@ -318,7 +343,10 @@ bool OLCState::globalBitvectorEdit(GlobalBitvector &field)
         DLString name = args.substr(1);
         name.stripWhiteSpace();
 
+        // findExisting also returns placeholders of retired names.
         E *elem = registry->findExisting(name);
+        if (elem && !elem->isValid())
+            elem = 0;
         if (!elem)
             elem = registry->findUnstrict(name);
 

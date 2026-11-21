@@ -1218,6 +1218,8 @@ MEDIT(race)
     if (*argument) {
         // Exact name first: 'giant' must not land on 'cloud giant'.
         race = raceManager->findExisting(argument);
+        if (race && !race->isValid())
+            race = 0;
         if (!race)
             race = raceManager->findUnstrict(argument);
 

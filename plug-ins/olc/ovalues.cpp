@@ -204,7 +204,7 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj, bool showWeb)
             "[v4] Пробка:           %d\n\r",
             obj->value[0],
             obj->value[1],
-            web_registry_menu(showWeb, liquidManager, "v2", liquidManager->find( obj->value[2] )->getName( )).c_str( ),
+            web_registry_menu(showWeb, liquidManager, "v2", liquidManager->find( obj->value[2] )->getName( ), "none").c_str( ),
             liquidManager->find( obj->value[2] )->getShortDescr( ).ruscase( '1' ).c_str( ),
             web_flag_menu(showWeb, drink_flags, "v3", drink_flags.names(obj->value[3])).c_str( ),
             obj->value[4]);
@@ -219,7 +219,7 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj, bool showWeb)
             "[v4] Флаги мебели:    %s {D(? furniture_flags){x\n\r",
             obj->value[0],
             obj->value[1],
-            web_registry_menu(showWeb, liquidManager, "v2", liquidManager->find( obj->value[2] )->getName( )).c_str( ),
+            web_registry_menu(showWeb, liquidManager, "v2", liquidManager->find( obj->value[2] )->getName( ), "none").c_str( ),
             liquidManager->find( obj->value[2] )->getShortDescr( ).ruscase( '1' ).c_str( ),
             obj->value[3],
             web_flag_menu(showWeb, furniture_flags, "v4", furniture_flags.names(obj->value[4])).c_str());
@@ -721,13 +721,16 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
             break;
         case 3:
             // y/n sets it (the web menu sends these), anything else toggles.
-            if (arg_is_yes(argument))
+            if (arg_is_yes(argument)) {
                 pObj->value[3] = 1;
-            else if (arg_is_no(argument))
+                stc("Еда отравлена.\n\r", ch);
+            } else if (arg_is_no(argument)) {
                 pObj->value[3] = 0;
-            else
+                stc("Еда не отравлена.\n\r", ch);
+            } else {
                 pObj->value[3] = (pObj->value[3] == 0) ? 1 : 0;
-            stc("Отравление переключено.\n\r", ch);
+                stc("Отравление переключено.\n\r", ch);
+            }
             break;
         }
         break;

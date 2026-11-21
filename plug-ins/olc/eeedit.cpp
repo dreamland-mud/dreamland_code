@@ -121,6 +121,11 @@ OLCStateExtraExit::changed( PCharacter *ch )
     /*ignore*/
 }
 
+DLString OLCStateExtraExit::getMenuKey( )
+{
+    return "eexit:" + DLString( room.getValue( ) ) + ":" + olc_menu_key_part( keyword.get( EN ) );
+}
+
 void 
 OLCStateExtraExit::statePrompt( Descriptor *d )
 {
