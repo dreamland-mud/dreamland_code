@@ -216,7 +216,7 @@ static bool obj_has_own_marks( Object *obj )
  */
 static bool obj_keeps_own_values( Object *obj )
 {
-    if (obj_has_own_marks( obj ) || obj->props.isMember( "keepOld" ))
+    if (obj_has_own_marks( obj ) || (obj->props.isObject( ) && obj->props.isMember( "keepOld" )))
         return true;
 
     switch (obj->item_type) {
@@ -1279,8 +1279,8 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
                 if (obj->econRev > 0)
                         fprintf( fp, "EconRev %d\n",  obj->econRev            );
                 // A stock item writes only the slots that differ (ValN), so the
-                // others follow a prototype edit on the next load. Wand charges or
-                // a half-empty flask no longer pin every other value to the old proto.
+                // others follow a prototype edit on the next load: an opened container
+                // or a burnt light no longer pins every other value to the old proto.
                 if ( obj->value0() != obj->pIndexData->value[0]
                         || obj->value1() != obj->pIndexData->value[1]
                         || obj->value2() != obj->pIndexData->value[2]
