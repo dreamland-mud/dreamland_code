@@ -24,6 +24,7 @@
 #include "resetops.h"
 #include "wearlocation.h"
 #include "olc.h"
+#include "xmlmultistring.h"
 #include "xmlroom.h"
 #include "xmlarea.h"
 #include "xmlmobilefactory.h"
@@ -237,8 +238,33 @@ struct OlcOpContext {
     std::set<int> quests;
     // Prototypes a 'validate' op named; area vnums mean every prototype of the area.
     std::set<std::pair<DLString, int> > validate;
+    // Mob and object shorts as they were before the batch's first subcommand
+    // on the prototype, for the case proposal made once after every op, with
+    // the gender the batch ended with. A put is the author's exact text and
+    // is never snapshotted.
+    std::map<std::pair<DLString, int>, XMLMultiString> casesBefore;
     Json::Value *warnings;
 };
+
+/** Remember a mob or object short before the batch's first subcommand on it. */
+static void cases_snapshot(OlcOpContext &ctx, const DLString &kind, int vnum)
+{
+    std::pair<DLString, int> key(kind, vnum);
+
+    if (ctx.dryRun || ctx.casesBefore.count(key))
+        return;
+
+    if (kind == "mob") {
+        MOB_INDEX_DATA *pMob = get_mob_index(vnum);
+        if (pMob)
+            ctx.casesBefore[key] = pMob->short_descr;
+    }
+    else if (kind == "obj") {
+        OBJ_INDEX_DATA *pObj = get_obj_index(vnum);
+        if (pObj)
+            ctx.casesBefore[key] = pObj->short_descr;
+    }
+}
 
 /** The parsed op, every string already KOI8. */
 struct OlcOpLine {
@@ -477,8 +503,9 @@ static bool run_on_state(::Pointer<State> state, OlcOpContext &ctx, OlcOpLine &l
     if (ctx.capture)
         output = DLString(ctx.capture->getString().substr(mark)).colourStrip();
 
-    // Read-only and refused subcommands answer in the editor's own words.
-    if (ctx.verbose || !state->lastChanged)
+    // Read-only and refused subcommands answer in the editor's own words, and
+    // so does 'cases', whose answer is the forms it shows or writes.
+    if (ctx.verbose || !state->lastChanged || name == "cases")
         res["output"] = output;
 
     // A 'set' the editor turned down is a failed op, not a no-op.
@@ -1410,6 +1437,7 @@ static bool prototype_op(OlcOpContext &ctx, const DLString &kind, const DLString
             return false;
         }
 
+        cases_snapshot(ctx, kind, vnum);
         OLCStateMobile::Pointer state(NEW, pMob);
         return run_on_state(state, ctx, line, pMob->behaviors, res, error);
     }
@@ -1420,6 +1448,7 @@ static bool prototype_op(OlcOpContext &ctx, const DLString &kind, const DLString
         return false;
     }
 
+    cases_snapshot(ctx, kind, vnum);
     OLCStateObject::Pointer state(NEW, pObj);
     return run_on_state(state, ctx, line, pObj->behaviors, res, error);
 }
@@ -2574,6 +2603,8 @@ Json::Value OlcOps::apply(PCharacter *actor, const Json::Value &ops,
             ctx.batchRooms.insert(op["vnum"].asInt());
 
     std::set<std::pair<DLString, int> > changed;
+    // The last op on each prototype: the case proposal goes into its output.
+    std::map<std::pair<DLString, int>, Json::Value::ArrayIndex> lastResult;
     Json::Value::ArrayIndex i;
 
     for (i = 0; i < ops.size(); i++) {
@@ -2596,6 +2627,8 @@ Json::Value OlcOps::apply(PCharacter *actor, const Json::Value &ops,
         }
         res["ok"] = ok;
         result["results"].append(res);
+        if (kind == "mob" || kind == "obj")
+            lastResult[std::make_pair(kind, vnum)] = result["results"].size() - 1;
 
         // A reset edit changes its room; a quest step, its quest.
         DLString changedKind = kind == "reset" ? DLString("room") : kind;
@@ -2652,6 +2685,40 @@ Json::Value OlcOps::apply(PCharacter *actor, const Json::Value &ops,
 
     if (!dryRun)
         quest_pairing_warnings(ctx);
+
+    // A proposal for the shorts the batch's subcommands typed as a bare
+    // nominative, once, with the sex, number and gender the batch ended with.
+    // Nothing is written: a 'cases ok' op applies it.
+    if (!dryRun)
+        for (auto &b: ctx.casesBefore) {
+            const std::pair<DLString, int> &key = b.first;
+            DLString report;
+
+            if (key.first == "mob") {
+                MOB_INDEX_DATA *pMob = get_mob_index(key.second);
+                if (!pMob)
+                    continue;
+                olc_cases_propose(pMob->short_descr, &b.second,
+                                  olc_cases_gender_mob(pMob->sex, pMob->gram_number == Grammar::Number::PLURAL),
+                                  true, report);
+            }
+            else {
+                OBJ_INDEX_DATA *pObj = get_obj_index(key.second);
+                if (!pObj)
+                    continue;
+                olc_cases_propose(pObj->short_descr, &b.second,
+                                  olc_cases_gender_obj(pObj->gram_gender), false, report);
+            }
+
+            auto last = lastResult.find(key);
+            if (!report.empty() && last != lastResult.end()) {
+                Json::Value &r = result["results"][last->second];
+                DLString shown = r.isMember("output") ? DLString(r["output"].asString()) : DLString();
+                if (!shown.empty() && shown.at(shown.size() - 1) != '\n')
+                    shown += "\n";
+                r["output"] = shown + report.colourStrip();
+            }
+        }
 
     // A dry run changed nothing: only what 'validate' ops named is checked.
     int validationErrors = run_validators(ctx, dryRun ? std::set<std::pair<DLString, int> >() : changed,

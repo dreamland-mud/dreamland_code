@@ -67,4 +67,28 @@ int next_mob_index( Character *ch, RoomIndexData *r );
  *  unchanged behavior node alone, so its runtime state survives. */
 bool olc_same_xml( const XMLNode::Pointer &a, const XMLNode::Pointer &b );
 
+class XMLMultiString;
+
+/** Case forms of a prototype short description, RU and UA (medit/oedit
+ *  'cases'). Nothing declines a short on its own: the editor proposes the
+ *  forms and the builder applies them with 'cases ok'. gender is the
+ *  morphology sidecar's masc|femn|neut|plur, anim is true for mobiles. */
+DLString olc_cases_gender_mob( int sex, bool plural );
+DLString olc_cases_gender_obj( int multiGender );
+
+/** The proposal for the RU and UA short that this edit run changed (it
+ *  differs from 'before', the prototype's short when the run started; null
+ *  for a new prototype) and that has Cyrillic and no '|'. A short nobody
+ *  touched gets no line, however bare. Writes nothing; report gets one line
+ *  per language and how to apply. True if anything was proposed. */
+bool olc_cases_propose( const XMLMultiString &shortDescr, const XMLMultiString *before,
+                        const DLString &gender, bool anim, DLString &report );
+
+/** The 'cases' editor command: show the six cases (and the proposal for a
+ *  short without them); 'cases ok' writes the forms of a short that has
+ *  none, 'cases ok ru|ua' re-declines that language from its nominative
+ *  even over existing forms. True if a value changed. */
+bool olc_cases_command( PCharacter *ch, const char *argument, XMLMultiString &shortDescr,
+                        const DLString &gender, bool anim );
+
 #endif /* __OLC_H__ */

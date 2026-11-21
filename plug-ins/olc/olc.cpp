@@ -35,6 +35,8 @@
 #include "room.h"
 
 #include "olc.h"
+#include "morphology.h"
+#include "xmlmultistring.h"
 #include "body.h"
 #include "olcflags.h"
 #include "olcstate.h"
@@ -729,4 +731,220 @@ bool olc_same_xml( const XMLNode::Pointer &a, const XMLNode::Pointer &b )
         return !a && !b;
 
     return a->equal(**b);
+}
+
+/*--------------------------------------------------------------------------
+ * Case forms of prototype short descriptions
+ *-------------------------------------------------------------------------*/
+DLString olc_cases_gender_mob( int sex, bool plural )
+{
+    if (plural)
+        return "plur";
+    if (sex == SEX_FEMALE)
+        return "femn";
+    if (sex == SEX_NEUTRAL)
+        return "neut";
+    return "masc";
+}
+
+DLString olc_cases_gender_obj( int multiGender )
+{
+    switch (multiGender) {
+    case Grammar::MultiGender::FEMININE: return "femn";
+    case Grammar::MultiGender::NEUTER:   return "neut";
+    case Grammar::MultiGender::PLURAL:   return "plur";
+    default:                             return "masc";
+    }
+}
+
+static const char *olc_cases_label( lang_t lang )
+{
+    return lang == LANG_RU ? "RU" : "UA";
+}
+
+/** Decline the nominative of value through the sidecar. True with pad set
+ *  when there are case forms to offer; false with why set otherwise (why
+ *  stays empty when the short simply does not decline). */
+static bool olc_cases_decline( const DLString &value, lang_t lang, const DLString &gender, bool anim,
+                               DLString &pad, DLString &why )
+{
+    DLString label = olc_cases_label( lang );
+
+    // A colour code would land inside a case cell, or split a word in two.
+    if (value.find( '{' ) != DLString::npos) {
+        why = label + " short has colour codes: type its case forms by hand.";
+        return false;
+    }
+
+    DLString nominative = value.find( '|' ) != DLString::npos ? value.ruscase( '1' ) : value;
+    // The sidecar reads the animacy after the comma and declines the phrase
+    // as a prototype name: head noun, agreeing adjectives, fixed tail.
+    DLString request = gender + (anim ? ",anim" : ",inan");
+    pad = lang == LANG_RU
+            ? Morphology::declineRu( nominative, "-", request )
+            : Morphology::declineUa( nominative, "-", request );
+
+    // decline_sidecar's fallback when the sidecar is down or still loading.
+    if (pad == nominative + "|||||") {
+        why = label + " cases: the morphology service did not answer, try again later.";
+        return false;
+    }
+
+    if (pad.find( '|' ) == DLString::npos)
+        return false;
+
+    if (pad.ruscase( '1' ) != nominative) {
+        why = label + " cases: the answer would change the name to '" + pad.ruscase( '1' ) + "', not offered.";
+        return false;
+    }
+
+    return true;
+}
+
+/** One screen-reader friendly line: the six rendered cases, then the pad. */
+static DLString olc_cases_line( const DLString &title, const DLString &pad )
+{
+    static const char *names[] = { "nom", "gen", "dat", "acc", "ins", "loc" };
+    DLString line = title + ": ";
+
+    for (int c = 0; c < 6; c++) {
+        if (c > 0)
+            line += ", ";
+        line += DLString( names[c] ) + " " + pad.ruscase( (char)('1' + c) );
+    }
+
+    return line + ". Pad: " + pad + "\r\n";
+}
+
+bool olc_cases_propose( const XMLMultiString &shortDescr, const XMLMultiString *before,
+                        const DLString &gender, bool anim, DLString &report )
+{
+    static const lang_t langs[] = { LANG_RU, LANG_UA };
+    bool proposed = false;
+
+    for (auto lang: langs) {
+        const DLString &value = shortDescr.get( lang );
+
+        if (before && before->get( lang ) == value)
+            continue;
+        if (value.find( '|' ) != DLString::npos || !String::hasCyrillic( value ))
+            continue;
+
+        DLString pad, why;
+        if (olc_cases_decline( value, lang, gender, anim, pad, why )) {
+            report << olc_cases_line( DLString( olc_cases_label( lang ) ) + " short has no case forms, proposed", pad );
+            proposed = true;
+        }
+        else if (!why.empty( ))
+            report << why << "\r\n";
+    }
+
+    if (proposed)
+        report << "Apply with {Wcases ok{x [{Wru{x|{Wua{x], or type the case forms by hand.\r\n";
+
+    return proposed;
+}
+
+static void olc_cases_show( PCharacter *ch, const XMLMultiString &shortDescr, const DLString &gender, bool anim )
+{
+    static const lang_t langs[] = { LANG_RU, LANG_UA };
+    bool proposed = false;
+
+    for (auto lang: langs) {
+        const DLString &value = shortDescr.get( lang );
+        DLString label = olc_cases_label( lang );
+
+        if (value.empty( ))
+            continue;
+
+        if (value.find( '|' ) != DLString::npos) {
+            ch->send_to( olc_cases_line( "Short " + label + " cases", value ) );
+            continue;
+        }
+
+        ptc( ch, "Short %s has no case forms, every case reads: %s\n\r", label.c_str( ), value.c_str( ) );
+
+        if (!String::hasCyrillic( value ))
+            continue;
+
+        DLString pad, why;
+        if (olc_cases_decline( value, lang, gender, anim, pad, why )) {
+            ch->send_to( olc_cases_line( label + " proposed", pad ) );
+            proposed = true;
+        }
+        else if (!why.empty( ))
+            ch->send_to( why + "\r\n" );
+    }
+
+    if (proposed)
+        ch->send_to( "Apply with {Wcases ok{x [{Wru{x|{Wua{x], or type the case forms by hand.\r\n" );
+}
+
+bool olc_cases_command( PCharacter *ch, const char *argument, XMLMultiString &shortDescr,
+                        const DLString &gender, bool anim )
+{
+    static const lang_t langs[] = { LANG_RU, LANG_UA };
+    DLString args = argument;
+    DLString word = args.getOneArgument( );
+    DLString which = args.getOneArgument( );
+
+    if (word.empty( )) {
+        olc_cases_show( ch, shortDescr, gender, anim );
+        return false;
+    }
+
+    bool ru = which.empty( ) || which == "ru";
+    bool ua = which.empty( ) || which == "ua";
+    bool ok = word == "ok" || word == "ок" || word.strPrefix( "auto" ) || word.strPrefix( "авто" );
+
+    if (!ok || (!ru && !ua)) {
+        ch->send_to( "Usage:\r\n"
+                     "{Wcases{x - the six cases of the RU and UA short, and a proposal for a short without them\r\n"
+                     "{Wcases ok{x - write the case forms of a short that has none\r\n"
+                     "{Wcases ok{x {Wru{x|{Wua{x - decline that short from its nominative and write its case forms, replacing any\r\n" );
+        return false;
+    }
+
+    bool changed = false;
+    DLString report;
+
+    for (auto lang: langs) {
+        if ((lang == LANG_RU && !ru) || (lang == LANG_UA && !ua))
+            continue;
+
+        DLString value = shortDescr.get( lang );
+        DLString label = olc_cases_label( lang );
+
+        if (value.empty( ) || !String::hasCyrillic( value ))
+            continue;
+
+        // Hand-made case forms are only re-declined when the builder names
+        // the language: a bare 'cases ok' applies what was proposed.
+        if (which.empty( ) && value.find( '|' ) != DLString::npos) {
+            report << label << " already has case forms: {Wcases ok " << (lang == LANG_RU ? "ru" : "ua")
+                   << "{x re-declines.\r\n";
+            continue;
+        }
+
+        DLString pad, why;
+        if (!olc_cases_decline( value, lang, gender, anim, pad, why )) {
+            report << (why.empty( ) ? label + " short does not decline, left as typed." : why) << "\r\n";
+            continue;
+        }
+
+        if (pad == value) {
+            report << label << " cases already match.\r\n";
+            continue;
+        }
+
+        shortDescr[lang] = pad;
+        report << olc_cases_line( label + " cases written", pad );
+        changed = true;
+    }
+
+    if (report.empty( ))
+        report = "Nothing to decline: no Cyrillic short.\r\n";
+
+    ch->send_to( report );
+    return changed;
 }

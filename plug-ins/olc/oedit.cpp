@@ -266,6 +266,14 @@ void OLCStateObject::statePrompt(Descriptor *d)
     d->send( "Editing obj> " );
 }
 
+// Defined before every other subcommand: the chain matches the last defined
+// first, so 'c', 'ca' and the rest keep resolving to what they did before.
+OEDIT(cases)
+{
+    return olc_cases_command(ch, argument, obj.short_descr,
+                             olc_cases_gender_obj(obj.gram_gender), false);
+}
+
 OEDIT(show)
 {
     OBJ_INDEX_DATA *pObj;
@@ -1299,7 +1307,14 @@ OEDIT(commands)
 
 OEDIT(done) 
 {
+    // See MEDIT(done): a proposal for a short this run typed bare.
+    OBJ_INDEX_DATA *original = get_obj_index(obj.vnum);
+    DLString report;
+    olc_cases_propose(obj.short_descr, original ? &original->short_descr : 0,
+                      olc_cases_gender_obj(obj.gram_gender), false, report);
+
     commit();
+    ch->send_to(report);
     olc_validate_print(ch, "obj", obj.vnum);
     detach(ch);
     return true;
