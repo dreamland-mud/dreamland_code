@@ -1304,11 +1304,11 @@ OEDIT(commands)
 
 OEDIT(done) 
 {
-    // See MEDIT(done): case forms for a short this run typed bare.
+    // See MEDIT(done): a proposal for a short this run typed bare.
     OBJ_INDEX_DATA *original = get_obj_index(obj.vnum);
     DLString report;
-    olc_cases_autofill(obj.short_descr, original ? &original->short_descr : 0,
-                       olc_cases_gender_obj(obj.gram_gender), false, report);
+    olc_cases_propose(obj.short_descr, original ? &original->short_descr : 0,
+                      olc_cases_gender_obj(obj.gram_gender), false, report);
 
     commit();
     ch->send_to(report);

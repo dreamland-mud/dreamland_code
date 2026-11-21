@@ -1329,13 +1329,14 @@ MEDIT(commands)
 
 MEDIT(done) 
 {
-    // Case forms for a short this run typed as a bare nominative, with the
-    // sex and number the run ended with. The API fills at the end of a batch.
+    // Propose case forms for a short this run typed as a bare nominative,
+    // with the sex and number the run ended with. Nothing is written: the
+    // builder applies them with 'cases ok'.
     MOB_INDEX_DATA *original = get_mob_index(mob.vnum);
     DLString report;
-    olc_cases_autofill(mob.short_descr, original ? &original->short_descr : 0,
-                       olc_cases_gender_mob(mob.sex, mob.gram_number == Grammar::Number::PLURAL),
-                       true, report);
+    olc_cases_propose(mob.short_descr, original ? &original->short_descr : 0,
+                      olc_cases_gender_mob(mob.sex, mob.gram_number == Grammar::Number::PLURAL),
+                      true, report);
 
     commit();
     ch->send_to(report);

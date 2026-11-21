@@ -70,23 +70,23 @@ bool olc_same_xml( const XMLNode::Pointer &a, const XMLNode::Pointer &b );
 class XMLMultiString;
 
 /** Case forms of a prototype short description, RU and UA (medit/oedit
- *  'cases' and the autofill when an edit commits). gender is the morphology
- *  sidecar's masc|femn|neut|plur, anim is true for mobiles. */
+ *  'cases'). Nothing declines a short on its own: the editor proposes the
+ *  forms and the builder applies them with 'cases ok'. gender is the
+ *  morphology sidecar's masc|femn|neut|plur, anim is true for mobiles. */
 DLString olc_cases_gender_mob( int sex, bool plural );
 DLString olc_cases_gender_obj( int multiGender );
 
-/** Autofill: decline the RU and UA short that this edit run changed (it
+/** The proposal for the RU and UA short that this edit run changed (it
  *  differs from 'before', the prototype's short when the run started; null
- *  for a new prototype) and that has Cyrillic, no '|' and no colour code.
- *  A short nobody touched is left alone, however bare. One line per
- *  language goes to report. True if a value changed. */
-bool olc_cases_autofill( XMLMultiString &shortDescr, const XMLMultiString *before,
-                         const DLString &gender, bool anim, DLString &report );
+ *  for a new prototype) and that has Cyrillic and no '|'. A short nobody
+ *  touched gets no line, however bare. Writes nothing; report gets one line
+ *  per language and how to apply. True if anything was proposed. */
+bool olc_cases_propose( const XMLMultiString &shortDescr, const XMLMultiString *before,
+                        const DLString &gender, bool anim, DLString &report );
 
-/** The six cases of the RU and UA short, one line each. */
-void olc_cases_show( PCharacter *ch, const XMLMultiString &shortDescr );
-
-/** The 'cases [auto [ru|ua]]' editor command. True if a value changed. */
+/** The 'cases' editor command: show the six cases (and the proposal for a
+ *  short without them); 'cases ok [ru|ua]' declines the short from its
+ *  nominative and writes the forms. True if a value changed. */
 bool olc_cases_command( PCharacter *ch, const char *argument, XMLMultiString &shortDescr,
                         const DLString &gender, bool anim );
 

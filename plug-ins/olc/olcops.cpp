@@ -238,35 +238,31 @@ struct OlcOpContext {
     std::set<int> quests;
     // Prototypes a 'validate' op named; area vnums mean every prototype of the area.
     std::set<std::pair<DLString, int> > validate;
-    // Mob and object shorts as they were before the batch first touched the
-    // prototype (absent: the batch created it), for the case autofill that
-    // runs once after every op, with the gender the batch ended with.
+    // Mob and object shorts as they were before the batch's first subcommand
+    // on the prototype, for the case proposal made once after every op, with
+    // the gender the batch ended with. A put is the author's exact text and
+    // is never snapshotted.
     std::map<std::pair<DLString, int>, XMLMultiString> casesBefore;
-    std::set<std::pair<DLString, int> > casesNew;
     Json::Value *warnings;
 };
 
-/** Remember a mob or object short before the batch's first edit of it. */
+/** Remember a mob or object short before the batch's first subcommand on it. */
 static void cases_snapshot(OlcOpContext &ctx, const DLString &kind, int vnum)
 {
     std::pair<DLString, int> key(kind, vnum);
 
-    if (ctx.dryRun || ctx.casesBefore.count(key) || ctx.casesNew.count(key))
+    if (ctx.dryRun || ctx.casesBefore.count(key))
         return;
 
     if (kind == "mob") {
         MOB_INDEX_DATA *pMob = get_mob_index(vnum);
         if (pMob)
             ctx.casesBefore[key] = pMob->short_descr;
-        else
-            ctx.casesNew.insert(key);
     }
     else if (kind == "obj") {
         OBJ_INDEX_DATA *pObj = get_obj_index(vnum);
         if (pObj)
             ctx.casesBefore[key] = pObj->short_descr;
-        else
-            ctx.casesNew.insert(key);
     }
 }
 
@@ -508,7 +504,7 @@ static bool run_on_state(::Pointer<State> state, OlcOpContext &ctx, OlcOpLine &l
         output = DLString(ctx.capture->getString().substr(mark)).colourStrip();
 
     // Read-only and refused subcommands answer in the editor's own words, and
-    // so does 'cases', whose answer is the forms it filled.
+    // so does 'cases', whose answer is the forms it shows or writes.
     if (ctx.verbose || !state->lastChanged || name == "cases")
         res["output"] = output;
 
@@ -1036,8 +1032,6 @@ static bool op_put(OlcOpContext &ctx, const DLString &kind, int vnum, const Json
         error = "You can't build at vnum " + DLString(vnum);
         return false;
     }
-
-    cases_snapshot(ctx, kind, vnum);
 
     if (!exists && !is_planned(ctx, kind, vnum)) {
         if (create_vnum(ctx, kind, 0, DLString(vnum), error) < 0)
@@ -2609,7 +2603,7 @@ Json::Value OlcOps::apply(PCharacter *actor, const Json::Value &ops,
             ctx.batchRooms.insert(op["vnum"].asInt());
 
     std::set<std::pair<DLString, int> > changed;
-    // The last op on each prototype: the case autofill reports in its output.
+    // The last op on each prototype: the case proposal goes into its output.
     std::map<std::pair<DLString, int>, Json::Value::ArrayIndex> lastResult;
     Json::Value::ArrayIndex i;
 
@@ -2692,48 +2686,28 @@ Json::Value OlcOps::apply(PCharacter *actor, const Json::Value &ops,
     if (!dryRun)
         quest_pairing_warnings(ctx);
 
-    // Case forms for the shorts the batch typed as a bare nominative, once,
-    // with the sex, number and gender the batch ended with.
-    if (!dryRun) {
-        std::set<std::pair<DLString, int> > touched(ctx.casesNew);
-        for (auto &b: ctx.casesBefore)
-            touched.insert(b.first);
-
-        for (auto &key: touched) {
-            auto b = ctx.casesBefore.find(key);
-            const XMLMultiString *before = b == ctx.casesBefore.end() ? 0 : &b->second;
+    // A proposal for the shorts the batch's subcommands typed as a bare
+    // nominative, once, with the sex, number and gender the batch ended with.
+    // Nothing is written: a 'cases ok' op applies it.
+    if (!dryRun)
+        for (auto &b: ctx.casesBefore) {
+            const std::pair<DLString, int> &key = b.first;
             DLString report;
-            bool filled = false;
-            AreaIndexData *pArea = 0;
 
             if (key.first == "mob") {
                 MOB_INDEX_DATA *pMob = get_mob_index(key.second);
                 if (!pMob)
                     continue;
-                filled = olc_cases_autofill(pMob->short_descr, before,
-                            olc_cases_gender_mob(pMob->sex, pMob->gram_number == Grammar::Number::PLURAL),
-                            true, report);
-                pArea = pMob->area;
+                olc_cases_propose(pMob->short_descr, &b.second,
+                                  olc_cases_gender_mob(pMob->sex, pMob->gram_number == Grammar::Number::PLURAL),
+                                  true, report);
             }
             else {
                 OBJ_INDEX_DATA *pObj = get_obj_index(key.second);
                 if (!pObj)
                     continue;
-                filled = olc_cases_autofill(pObj->short_descr, before,
-                            olc_cases_gender_obj(pObj->gram_gender), false, report);
-                pArea = pObj->area;
-            }
-
-            if (filled) {
-                if (pArea)
-                    pArea->changed = true;
-                op_journal(ctx, key.first, key.second, "cases", "auto");
-                if (changed.insert(key).second) {
-                    Json::Value c;
-                    c["kind"] = key.first;
-                    c["vnum"] = key.second;
-                    result["changed"].append(c);
-                }
+                olc_cases_propose(pObj->short_descr, &b.second,
+                                  olc_cases_gender_obj(pObj->gram_gender), false, report);
             }
 
             auto last = lastResult.find(key);
@@ -2745,7 +2719,6 @@ Json::Value OlcOps::apply(PCharacter *actor, const Json::Value &ops,
                 r["output"] = shown + report.colourStrip();
             }
         }
-    }
 
     // A dry run changed nothing: only what 'validate' ops named is checked.
     int validationErrors = run_validators(ctx, dryRun ? std::set<std::pair<DLString, int> >() : changed,
