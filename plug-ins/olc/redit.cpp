@@ -122,6 +122,16 @@ int OLCStateRoom::getJournalVnum( ) const
     return room.getValue();
 }
 
+// redit edits the room the builder stands in, not the one it was opened on,
+// so menus are keyed to that room, the same way the static show spells it.
+DLString OLCStateRoom::getMenuKey( )
+{
+    if (!owner || !owner->character || !owner->character->in_room)
+        return OLCState::getMenuKey( );
+
+    return "room:" + DLString( getOriginal( )->vnum );
+}
+
 /*-------------------------------------------------------------------------
  * state level commands
  *-------------------------------------------------------------------------*/
