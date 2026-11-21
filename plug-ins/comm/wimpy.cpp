@@ -17,17 +17,18 @@ CMDRUNP( wimpy )
 
     one_argument( argument, arg );
 
-    if ((ch->getProfession() == prof_samurai) && (ch->getRealLevel() >= 10))
+    if ( arg[0] == '\0' )
+        wimpy = ch->max_hit / 5;
+    else  wimpy = atoi( arg );
+
+    // A samurai never flees, but an explicit 0 agrees with that and is allowed.
+    if ((ch->getProfession() == prof_samurai) && (ch->getRealLevel() >= 10) && wimpy != 0)
     {
         ch->pecho(_("Стыдись! Это будет слишком большим позором для самурая."));
         if (ch->wimpy != 0) 
             ch->wimpy = 0;
         return;
     }
-
-    if ( arg[0] == '\0' )
-        wimpy = ch->max_hit / 5;
-    else  wimpy = atoi( arg );
 
     if ( wimpy < 0 )
     {
