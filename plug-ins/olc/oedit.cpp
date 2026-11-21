@@ -1109,7 +1109,7 @@ OEDIT(copy)
         ch->pecho("Syntax: \r\n"
                     "  copy param <vnum> -- copy affects, level, flags and other parameters from <vnum> obj index.\r\n"
                     "  copy behav <vnum> -- copy behaviors and props.\r\n"
-                    "  copy fenia <vnum> -- copy Fenia triggers (one-trigger scenarios), live at once, no undo.\r\n"
+                    "  copy fenia <vnum> -- copy Fenia triggers (one-trigger scenarios), live at once, no undo, in-game only.\r\n"
                     "  copy desc <vnum>  -- copy name, short, long and extra descriptions from <vnum> obj index.\r\n" );
         return false;
     }

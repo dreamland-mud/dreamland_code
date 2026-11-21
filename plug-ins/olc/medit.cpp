@@ -1374,7 +1374,7 @@ MEDIT(copy)
         ch->pecho("Syntax: \r\n"
                     "  copy param <vnum> -- copy race, hit, damage and other parameters from <vnum> mob index.\r\n"
                     "  copy behav <vnum> -- copy behaviors and props.\r\n"
-                    "  copy fenia <vnum> -- copy Fenia triggers (one-trigger scenarios), live at once, no undo.\r\n"
+                    "  copy fenia <vnum> -- copy Fenia triggers (one-trigger scenarios), live at once, no undo, in-game only.\r\n"
                     "  copy desc <vnum>  -- copy name, description, short and long description from <vnum> mob index.\r\n" );
         return false;
     }

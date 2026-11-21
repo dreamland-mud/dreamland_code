@@ -74,6 +74,15 @@ DLString olc_servlet_refusal(const DLString &cmdName, const DLString &arguments,
     DLString args = arguments;
     DLString word = args.getOneArgument();
 
+    // copy fenia evaluates Fenia code and needs a Fenia right the API actor lacks:
+    // refuse it here as an error instead of a refusal hidden in the editor echo.
+    if (cmdName == "copy") {
+        DLString rest = args;
+        DLString second = rest.getOneArgument();
+        if (arg_is(word, "fenia") || arg_is(second, "fenia"))
+            return "copy fenia is in-game only (it needs Fenia security)";
+    }
+
     if (olc_is_direction(cmdName)) {
         // A bare direction moves the actor through the exit.
         if (word.empty())

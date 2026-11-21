@@ -181,7 +181,7 @@ REDIT(copy, "копировать", "скопировать описания, п
             "  copy param <vnum>    -- sector, flags, heal and mana rate, clan, guilds, liquid.\r\n"
             "  copy behavior <vnum> -- behaviors and their props.\r\n"
             "  copy all <vnum>      -- all of the above.\r\n"
-            "  copy fenia <vnum>    -- Fenia triggers (one-trigger scenarios), not part of 'all'.\r\n"
+            "  copy fenia <vnum>    -- Fenia triggers (one-trigger scenarios), not part of 'all', in-game only.\r\n"
             "The order 'copy <vnum> <mode>' works too.\r\n"
             "Exits and resets are never copied.\r\n"
             "This edits the room directly: there is no undo.\r\n", ch);
