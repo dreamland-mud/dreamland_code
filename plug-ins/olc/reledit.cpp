@@ -81,6 +81,11 @@ void OLCStateReligion::changed( PCharacter *ch )
     isChanged = true;
 }
 
+DLString OLCStateReligion::getMenuKey( )
+{
+    return "religion:" + olc_menu_key_part( original.getName( ) );
+}
+
 void OLCStateReligion::show( PCharacter *ch )
 {
     DefaultReligion *r = getOriginal();
@@ -96,7 +101,7 @@ void OLCStateReligion::show( PCharacter *ch )
     ptc(ch, "Пол божества:      {C%s{x {D(? sex){x\r\n",
         web_flag_menu(true, *r->sex.getTable(), "sex", sex_table.name(r->getSex())).c_str());
 
-    ptc(ch, "Пол последователей: {C%s{x {D(? sex){x\r\n",
+    ptc(ch, "Пол последователей: {C%s{x {D(followersex; ? sex){x\r\n",
         web_flag_menu(true, *r->followerSex.getTable(), "followersex", sex_table.name(r->followerSex.getValue())).c_str());
 
     ptc(ch, "Описание:          {C%s{x  %s {D(desc help){x\r\n",

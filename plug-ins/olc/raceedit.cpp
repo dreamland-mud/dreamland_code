@@ -93,6 +93,11 @@ void OLCStateRace::changed( PCharacter *ch )
     MobBody::touch();
 }
 
+DLString OLCStateRace::getMenuKey( )
+{
+    return "race:" + olc_menu_key_part( original.getName( ) );
+}
+
 static DLString show_flag(const Flags &f)
 {
     return f.getValue() == 0 ? "-" : f.names();
@@ -100,7 +105,7 @@ static DLString show_flag(const Flags &f)
 
 static DLString show_flag_menu(const Flags &f, const DLString &cmd)
 {
-    return web_flag_menu(true, *f.getTable(), cmd, show_flag(f));
+    return web_flag_bits_menu(true, *f.getTable(), cmd, show_flag(f));
 }
 
 static DLString show_enum(const Enumeration &e)
@@ -167,13 +172,13 @@ void OLCStateRace::show( PCharacter *ch )
 
     ptc(ch, "Удары:         {Y%s{x {D(attacks){x  материал {Y%s{x {D(material){x\r\n",
         r->attacks.empty() ? "-" : r->attacks.c_str(),
-        web_material_menu(true, "material", r->material.empty() ? DLString("-") : r->material).c_str());
+        web_material_menu(true, "material", r->material.empty() ? DLString("-") : r->material, "clear").c_str());
     ptc(ch, "Множители:     здоровье {Y%s{x {D(hpmult){x урон {Y%s{x {D(dmgmult){x  походка {Y%s{x {D(moveverb){x\r\n",
         r->hpMult.empty() ? "1.0" : r->hpMult.c_str(),
         r->dmgMult.empty() ? "1.0" : r->dmgMult.c_str(),
         r->moveverb.empty() ? "-" : r->moveverb.c_str());
     ptc(ch, "Спецфункция:   {Y%s{x {D(spec){x\r\n",
-        web_list_menu(true, spec_function_names(), "spec", r->spec.empty() ? DLString("-") : r->spec).c_str());
+        web_list_menu(true, spec_function_names("clear"), "spec", r->spec.empty() ? DLString("-") : r->spec).c_str());
 
     ptc(ch, "Политика:      охотится [{r%s{x] {D(hunts){x, делится [{g%s{x] {D(donates){x\r\n",
            web_bitvector_menu(true, r->hunts, "hunts", r->hunts.toString()).c_str(),
@@ -326,8 +331,13 @@ RACEEDIT(attacks, "удары", "типы ударов мобов расы че�
 
     return editor(argument, getOriginal()->attacks, ED_NO_NEWLINE);
 }
-RACEEDIT(material, "материал", "материал тела по умолчанию для мобов расы")
+RACEEDIT(material, "материал", "материал тела по умолчанию для мобов расы, clear -- сбросить")
 {
+    if (arg_is_clear(argument)) {
+        getOriginal()->material.clear();
+        stc("Материал сброшен.\r\n", ch);
+        return true;
+    }
     return editor(argument, getOriginal()->material, ED_NO_NEWLINE);
 }
 RACEEDIT(hpmult, "здоровьемножитель", "множитель здоровья мобов расы (1.0 по умолчанию)")
@@ -342,8 +352,13 @@ RACEEDIT(moveverb, "походка", "глагол движения мобов �
 {
     return editor(argument, getOriginal()->moveverb, ED_NO_NEWLINE);
 }
-RACEEDIT(spec, "спец", "спецфункция мобов расы, если у прототипа своей нет (spec_breath_any...)")
+RACEEDIT(spec, "спец", "спецфункция мобов расы, если у прототипа своей нет (spec_breath_any...), clear -- сбросить")
 {
+    if (arg_is_clear(argument)) {
+        getOriginal()->spec.clear();
+        stc("Спецфункция сброшена.\r\n", ch);
+        return true;
+    }
     return editor(argument, getOriginal()->spec, ED_NO_NEWLINE);
 }
 RACEEDIT(size, "размер", "размеры (? size_table)")

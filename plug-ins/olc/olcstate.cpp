@@ -1262,6 +1262,16 @@ DLString web_flag_menu(bool showWeb, const FlagTable &table, const DLString &cmd
     return web_list_menu(showWeb, names, cmd, label);
 }
 
+DLString web_flag_bits_menu(bool showWeb, const FlagTable &table, const DLString &cmd, const DLString &label)
+{
+    StringList names;
+    for (int i = 0; i < table.size; i++)
+        if (!table.enumerated || table.fields[i].value != 0)
+            names.push_back(table.fields[i].name);
+
+    return web_list_menu(showWeb, names, cmd, label);
+}
+
 DLString web_registry_menu(bool showWeb, GlobalRegistryBase *registry, const DLString &cmd, const DLString &label,
                            const DLString &clearWord)
 {
@@ -1290,19 +1300,23 @@ DLString web_bitvector_menu(bool showWeb, const GlobalBitvector &field, const DL
     return web_list_menu(showWeb, values, cmd, label);
 }
 
-StringList spec_function_names()
+StringList spec_function_names(const DLString &clearWord)
 {
     StringList names;
     for (int i = 0; spec_table[i].name != 0; i++)
         names.push_back(spec_table[i].name);
+    if (!clearWord.empty())
+        names.push_back(clearWord);
     return names;
 }
 
-DLString web_material_menu(bool showWeb, const DLString &cmd, const DLString &label)
+DLString web_material_menu(bool showWeb, const DLString &cmd, const DLString &label, const DLString &clearWord)
 {
     StringList names;
     for (auto &m: material_table)
         names.push_back(m.name);
+    if (!clearWord.empty())
+        names.push_back(clearWord);
 
     return web_list_menu(showWeb, names, cmd, label);
 }

@@ -28,6 +28,7 @@ public:
     
     virtual void commit();
     virtual void changed( PCharacter * );
+    virtual DLString getMenuKey( );
     void show( PCharacter * );
 
     XML_VARIABLE XMLSkillReference original;
@@ -64,6 +65,7 @@ public:
     
     virtual void commit();
     virtual void changed( PCharacter * );
+    virtual DLString getMenuKey( );
     void show( PCharacter * );
 
     XML_VARIABLE XMLSkillGroupReference original;

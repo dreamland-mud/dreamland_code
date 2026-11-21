@@ -164,6 +164,28 @@ void OLCStateSkill::changed( PCharacter *ch )
     isChanged = true;
 }
 
+DLString OLCStateSkill::getMenuKey( )
+{
+    return "skill:" + olc_menu_key_part( original.getName( ) );
+}
+
+// Some skill types hand out one static group set for all of them (cards,
+// languages, the Skill base): editing it from one skill changes every one
+// and is never saved, so those get no group menu.
+static bool skill_owns_groups(BasicSkill *r)
+{
+    GlobalBitvector *groups = &r->getGroups();
+    if (groups == &r->Skill::getGroups())
+        return false;
+
+    for (int i = 0; i < skillManager->size(); i++) {
+        Skill *sk = skillManager->find(i);
+        if (sk != r && sk->isValid() && &sk->getGroups() == groups)
+            return false;
+    }
+    return true;
+}
+
 static void show_one_message(const char *prefix, PCharacter *ch, const DLString &message, const char *cmd)
 {
     ostringstream buf;
@@ -189,16 +211,16 @@ void OLCStateSkill::show( PCharacter *ch )
             r->name[RU].c_str(),
             web_edit_button(ch, "runame", "web").c_str());
     ptc(ch, "Группы:      {C%s {D(group){x\r\n",
-            web_bitvector_menu(true, r->getGroups(), "group", r->getGroups().toString()).c_str());
+            web_bitvector_menu(skill_owns_groups(r), r->getGroups(), "group", r->getGroups().toString()).c_str());
     ptc(ch, "Дает:        {C%s {D(grants){x\r\n", r->getGrants().toString().c_str());
     ptc(ch, "Задержка:    {C%d{w пульсов {D(beats){x\r\n", r->getBeats());
     ptc(ch, "Цена, очки:  {C%d мана {D(mana) {C%d шаги {D(move){x \r\n", r->getMana(), r->move.getValue());
     ptc(ch, "Цена, %%:     {C%d%% мана {Dpmana) {C%d%% шаги {D(pmove) {C%d%% здоровье {D(phealth){x\r\n",
         r->manaPenalty.getValue(), r->movesPenalty.getValue(), r->healthPenalty.getValue());
     ptc(ch, "Характер:    {C%s {D(align) {C%s {D(ethos){x\r\n",
-        web_flag_menu(true, *r->align.getTable(), "align",
+        web_flag_bits_menu(true, *r->align.getTable(), "align",
                       r->align.getValue() != 0 ? r->align.names() : DLString("-")).c_str(),
-        web_flag_menu(true, *r->ethos.getTable(), "ethos",
+        web_flag_bits_menu(true, *r->ethos.getTable(), "ethos",
                       r->ethos.getValue() != 0 ? r->ethos.names() : DLString("-")).c_str());
     ptc(ch, "Негатив:     {C%s {D(negative){x\r\n",
         web_bool_menu(true, "negative", r->isNegative() ? "да - дебафф, в aff красным" : "нет").c_str());
@@ -1241,6 +1263,11 @@ DefaultSkillGroup * OLCStateSkillGroup::getOriginal()
 void OLCStateSkillGroup::changed( PCharacter * )
 {
     isChanged = true;
+}
+
+DLString OLCStateSkillGroup::getMenuKey( )
+{
+    return "group:" + olc_menu_key_part( original.getName( ) );
 }
 
 void OLCStateSkillGroup::statePrompt(Descriptor *d) 

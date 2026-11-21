@@ -66,6 +66,11 @@ void OLCStateSocial::changed( PCharacter *ch )
     isChanged = true;
 }
 
+DLString OLCStateSocial::getMenuKey( )
+{
+    return "social:" + olc_menu_key_part( socialName.getValue( ) );
+}
+
 lang_t OLCStateSocial::getLang() const
 {
     DLString value = editLang.getValue();

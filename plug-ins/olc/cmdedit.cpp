@@ -109,6 +109,11 @@ void OLCStateCommand::changed( PCharacter *ch )
     isChanged = true;
 }
 
+DLString OLCStateCommand::getMenuKey( )
+{
+    return "command:" + olc_menu_key_part( cmdName.getValue( ) );
+}
+
 void OLCStateCommand::show( PCharacter *ch )
 {
     ::Command *c = getOriginal();
