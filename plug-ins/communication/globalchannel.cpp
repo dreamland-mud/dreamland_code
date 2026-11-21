@@ -3,6 +3,8 @@
  * ruffina, 2004
  */
 #include <jsoncpp/json/json.h>
+#include <map>
+#include <vector>
 
 #include "logstream.h"
 #include "globalchannel.h"
@@ -62,16 +64,68 @@ GlobalChannel::GlobalChannel( )
 // ("tiers": [{hours, percent}], the highest reached tier wins) and one word list
 // per language. The lists are parallel: one index is the same joke for every
 // reader, whatever language each of them reads in.
-static Json::Value agingConfig;
+//
+// The file is hand-edited, and jsoncpp throws std::exception on a wrong type,
+// which nothing on the command path catches. So it is validated once here into
+// plain containers and the say path never touches a Json::Value.
+static vector<pair<int, int> > grumbleTiers;
+static map<DLString, vector<DLString> > grumbleWords;
+
 CONFIGURABLE_LOADED(config, aging)
 {
-    agingConfig = value;
+    grumbleTiers.clear( );
+    grumbleWords.clear( );
+
+    if (!value.isObject( )) {
+        if (!value.isNull( ))
+            LogStream::sendError( ) << "aging.json: root is not an object, no grumble" << endl;
+        return;
+    }
+
+    if (!value.isMember( "grumble" ))
+        return;
+
+    const Json::Value &cfg = value["grumble"];
+    if (!cfg.isObject( )) {
+        LogStream::sendError( ) << "aging.json: grumble is not an object, no grumble" << endl;
+        return;
+    }
+
+    for (Json::Value::const_iterator k = cfg.begin( ); k != cfg.end( ); k++) {
+        DLString key = k.name( );
+        const Json::Value &list = *k;
+
+        if (!list.isArray( )) {
+            LogStream::sendError( ) << "aging.json: grumble." << key << " is not a list, skipped" << endl;
+            continue;
+        }
+
+        for (Json::ArrayIndex i = 0; i < list.size( ); i++) {
+            const Json::Value &item = list[i];
+
+            if (key == "tiers") {
+                if (item.isObject( )
+                    && item["hours"].isInt( ) && item["percent"].isInt( ))
+                    grumbleTiers.push_back( make_pair( item["hours"].asInt( ), item["percent"].asInt( ) ) );
+                else
+                    LogStream::sendError( ) << "aging.json: grumble.tiers[" << i
+                                            << "] needs integer hours and percent, skipped" << endl;
+            }
+            else if (item.isString( ))
+                grumbleWords[key].push_back( item.asString( ) );
+            else
+                LogStream::sendError( ) << "aging.json: grumble." << key << "[" << i
+                                        << "] is not a string, skipped" << endl;
+        }
+    }
 }
 
-static const Json::Value & grumble_config( )
+static const vector<DLString> * grumble_words( const DLString &lang )
 {
-    const Json::Value &root = agingConfig;
-    return root["grumble"];
+    map<DLString, vector<DLString> >::const_iterator w = grumbleWords.find( lang );
+    if (w == grumbleWords.end( ) || w->second.empty( ))
+        return 0;
+    return &w->second;
 }
 
 int GlobalChannel::grumbleRoll( Character *ch ) const
@@ -82,21 +136,24 @@ int GlobalChannel::grumbleRoll( Character *ch ) const
     if (IS_SET(ch->getPC( )->config, CONFIG_NOGRUMBLE))
         return -1;
 
-    const Json::Value &cfg = grumble_config( );
-    const Json::Value &words = cfg["ru"];
-    if (!words.isArray( ) || words.empty( ))
+    // Gibberish gets no clean tail.
+    if (garbles( ch ))
+        return -1;
+
+    const vector<DLString> *words = grumble_words( "ru" );
+    if (!words || grumbleTiers.empty( ))
         return -1;
 
     int hours = pc_total_hours( ch->getPC( ) );
     int pct = 0;
-    for (const Json::Value &tier: cfg["tiers"])
-        if (hours >= tier["hours"].asInt( ))
-            pct = max( pct, tier["percent"].asInt( ) );
+    for (const pair<int, int> &tier: grumbleTiers)
+        if (hours >= tier.first)
+            pct = max( pct, tier.second );
 
     if (pct <= 0 || number_percent( ) > pct)
         return -1;
 
-    return number_range( 0, (int)words.size( ) - 1 );
+    return number_range( 0, (int)words->size( ) - 1 );
 }
 
 DLString GlobalChannel::grumbleText( int index, Character *reader ) const
@@ -104,14 +161,13 @@ DLString GlobalChannel::grumbleText( int index, Character *reader ) const
     if (index < 0)
         return DLString::emptyString;
 
-    const Json::Value &cfg = grumble_config( );
-    const Json::Value *words = &cfg[lang2attr( viewerLang( reader ) )];
-    if (!words->isArray( ) || words->empty( ))
-        words = &cfg["ru"];
-    if (!words->isArray( ) || words->empty( ))
+    const vector<DLString> *words = grumble_words( lang2attr( viewerLang( reader ) ) );
+    if (!words)
+        words = grumble_words( "ru" );
+    if (!words)
         return DLString::emptyString;
 
-    return DLString( " ... " ) + (*words)[(Json::ArrayIndex)index % words->size( )].asString( );
+    return DLString( " ... " ) + (*words)[index % words->size( )];
 }
 
 void GlobalChannel::run( Character *ch, const DLString &arg )
@@ -160,13 +216,16 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
 
     // Readers get the noise, triggers and logs get the clean line.
     int noise = arg.empty( ) ? -1 : grumbleRoll( ch );
+    bool noiseRead = false;
 
     if (needOutputSelf( ch )) {
         bool fMild = (IS_SET(ch->comm, COMM_MILDCOLOR) && !msgSelfMild.empty( ));
         bool fEmpty = (!msgListEmpty.empty( ) && listeners.size( ) == 0);
         const DLString &fmtSelf = fEmpty ? msgListEmpty : fMild ? msgSelfMild : msgSelf;
 
-        DLString outSelf = argGarbled + grumbleText( noise, ch );
+        DLString noiseSelf = grumbleText( noise, ch );
+        DLString outSelf = argGarbled + noiseSelf;
+        noiseRead = noiseRead || !noiseSelf.empty( );
         DLString message = outputSelf( ch, fmtSelf, outSelf );
         ch->pecho(message);
         postOutput(ch, message, ch);
@@ -188,7 +247,9 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
             bool fMild = (IS_SET((*i)->comm, COMM_MILDCOLOR) && !msgOtherMild.empty( ));
             const DLString &fmtVict = fNoarg ? msgOtherNoarg : fMild ? msgOtherMild : msgOther;
             
-            DLString outVict = argGarbled + grumbleText( noise, victim );
+            DLString noiseVict = grumbleText( noise, victim );
+            DLString outVict = argGarbled + noiseVict;
+            noiseRead = noiseRead || !noiseVict.empty( );
 
             DLString message = outputVict( ch, victim, fmtVict, outVict );
             victim->pecho(message);
@@ -202,7 +263,7 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
         }
     }
 
-    if (noise >= 0)
+    if (noiseRead)
         achievement( ch, "back_in_my_day" );
 
     triggers( ch, argGarbled );

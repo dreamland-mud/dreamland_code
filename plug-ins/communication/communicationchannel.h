@@ -33,6 +33,9 @@ public:
 protected:
     virtual bool checkIsolator( Character *, Character * ) const;
 
+    /** True when applyGarble would mangle this speaker's line: the channel
+     *  garbles and the speaker has garble or slurred speech on. */
+    bool garbles( Character * ) const;
     virtual void applyGarble( Character *, DLString & ) const;
 
     // Neutralize player-injected web/command tags ({hc, {hh, ...) in channel text
