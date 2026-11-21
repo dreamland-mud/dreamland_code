@@ -116,9 +116,13 @@ static DLString decline_sidecar( const DLString &word, const DLString &pos, cons
     if (word.empty( ))
         return fallback;
 
+    // A gender with animacy after a comma is an OLC prototype short: rare,
+    // and its answer must follow the sidecar's rules when they change, so it
+    // skips the cache that pins every other answer until a reload.
     static std::map<DLString, DLString> cache;
+    bool cached = gender.find( ',' ) == DLString::npos;
     DLString key = word + "\t" + pos + "\t" + gender + "\t" + lang;
-    std::map<DLString, DLString>::iterator ci = cache.find( key );
+    std::map<DLString, DLString>::iterator ci = cached ? cache.find( key ) : cache.end( );
     if (ci != cache.end( ))
         return ci->second;
 
@@ -170,7 +174,8 @@ static DLString decline_sidecar( const DLString &word, const DLString &pos, cons
         LogStream::sendWarning( ) << "ua-morph: low confidence " << score
                                   << " declining '" << word << "' -> " << pad << endl;
 
-    cache[key] = pad;
+    if (cached)
+        cache[key] = pad;
     return pad;
 }
 
