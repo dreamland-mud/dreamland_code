@@ -88,6 +88,7 @@ DLString OLCStateReligion::getMenuKey( )
 
 void OLCStateReligion::show( PCharacter *ch )
 {
+    OLCMenuKeyScope menuScope( getMenuKey( ) );
     DefaultReligion *r = getOriginal();
 
     ptc(ch, "Короткое описание: {C%s{x  %s {D(short help){x\r\n", 

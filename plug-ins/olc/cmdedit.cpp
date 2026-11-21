@@ -116,6 +116,7 @@ DLString OLCStateCommand::getMenuKey( )
 
 void OLCStateCommand::show( PCharacter *ch )
 {
+    OLCMenuKeyScope menuScope( getMenuKey( ) );
     ::Command *c = getOriginal();
     WrappedCommand *wcmd = dynamic_cast<WrappedCommand *>(c);
 

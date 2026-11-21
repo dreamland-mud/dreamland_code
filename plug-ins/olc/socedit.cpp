@@ -85,6 +85,7 @@ lang_t OLCStateSocial::getLang() const
 
 void OLCStateSocial::show( PCharacter *ch )
 {
+    OLCMenuKeyScope menuScope( getMenuKey( ) );
     Social *s = getOriginal();
     lang_t lang = getLang();
 

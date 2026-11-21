@@ -116,6 +116,7 @@ static DLString show_enum(const Enumeration &e)
 
 void OLCStateRace::show( PCharacter *ch )
 {
+    OLCMenuKeyScope menuScope( getMenuKey( ) );
     DefaultRace *r = getOriginal();
     DefaultPCRace *pc = getPC();
 

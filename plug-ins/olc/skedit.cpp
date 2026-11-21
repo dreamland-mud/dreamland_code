@@ -197,6 +197,7 @@ static void show_one_message(const char *prefix, PCharacter *ch, const DLString 
 
 void OLCStateSkill::show( PCharacter *ch )
 {
+    OLCMenuKeyScope menuScope( getMenuKey( ) );
     BasicSkill *r = getOriginal();
     DefaultSpell *s = getSpell(r);
     DefaultAffectHandler *a = getAffect(r);
@@ -1277,6 +1278,7 @@ void OLCStateSkillGroup::statePrompt(Descriptor *d)
 
 void OLCStateSkillGroup::show(PCharacter *ch)
 {
+    OLCMenuKeyScope menuScope( getMenuKey( ) );
     DefaultSkillGroup *g = getOriginal();
 
     ptc(ch, "Группа:      {C%s\r\n", g->getName().c_str());
