@@ -7111,6 +7111,12 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // bars blocks nothing: it is not the char's to keep.
     Wearlocation *gaWieldSlot = wearlocationManager->findExisting( "wield" );
     ::Object *gaWielded = gaWieldSlot ? gaWieldSlot->find( target ) : 0;
+    // A caster keeps unskilled weapons in the pool (worn for passive stats), unless it
+    // already wields a weapon it is trained in: a druid's staff is never traded for a
+    // sword it can only wave, however good the sword's worn spell is.
+    bool gaUnskilledOut = !w.caster
+                          || (gaWielded != 0 && gaWielded->item_type == ITEM_WEAPON
+                              && target->getSkill( get_weapon_sn( gaWielded ) ) > 0);
     bool gaShieldBlocked = gaWielded != 0 && !target->is_npc( )
                            && target->getRace( )->getSize( ) < SIZE_LARGE
                            && IS_WEAPON_STAT( gaWielded, WEAPON_TWO_HANDS )
@@ -7327,9 +7333,9 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         // paladin, a staff to a warrior. Drop it from the candidate pool outright.
         // Candidate path ONLY: the worn overload keeps scoring an unskilled weapon so
         // "you already wear the best" still holds for a char stuck with one. Casters
-        // are unchanged -- they don't swing, so a weapon is worn for its passive stats.
+        // keep them (worn for passive stats) unless they wield a trained weapon already.
         // A cleric who can compound the weapon into a mace DOES wield it: keep it.
-        if (!w.caster && pObj->item_type == ITEM_WEAPON
+        if (gaUnskilledOut && pObj->item_type == ITEM_WEAPON
             && target->getSkill( get_weapon_sn( pObj ) ) == 0
             && !ga_clericCanCompound( target, pObj ))
             continue;
@@ -7480,7 +7486,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         if (IS_SET(o->wear_flags, ITEM_WEAR_HORSE)  && horseLoc  && !target->getWearloc( ).isSet( horseLoc ))  continue;
         if (IS_SET(o->wear_flags, ITEM_WEAR_HOOVES) && hoovesLoc && !target->getWearloc( ).isSet( hoovesLoc )) continue;
         if (IS_SET(o->wear_flags, ITEM_WEAR_FEET)   && feetLoc   && !target->getWearloc( ).isSet( feetLoc ))   continue;
-        if (!w.caster && o->item_type == ITEM_WEAPON
+        if (gaUnskilledOut && o->item_type == ITEM_WEAPON
             && target->getSkill( get_weapon_sn( o ) ) == 0
             && !ga_clericCanCompound( target, o ))
             continue;
