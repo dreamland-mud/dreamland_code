@@ -195,16 +195,40 @@ static void convert_obj_values( Object *obj )
 }
 
 /*
- * Crafted, rolled and enchanted items own their values: they keep the whole
- * set they were made with. Stock items follow their prototype slot by slot.
+ * Crafted, rolled and enchanted copies: the same marks the armor refit checks.
  */
-static bool obj_keeps_own_values( Object *obj )
+static bool obj_has_own_marks( Object *obj )
 {
-    for (const char *mark: { "measure_m", "craft_picks", "tier", "enchanted", "propsLost", "keepOld" })
+    for (const char *mark: { "measure_m", "craft_picks", "tier", "enchanted", "propsLost" })
         if (!obj->getProperty( mark ).empty( ))
             return true;
 
     return false;
+}
+
+/*
+ * Items whose five values belong together keep the whole set on save: crafted,
+ * rolled, enchanted or pinned copies, wands and staves (level, max, charges,
+ * spell), drink containers (capacity, amount, poison) and weapons with
+ * level-scaled dice. Everything else follows its prototype slot by slot.
+ * keepOld is read off the copy only: the prototype carries it on every
+ * converted 'random armor' and 'random weapon' piece.
+ */
+static bool obj_keeps_own_values( Object *obj )
+{
+    if (obj_has_own_marks( obj ) || obj->props.isMember( "keepOld" ))
+        return true;
+
+    switch (obj->item_type) {
+    case ITEM_WAND:
+    case ITEM_STAFF:
+    case ITEM_DRINK_CON:
+        return true;
+    case ITEM_WEAPON:
+        return !obj->getsValueFromProto( 1 ) || !obj->getsValueFromProto( 2 );
+    default:
+        return false;
+    }
 }
 
 static void convert_religion( PCharacter *pc, int number )
@@ -2531,7 +2555,7 @@ static void obj_refit_migrate( Object *obj )
         if (!from[i].isInt( ))
             return;
 
-    if (obj_keeps_own_values( obj ))
+    if (obj_has_own_marks( obj ))
         return;
 
     for (int i = 0; i < 4; i++)
