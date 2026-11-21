@@ -437,9 +437,12 @@ OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
     ptc(ch, "Name EN: [{W%s{x] %s\n\r", pRoom->name.get(EN).c_str(), web_edit_button(showWeb, ch, "name", "web").c_str());   
     ptc(ch, "Name UA: [{W%s{x] %s\n\r", pRoom->name.get(UA).c_str(), web_edit_button(showWeb, ch, "uaname", "web").c_str());   
     ptc(ch, "Name RU: [{W%s{x] %s\n\r", pRoom->name.get(RU).c_str(), web_edit_button(showWeb, ch, "runame", "web").c_str());   
-    ptc(ch, "Clan:    [{W%s{x]  Guilds: [{W%s{x]\n", pRoom->clan->getName( ).c_str( ), pRoom->guilds.toString().c_str());
+    ptc(ch, "Clan:    [{W%s{x]  Guilds: [{W%s{x]\n",
+            web_registry_menu(showWeb, ClanManager::getThis(), "clan", pRoom->clan->getName( )).c_str( ),
+            web_bitvector_menu(showWeb, pRoom->guilds, "guilds", pRoom->guilds.toString()).c_str());
     ptc(ch, "Sector:  [{W%s{x] {D(? sector_table){x  Liquid: [{W%s{x] {D(? liquid){x\n\r", 
-            sector_table.name(pRoom->sector_type).c_str(), pRoom->liquid->getName().c_str());
+            web_flag_menu(showWeb, sector_table, "sector", sector_table.name(pRoom->sector_type)).c_str(),
+            web_registry_menu(showWeb, liquidManager, "liquid", pRoom->liquid->getName()).c_str());
     ptc(ch, "Smell:   [{W%s{x] %s [{W%s{x] %s [{W%s{x] %s\n\r", 
           String::stripEOL(pRoom->smell.get(EN)).c_str(), web_edit_button(showWeb, ch, "smell", "web").c_str(),   
           String::stripEOL(pRoom->smell.get(UA)).c_str(), web_edit_button(showWeb, ch, "uasmell", "web").c_str(),   
@@ -448,7 +451,8 @@ OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
           String::stripEOL(pRoom->sound.get(EN)).c_str(), web_edit_button(showWeb, ch, "sound", "web").c_str(),   
           String::stripEOL(pRoom->sound.get(UA)).c_str(), web_edit_button(showWeb, ch, "uasound", "web").c_str(),   
           String::stripEOL(pRoom->sound.get(RU)).c_str(), web_edit_button(showWeb, ch, "rusound", "web").c_str());   
-    ptc(ch, "Flags:   [{W%s{x] {D(? room_flags){x\n\r", room_flags.names(pRoom->room_flags).c_str());
+    ptc(ch, "Flags:   [{W%s{x] {D(? room_flags){x\n\r",
+            web_flag_menu(showWeb, room_flags, "flags", room_flags.names(pRoom->room_flags)).c_str());
     ptc(ch, "Health:  [{W%d{x]%%  Mana: [{W%d{x]%%\r\n", pRoom->heal_rate,  pRoom->mana_rate);
     
     if (!pRoom->extraDescriptions.empty()) {
@@ -490,7 +494,7 @@ OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
                 ptc(ch, "            Key:        [{W%7u{x]\n\r", pexit->key);
             
             ptc(ch, "            Exit flags: [{W%s{x] {D(? exit_flags){x\n\r",
-                      exit_flags.names(pexit->exit_info).c_str());
+                      web_flag_menu(showWeb, exit_flags, dirs[door].name, exit_flags.names(pexit->exit_info)).c_str());
 
             ptc(ch, "            Keywords:   [{W%s{x] [{W%s{x] [{W%s{x]\n\r", 
                     pexit->keyword.get(EN).c_str(),
@@ -1402,7 +1406,10 @@ REDIT(clan, "клан", "установить клановую принадле�
         return true;
     }
 
-    clan = ClanManager::getThis( )->findUnstrict( argument );
+    // Exact name first, so a menu pick never lands on a longer clan name.
+    clan = ClanManager::getThis( )->findExisting( argument );
+    if (!clan)
+        clan = ClanManager::getThis( )->findUnstrict( argument );
     if (!clan) {
         stc("Clan not found\n\r", ch);
         return false;
@@ -1423,6 +1430,7 @@ REDIT(guilds, "гильдии", "установить гильдию для кл
 
     if (argument[0] == '\0') {
         stc("Syntax:  guild [name]\n\r", ch);
+        stc("         guild -[name]\n\r", ch);
         stc("         guild clear\n\r", ch);
         return false;
     }
@@ -1433,10 +1441,25 @@ REDIT(guilds, "гильдии", "установить гильдию для кл
         return true;
     }
 
-    prof = professionManager->findUnstrict( argument );
+    // '-name' removes one guild, the web menu sends it; '+name' and a bare name add one.
+    DLString name = argument;
+    bool fRemove = name.at(0) == '-';
+    if (name.at(0) == '-' || name.at(0) == '+')
+        name.erase(0, 1);
+    name.stripWhiteSpace();
+
+    prof = professionManager->findExisting( name );
+    if (!prof)
+        prof = professionManager->findUnstrict( name );
     if (!prof) {
         stc("Guild (class) not found.\n\r", ch);
         return false;
+    }
+
+    if (fRemove) {
+        pRoom->guilds.remove(*prof);
+        stc("Guild removed.\n\r", ch);
+        return true;
     }
 
     pRoom->guilds.set(*prof);

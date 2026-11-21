@@ -25,6 +25,8 @@ using namespace std;
 class Descriptor;
 struct AreaIndexData;
 class GlobalBitvector;
+class GlobalRegistryBase;
+class StringList;
 class XMLJsonValue;
 class ExtraDescription;
 
@@ -235,6 +237,15 @@ public:
     {
         Chain *cmd;
 
+        // An exact name wins over a prefix: otherwise 'tier' reaches 'tierstyle'
+        // and 'act' reaches 'actdel', whichever was registered later.
+        for (cmd = Chain::begin( ); cmd; cmd = cmd->getNext( ))
+            if ((name ^ cmd->getKey( )) || (!cmd->getVal().rname.empty() && (name ^ cmd->getVal().rname)))
+                return typename Command::Pointer( NEW, 
+                                         (T *)this, 
+                                         cmd->getKey( ), 
+                                         cmd->getVal( ).method );
+
         for (cmd = Chain::begin( ); cmd; cmd = cmd->getNext( ))
             if (name.strPrefix( cmd->getKey( ) ) || name.strPrefix(cmd->getVal().rname))
                 return typename Command::Pointer( NEW, 
@@ -252,6 +263,20 @@ extern DLString flag_table_all_names(const FlagTable &table);
 /** A field value as a web drop-down of every flag in the table: picking one sends
  *  '<cmd> <flag>'. Telnet and showWeb=false see only the label. */
 extern DLString web_flag_menu(bool showWeb, const FlagTable &table, const DLString &cmd, const DLString &label);
+/** A field value as a web drop-down of fixed values: picking one sends '<cmd> <value>'. */
+extern DLString web_list_menu(bool showWeb, const StringList &values, const DLString &cmd, const DLString &label);
+/** A field value as a web drop-down of every valid registry element (races, liquids,
+ *  clans...): picking one sends '<cmd> <name>'. */
+extern DLString web_registry_menu(bool showWeb, GlobalRegistryBase *registry, const DLString &cmd, const DLString &label);
+/** A set edited by globalBitvectorEdit as a web drop-down: a member sends '<cmd> -name',
+ *  any other element '<cmd> +name'. */
+extern DLString web_bitvector_menu(bool showWeb, const GlobalBitvector &field, const DLString &cmd, const DLString &label);
+/** A material field (fight/material.json names) as a web drop-down: '<cmd> <name>'. */
+extern DLString web_material_menu(bool showWeb, const DLString &cmd, const DLString &label);
+/** A genderEdit field as an m/f/n/p web drop-down. */
+extern DLString web_gender_menu(bool showWeb, const DLString &cmd, const DLString &label);
+/** A boolEdit field as a y/n web drop-down. */
+extern DLString web_bool_menu(bool showWeb, const DLString &cmd, const DLString &label);
 
 #define OLC_STATE(State) \
 template <> \
@@ -272,6 +297,7 @@ bool OLCState::globalBitvectorEdit(GlobalBitvector &field)
 
     if (args.empty()) {
         ch->pecho("Использование:\r\n{W%1$s{x значения - установить новые значения\r\n"
+                   "{W%1$s +значение{x, {W%1$s -значение{x - добавить или убрать одно значение\r\n"
                    "{W%1$s clear{x - очистить поле\r\n"
                    "{W? %1$s{x - показать таблицу значений", cmd);
         return false;
@@ -284,7 +310,32 @@ bool OLCState::globalBitvectorEdit(GlobalBitvector &field)
     }
 
     GlobalRegistry<E> *registry = static_cast<GlobalRegistry<E>*>(field.getRegistry());
-    
+
+    // '+name' adds and '-name' removes one element, the rest stays: the web menus
+    // send these. The name may contain spaces ('+storm giant').
+    if (args.at(0) == '+' || args.at(0) == '-') {
+        bool fSet = args.at(0) == '+';
+        DLString name = args.substr(1);
+        name.stripWhiteSpace();
+
+        E *elem = registry->findExisting(name);
+        if (!elem)
+            elem = registry->findUnstrict(name);
+
+        if (!elem) {
+            ch->pecho("Значение '%s' не найдено.", name.c_str());
+            return false;
+        }
+
+        if (fSet)
+            field.set(elem->getIndex());
+        else
+            field.remove(elem->getIndex());
+
+        ch->pecho("Новое значение: {g%s{x", field.toString().c_str());
+        return true;
+    }
+
     GlobalBitvector newField(registry);
     StringSet values;
     values.fromString(args);

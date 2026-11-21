@@ -192,7 +192,9 @@ static void display_resets(ostringstream &result, Character * ch, RoomIndexData 
                         pMob->getShortDescr(LANG_DEFAULT),
                         pReset->arg2, 
                         pReset->arg4,
-                        pReset->flags.names().c_str());
+                        web_flag_menu(true, reset_flags,
+                                      "at " + DLString(pRoom->vnum) + " reset " + DLString(iReset+1) + " flag",
+                                      pReset->flags.names()).c_str());
             }
             break;
 

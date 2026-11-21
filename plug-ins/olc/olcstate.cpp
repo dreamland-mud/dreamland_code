@@ -21,6 +21,9 @@
 #include "websocketrpc.h"
 #include "stringlist.h"
 #include "olcops.h"
+#include "globalbitvector.h"
+#include "globalregistry.h"
+#include "material-table.h"
 
 
 /*--------------------------------------------------------------------------
@@ -1163,15 +1166,85 @@ DLString flag_table_all_names(const FlagTable &table)
     return names.join(" ");
 }
 
-DLString web_flag_menu(bool showWeb, const FlagTable &table, const DLString &cmd, const DLString &label)
+// A value can't break out of the menu tag: the client splits entries on commas
+// and the tag quotes its attributes with apostrophes.
+static bool web_menu_value_ok(const DLString &value)
+{
+    return !value.empty() && value.find_first_of(",'") == DLString::npos;
+}
+
+DLString web_list_menu(bool showWeb, const StringList &values, const DLString &cmd, const DLString &label)
 {
     if (!showWeb)
         return label;
 
     StringList commands;
-    for (int i = 0; i < table.size; i++)
-        commands.push_back("$ " + DLString(table.fields[i].name));
+    for (auto &v: values)
+        if (web_menu_value_ok(v))
+            commands.push_back("$ " + v);
 
-    // An empty label would leave nothing to click on.
-    return web_menu(commands, cmd, label.empty() ? DLString("none") : label);
+    // An empty label would leave nothing to click on. Web-only, so telnet keeps
+    // seeing the empty field it always saw.
+    return web_menu(commands, cmd, label.empty() ? DLString("{Iwnone{Ix") : label);
+}
+
+DLString web_flag_menu(bool showWeb, const FlagTable &table, const DLString &cmd, const DLString &label)
+{
+    StringList names;
+    for (int i = 0; i < table.size; i++)
+        names.push_back(table.fields[i].name);
+
+    return web_list_menu(showWeb, names, cmd, label);
+}
+
+DLString web_registry_menu(bool showWeb, GlobalRegistryBase *registry, const DLString &cmd, const DLString &label)
+{
+    StringList names;
+    for (int i = 0; i < registry->size(); i++) {
+        GlobalRegistryElement *elem = registry->find(i);
+        if (elem->isValid())
+            names.push_back(elem->getName());
+    }
+
+    return web_list_menu(showWeb, names, cmd, label);
+}
+
+DLString web_bitvector_menu(bool showWeb, const GlobalBitvector &field, const DLString &cmd, const DLString &label)
+{
+    GlobalRegistryBase *registry = field.getRegistry();
+    StringList values;
+    for (int i = 0; i < registry->size(); i++) {
+        GlobalRegistryElement *elem = registry->find(i);
+        if (elem->isValid())
+            values.push_back(DLString(field.isSet(i) ? "-" : "+") + elem->getName());
+    }
+
+    return web_list_menu(showWeb, values, cmd, label);
+}
+
+DLString web_material_menu(bool showWeb, const DLString &cmd, const DLString &label)
+{
+    StringList names;
+    for (auto &m: material_table)
+        names.push_back(m.name);
+
+    return web_list_menu(showWeb, names, cmd, label);
+}
+
+DLString web_gender_menu(bool showWeb, const DLString &cmd, const DLString &label)
+{
+    StringList values;
+    values.push_back("m");
+    values.push_back("f");
+    values.push_back("n");
+    values.push_back("p");
+    return web_list_menu(showWeb, values, cmd, label);
+}
+
+DLString web_bool_menu(bool showWeb, const DLString &cmd, const DLString &label)
+{
+    StringList values;
+    values.push_back("y");
+    values.push_back("n");
+    return web_list_menu(showWeb, values, cmd, label);
 }

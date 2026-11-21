@@ -466,7 +466,10 @@ void OLCStateMobile::statePrompt(Descriptor *d)
 MEDIT(show)
 {
     bool showWeb = !arg_is_strict(argument, "noweb");
+    // Fields printed only when set still get a line on the web, to click on.
+    bool webMenus = showWeb && is_websock(ch);
     Race *race = raceManager->findExisting(mob.race);
+    const MobTiers::Config &tc = MobBody::tiers();
 
     ptc(ch, "{CVnum: [{Y%u{C]  Area: [{Y%5d{C] {G%s{x\n\r",
         mob.vnum,
@@ -485,18 +488,32 @@ MEDIT(show)
     ptc(ch, "{GLong UA:{x  [{W%s{w]{x %s\n\r", String::stripEOL(mob.long_descr.get(UA)).c_str(), web_edit_button(showWeb, ch, "ualong", "web").c_str());        
     ptc(ch, "{GLong RU:{x  [{W%s{w]{x %s\n\r", String::stripEOL(mob.long_descr.get(RU)).c_str(), web_edit_button(showWeb, ch, "rulong", "web").c_str());        
     
+    StringList tierNames;
+    for (int t = MobTiers::TIER_BEST; t <= MobTiers::TIER_WORST; t++)
+        tierNames.push_back(tc.name(t));
+    tierNames.push_back("default");
     ptc(ch, "{CLevel{x:       [{W%3d{x]  {CTier{x: [{W%s{x] %s {D(tier){x\n\r", mob.level,
-        MobBody::tiers().name(mob.tier).c_str(),
+        web_list_menu(showWeb, tierNames, "tier", tc.name(mob.tier)).c_str(),
         mob.tierName.empty() ? "{D(по умолчанию){x" : "");
-    if (!mob.tierStyle.empty())
-        ptc(ch, "{CTier style{x:  [{W%s{x] {D(tierstyle){x\n\r", mob.tierStyle.c_str());
+    if (!mob.tierStyle.empty() || webMenus) {
+        StringList styleNames;
+        for (auto &st: tc.styles)
+            styleNames.push_back(st.first);
+        styleNames.push_back("none");
+        ptc(ch, "{CTier style{x:  [{W%s{x] {D(tierstyle){x\n\r",
+            web_list_menu(showWeb, styleNames, "tierstyle", mob.tierStyle).c_str());
+    }
     ptc(ch, "{DЧисла ниже -- центры тира (fight/mob_tiers.json), правка не сохраняется. Спасброски [%d], кап параметров [%d].{x\n\r",
         mob.saves, mob.statCap);
 
+    StringList numbers;
+    numbers.push_back("s");
+    numbers.push_back("p");
     ptc(ch, "{CRace{x:        [{W%s{x] {D(? race){x Sex: [{W%s{x] {D(? sex_table){x Number: [{W%s{x]\n\r",
-        mob.race.c_str(), 
-        sex_table.name( mob.sex ).c_str( ),
-        mob.gram_number == Grammar::Number::PLURAL ? "plural" : "singular");
+        web_registry_menu(showWeb, raceManager, "race", mob.race).c_str(),
+        web_flag_menu(showWeb, sex_table, "sex", sex_table.name( mob.sex )).c_str( ),
+        web_list_menu(showWeb, numbers, "number",
+                      mob.gram_number == Grammar::Number::PLURAL ? "plural" : "singular").c_str());
 
     ptc(ch, "{CHit dice:{x    [{W%6dd%-5d+%6d{x]\n\r",
         mob.hit[DICE_NUMBER],
@@ -516,43 +533,45 @@ MEDIT(show)
     ptc(ch, "{CWealth:{x      [{W%10d{x]  {CAlign{x: [{W%5d{x]\n\r",
         mob.wealth, mob.alignment);
 
-    ptc(ch, "{CHitroll:{x     [{W%5d{x]  {CDamtype{x: [{W%10s{x] {D(damtype; ? weapon_flags){x\n\r",
-        mob.hitroll, weapon_flags.name(mob.dam_type).c_str( ));
+    ptc(ch, "{CHitroll:{x     [{W%5d{x]  {CDamtype{x: [{W%s{x] {D(damtype; ? weapon_flags){x\n\r",
+        mob.hitroll,
+        web_flag_menu(showWeb, weapon_flags, "damtype", fmt(0, "%10s", weapon_flags.name(mob.dam_type).c_str())).c_str( ));
 
     ptc(ch, "{CArmor{x:       [{Wpierce: %d  bash: %d  slash: %d  magic: %d{x] {D(? ac_type){x\n\r",
         mob.ac[AC_PIERCE], mob.ac[AC_BASH],
         mob.ac[AC_SLASH], mob.ac[AC_EXOTIC]);
 
-    ptc(ch, "{CAct{x:         [{W%s{x] {D(? act_flags){x\n\r", act_flags.names(mob.act).c_str());
+    ptc(ch, "{CAct{x:         [{W%s{x] {D(? act_flags){x\n\r", web_flag_menu(showWeb, act_flags, "act", act_flags.names(mob.act)).c_str());
 
-    ptc(ch, "{CAff:{x         [{W%s{x] {D(oaff){x\n\r", affect_flags.names(mob.affected_by).c_str());
+    ptc(ch, "{CAff:{x         [{W%s{x] {D(oaff){x\n\r", web_flag_menu(showWeb, affect_flags, "oaff", affect_flags.names(mob.affected_by)).c_str());
     ptc(ch, "{CAffects:{x     [{W%s{x] {D(aff){x\n\r", mob.affects.toString().c_str());
     ptc(ch, "{CNoAffects:{x   [{W%s{x] {D(race traits dropped, noaffects){x\n\r", mob.affectsDel.toString().c_str());
-    ptc(ch, "{CDet:{x         [{W%s{x] {D(? detect_flags){x\n\r", detect_flags.names(mob.detection).c_str());
+    ptc(ch, "{CDet:{x         [{W%s{x] {D(? detect_flags){x\n\r", web_flag_menu(showWeb, detect_flags, "detection", detect_flags.names(mob.detection)).c_str());
 
     ptc(ch, "{CPosition:{x    starting [{W%s{x]  default [{W%s{x] {D(? position_table){x\n\r",
-        position_table.name(mob.start_pos).c_str(),
-        position_table.name(mob.default_pos).c_str());
+        web_flag_menu(showWeb, position_table, "position start", position_table.name(mob.start_pos)).c_str(),
+        web_flag_menu(showWeb, position_table, "position default", position_table.name(mob.default_pos)).c_str());
 
-    ptc(ch, "{CImm:{x         [{W%s{x] {D(? imm_flags){x\n\r", imm_flags.names(mob.imm_flags).c_str());
+    ptc(ch, "{CImm:{x         [{W%s{x] {D(? imm_flags){x\n\r", web_flag_menu(showWeb, imm_flags, "imm", imm_flags.names(mob.imm_flags)).c_str());
     mob_dead_adds_show(ch, mob, MOBSET_IMM, Body::BS_IMM, imm_flags);
-    ptc(ch, "{CRes:{x         [{W%s{x] {D(? res_flags){x\n\r", res_flags.names(mob.res_flags).c_str());
+    ptc(ch, "{CRes:{x         [{W%s{x] {D(? res_flags){x\n\r", web_flag_menu(showWeb, res_flags, "res", res_flags.names(mob.res_flags)).c_str());
     mob_dead_adds_show(ch, mob, MOBSET_RES, Body::BS_RES, res_flags);
-    ptc(ch, "{CVuln:{x        [{W%s{x] {D(? vuln_flags){x\n\r", vuln_flags.names(mob.vuln_flags).c_str());
+    ptc(ch, "{CVuln:{x        [{W%s{x] {D(? vuln_flags){x\n\r", web_flag_menu(showWeb, vuln_flags, "vuln", vuln_flags.names(mob.vuln_flags)).c_str());
     mob_dead_adds_show(ch, mob, MOBSET_VULN, Body::BS_VULN, vuln_flags);
     if (mob.randomExtra[MOBSET_IMM] || mob.randomExtra[MOBSET_RES] || mob.randomExtra[MOBSET_VULN])
         ptc(ch, "             {Drandom tier extras, part of the above, reshuffled monthly, never saved:{x imm [{W%s{x] res [{W%s{x] vuln [{W%s{x]\n\r",
             imm_flags.names(mob.randomExtra[MOBSET_IMM]).c_str(),
             res_flags.names(mob.randomExtra[MOBSET_RES]).c_str(),
             vuln_flags.names(mob.randomExtra[MOBSET_VULN]).c_str());
-    ptc(ch, "{COff:{x         [{W%s{x] {D(? off_flags){x\n\r", off_flags.names(mob.off_flags).c_str());
+    ptc(ch, "{COff:{x         [{W%s{x] {D(? off_flags){x\n\r", web_flag_menu(showWeb, off_flags, "off", off_flags.names(mob.off_flags)).c_str());
     ptc(ch, "{CSize:{x        [{W%s{x] (расовый {g%s{x) {D(? size_table){x\n\r", 
-        size_table.name(mob.size).c_str(), 
+        web_flag_menu(showWeb, size_table, "size", size_table.name(mob.size)).c_str(),
         race ? race->getSize().name().c_str() : "-");
 
-    ptc(ch, "{CMaterial:{x    [{W%s{x] {D(? material){x\n\r", mob.material.c_str());
-    ptc(ch, "{CForm:{x        [{W%s{x] {D(? form_flags){x\n\r", form_flags.names(mob.form).c_str());
-    ptc(ch, "{CParts:{x       [{W%s{x] {D(? part_flags){x\n\r", part_flags.names(mob.parts).c_str());
+    ptc(ch, "{CMaterial:{x    [{W%s{x] {D(? material){x\n\r",
+        web_material_menu(showWeb, "material", mob.material).c_str());
+    ptc(ch, "{CForm:{x        [{W%s{x] {D(? form_flags){x\n\r", web_flag_menu(showWeb, form_flags, "form", form_flags.names(mob.form)).c_str());
+    ptc(ch, "{CParts:{x       [{W%s{x] {D(? part_flags){x\n\r", web_flag_menu(showWeb, part_flags, "part", part_flags.names(mob.parts)).c_str());
     ptc(ch, "{CBody:{x        слоты [{W%s{x]\n\r", mob.wearloc.toString().c_str());
     // No %f here: the act formatters pull every vararg as a union, and a double
     // travels in an FP register, so %f reads garbage and the next %s crashes.
@@ -561,18 +580,33 @@ MEDIT(show)
     DLString acMult = DLString(mob.formAcPct / 100) + "." + (cents < 10 ? "0" : "") + DLString(cents);
     ptc(ch, "             походка [{W%s{x] броня тела [{Wx%s{x] атаки разрешены [{W%s{x]\n\r",
         mob.moveverb.c_str(), acMult.c_str(), off_flags.names(mob.offAllowed).c_str());
-    if (mob.reviewed)
-        ptc(ch, "{CReviewed:{x    [{W%s{x] {D(reviewed){x\n\r", mob_reviewed_names(mob.reviewed).c_str());
+    if (mob.reviewed || webMenus) {
+        StringList reviewedSets;
+        for (int k = Body::BS_AFF; k < Body::BS_MAX; k++)
+            reviewedSets.push_back(DLString((mob.reviewed & (1 << k)) ? "-" : "+") + Body::bitSetNames[k]);
+        ptc(ch, "{CReviewed:{x    [{W%s{x] {D(reviewed){x\n\r",
+            web_list_menu(showWeb, reviewedSets, "reviewed", mob_reviewed_names(mob.reviewed)).c_str());
+    }
 
-    if (!mob.spec_fun.name.empty())
-        ptc(ch, "{CSpec fun:{x    [{W%s{x] {D(? spec){x\n\r", mob.spec_fun.name.c_str());
+    if (!mob.spec_fun.name.empty() || webMenus) {
+        StringList specNames;
+        for (int i = 0; spec_table[i].name != 0; i++)
+            specNames.push_back(spec_table[i].name);
+        specNames.push_back("clear");
+        ptc(ch, "{CSpec fun:{x    [{W%s{x] {D(? spec){x\n\r",
+            web_list_menu(showWeb, specNames, "spec", mob.spec_fun.name).c_str());
+    }
     ptc(ch, "{CGroup:{x       [{W%d{x]\n\r", mob.group);
-    ptc(ch, "{CPracticer:{x   [{W%s{x] {D(? groups){x\n\r", mob.practicer.toString( ).c_str( ));
-    if (!mob.professions.empty())
-        ptc(ch, "{CProfessions:{x [{W%s{x] {D(professions, ? classes){x\n\r", mob.professions.toString().c_str());
-    ptc(ch, "{CReligion:{x    [{W%s{x] {D(reledit list){x\n\r", mob.religion.toString().c_str());
-    if (mob.clan != clan_none)
-        ptc(ch, "{CClan:{x        [{W%s{x] {D(? clan){x\n\r", mob.clan->getName().c_str());
+    ptc(ch, "{CPracticer:{x   [{W%s{x] {D(? groups){x\n\r",
+        web_bitvector_menu(showWeb, mob.practicer, "practicer", mob.practicer.toString( )).c_str( ));
+    if (!mob.professions.empty() || webMenus)
+        ptc(ch, "{CProfessions:{x [{W%s{x] {D(professions, ? classes){x\n\r",
+            web_bitvector_menu(showWeb, mob.professions, "professions", mob.professions.toString()).c_str());
+    ptc(ch, "{CReligion:{x    [{W%s{x] {D(reledit list){x\n\r",
+        web_bitvector_menu(showWeb, mob.religion, "religion", mob.religion.toString()).c_str());
+    if (mob.clan != clan_none || webMenus)
+        ptc(ch, "{CClan:{x        [{W%s{x] {D(? clan){x\n\r",
+            web_registry_menu(showWeb, ClanManager::getThis(), "clan", mob.clan->getName()).c_str());
 
     ptc(ch, "{GSmell:{x       [{W%s{x] %s [{W%s{x] %s [{W%s{x] %s\n\r", 
           String::stripEOL(mob.smell.get(EN)).c_str(), web_edit_button(showWeb, ch, "smell", "web").c_str(),   
@@ -1128,9 +1162,30 @@ MEDIT(reviewed)
     if (args.empty()) {
         ptc(ch, "Проверено: [%s]. Синтаксис: reviewed <aff|det|imm|res|vuln|none> ... -- "
                 "удаления (del) этих наборов начинают действовать, а для imm/res/vuln "
-                "и добавления (add).\n\r",
+                "и добавления (add). reviewed +набор или -набор меняет один набор.\n\r",
             mob_reviewed_names(mob.reviewed).c_str());
         return false;
+    }
+
+    // '+set' adds and '-set' removes one set, the rest stays: the web menu sends these.
+    if (args.at(0) == '+' || args.at(0) == '-') {
+        DLString name = args.substr(1);
+        name.stripWhiteSpace();
+        int k;
+        for (k = Body::BS_AFF; k < Body::BS_MAX; k++)
+            if (name == Body::bitSetNames[k])
+                break;
+        if (k == Body::BS_MAX) {
+            ptc(ch, "Неизвестный набор '%s'.\n\r", name.c_str());
+            return false;
+        }
+        if (args.at(0) == '+')
+            mob.reviewed |= 1 << k;
+        else
+            mob.reviewed &= ~(1 << k);
+        refresh_body(mob);
+        ptc(ch, "Проверено: [%s].\n\r", mob_reviewed_names(mob.reviewed).c_str());
+        return true;
     }
 
     int mask = 0;
@@ -1161,7 +1216,10 @@ MEDIT(race)
     Race *race;
 
     if (*argument) {
-        race = raceManager->findUnstrict(argument);
+        // Exact name first: 'giant' must not land on 'cloud giant'.
+        race = raceManager->findExisting(argument);
+        if (!race)
+            race = raceManager->findUnstrict(argument);
 
         if(race) {
 /*            

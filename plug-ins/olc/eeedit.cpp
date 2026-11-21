@@ -135,8 +135,10 @@ void OLCStateExtraExit::show(PCharacter *ch)
     ptc(ch, "Name EN:    [{W%s{x] %s {D(name help){x\n",   keyword.get(EN).c_str(), web_edit_button(ch, "name", "web").c_str());
     ptc(ch, "Name UA:    [{W%s{x] %s {D(uaname help){x\n", keyword.get(UA).c_str(), web_edit_button(ch, "uaname", "web").c_str());
     ptc(ch, "Name RU:    [{W%s{x] %s {D(runame help){x\n", keyword.get(RU).c_str(), web_edit_button(ch, "runame", "web").c_str());
-    ptc(ch, "Flags:      [{W%s{x] {D(? exit_flags){x\n", exit_flags.names(info.getValue( )).c_str());
-    ptc(ch, "Size:       [{W%s{x] {D(? size){x\n", size_table.name(max_size_pass.getValue( )).c_str());
+    ptc(ch, "Flags:      [{W%s{x] {D(? exit_flags){x\n",
+        web_flag_menu(true, exit_flags, "flags", exit_flags.names(info.getValue( ))).c_str());
+    ptc(ch, "Size:       [{W%s{x] {D(? size){x\n",
+        web_flag_menu(true, size_table, "size", size_table.name(max_size_pass.getValue( ))).c_str());
 
     if (pKey)
         ch->pecho("Key:        [{W%d{x] ({G%N1{x)", pKey->vnum, pKey->getShortDescr(LANG_DEFAULT));

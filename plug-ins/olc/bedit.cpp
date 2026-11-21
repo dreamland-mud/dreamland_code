@@ -103,7 +103,8 @@ void OLCStateBehavior::show( PCharacter *ch )
     ptc(ch, "Описание:        %s {D(desc help){x\r\n{c%s{x\r\n",
             web_edit_button(ch, "desc", "web").c_str(),
             bhv->getDescription().c_str());
-    ptc(ch, "Цель:            {c%s {D(target){x\r\n", bhv->target.name().c_str());
+    ptc(ch, "Цель:            {c%s {D(target){x\r\n",
+            web_flag_menu(true, *bhv->target.getTable(), "target", bhv->target.name()).c_str());
     ptc(ch, "Подкоманды:      {c%s {D(subcommand){x\r\n", bhv->cmd.c_str());
 
     if (bhv->help) {
