@@ -900,7 +900,8 @@ bool olc_cases_command( PCharacter *ch, const char *argument, XMLMultiString &sh
     if (!ok || (!ru && !ua)) {
         ch->send_to( "Usage:\r\n"
                      "{Wcases{x - the six cases of the RU and UA short, and a proposal for a short without them\r\n"
-                     "{Wcases ok{x [{Wru{x|{Wua{x] - decline the short from its nominative and write the case forms\r\n" );
+                     "{Wcases ok{x - write the case forms of a short that has none\r\n"
+                     "{Wcases ok{x {Wru{x|{Wua{x - decline that short from its nominative and write its case forms, replacing any\r\n" );
         return false;
     }
 
@@ -916,6 +917,14 @@ bool olc_cases_command( PCharacter *ch, const char *argument, XMLMultiString &sh
 
         if (value.empty( ) || !String::hasCyrillic( value ))
             continue;
+
+        // Hand-made case forms are only re-declined when the builder names
+        // the language: a bare 'cases ok' applies what was proposed.
+        if (which.empty( ) && value.find( '|' ) != DLString::npos) {
+            report << label << " already has case forms: {Wcases ok " << (lang == LANG_RU ? "ru" : "ua")
+                   << "{x re-declines.\r\n";
+            continue;
+        }
 
         DLString pad, why;
         if (!olc_cases_decline( value, lang, gender, anim, pad, why )) {

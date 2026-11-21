@@ -85,8 +85,9 @@ bool olc_cases_propose( const XMLMultiString &shortDescr, const XMLMultiString *
                         const DLString &gender, bool anim, DLString &report );
 
 /** The 'cases' editor command: show the six cases (and the proposal for a
- *  short without them); 'cases ok [ru|ua]' declines the short from its
- *  nominative and writes the forms. True if a value changed. */
+ *  short without them); 'cases ok' writes the forms of a short that has
+ *  none, 'cases ok ru|ua' re-declines that language from its nominative
+ *  even over existing forms. True if a value changed. */
 bool olc_cases_command( PCharacter *ch, const char *argument, XMLMultiString &shortDescr,
                         const DLString &gender, bool anim );
 
