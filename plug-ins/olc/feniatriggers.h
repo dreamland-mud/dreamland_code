@@ -48,6 +48,10 @@ public:
     void showTriggers(PCharacter *ch, DefaultSpell *spell) const;
     void showTriggers(PCharacter *ch, WrapperBase *wrapper, const DLString &indexType, const DLString &target = DLString::emptyString) const;
     
+    /** Copy one-trigger-per-file Fenia scenarios of a prototype (type mob|obj|room)
+     *  onto another, rebinding them to the new vnum. Takes effect at once. */
+    void copyTriggers(PCharacter *ch, const DLString &type, int srcVnum, int dstVnum) const;
+
     bool clearTrigger(Scripting::Object *wrapper, const DLString &trigName) const;
     bool clearTriggers(Scripting::Object *wrapper) const;
 

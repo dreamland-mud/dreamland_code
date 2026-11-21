@@ -161,7 +161,7 @@ REDIT(copy, "копировать", "скопировать описания, п
     DLString what = arg1.isNumber() ? arg2 : arg1;
     // One mode only, first match wins as in oedit/medit: a short prefix
     // such as Cyrillic 'п' matches both param and behavior synonyms.
-    bool copyDesc = false, copyParam = false, copyBhv = false;
+    bool copyDesc = false, copyParam = false, copyBhv = false, copyFenia = false;
     if (arg_is(what, "all"))
         copyDesc = copyParam = copyBhv = true;
     else if (arg_is(what, "desc"))
@@ -170,17 +170,20 @@ REDIT(copy, "копировать", "скопировать описания, п
         copyParam = true;
     else if (arg_is(what, "behavior"))
         copyBhv = true;
+    else if (arg_is(what, "fenia"))
+        copyFenia = true;
 
     EDIT_ROOM(ch, pRoom);
 
-    if (!vnumArg.isNumber() || (!copyDesc && !copyParam && !copyBhv)) {
+    if (!vnumArg.isNumber() || (!copyDesc && !copyParam && !copyBhv && !copyFenia)) {
         stc("Syntax:\r\n"
             "  copy desc <vnum>     -- name, description, smell, sound and extra descriptions, all languages.\r\n"
             "  copy param <vnum>    -- sector, flags, heal and mana rate, clan, guilds, liquid.\r\n"
             "  copy behavior <vnum> -- behaviors and their props.\r\n"
             "  copy all <vnum>      -- all of the above.\r\n"
+            "  copy fenia <vnum>    -- Fenia triggers (one-trigger scenarios), not part of 'all', in-game only.\r\n"
             "The order 'copy <vnum> <mode>' works too.\r\n"
-            "Exits, resets and Fenia triggers are never copied.\r\n"
+            "Exits and resets are never copied.\r\n"
             "This edits the room directly: there is no undo.\r\n", ch);
         return false;
     }
@@ -198,6 +201,11 @@ REDIT(copy, "копировать", "скопировать описания, п
 
     if (source == pRoom) {
         stc("That is this room.\r\n", ch);
+        return false;
+    }
+
+    if (copyFenia) {
+        feniaTriggers->copyTriggers(ch, "room", source->vnum, pRoom->vnum);
         return false;
     }
 
