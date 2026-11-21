@@ -162,6 +162,14 @@ bool DefaultWearlocation::equip( Object *obj )
     triggersOnEquip( ch, obj );
 
     affectsOnEquip( ch, obj );
+
+    // Cold iron burns a faery (and pins its blink, see material_cold_iron_pins).
+    // Checked after the item's own affects, so an item granting iron res spares the wearer.
+    // Only on a real equip: reset() at login re-equips silently.
+    if (material_cold_iron_pins( ch, obj->getMaterial( ).c_str( ), ch->imm_flags, ch->res_flags )) {
+        ch->pecho( _("{1{CХолодное железо обжигает тебе кожу!{2") );
+        ch->recho( _("%1$^C1 вздрагивает от прикосновения холодного железа."), ch );
+    }
     
     saveDrops( ch );
 
