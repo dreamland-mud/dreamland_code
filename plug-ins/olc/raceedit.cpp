@@ -93,9 +93,19 @@ void OLCStateRace::changed( PCharacter *ch )
     MobBody::touch();
 }
 
+DLString OLCStateRace::getMenuKey( )
+{
+    return "race:" + olc_menu_key_part( original.getName( ) );
+}
+
 static DLString show_flag(const Flags &f)
 {
     return f.getValue() == 0 ? "-" : f.names();
+}
+
+static DLString show_flag_menu(const Flags &f, const DLString &cmd)
+{
+    return web_flag_bits_menu(true, *f.getTable(), cmd, show_flag(f));
 }
 
 static DLString show_enum(const Enumeration &e)
@@ -106,6 +116,7 @@ static DLString show_enum(const Enumeration &e)
 
 void OLCStateRace::show( PCharacter *ch )
 {
+    OLCMenuKeyScope menuScope( getMenuKey( ) );
     DefaultRace *r = getOriginal();
     DefaultPCRace *pc = getPC();
 
@@ -130,28 +141,30 @@ void OLCStateRace::show( PCharacter *ch )
             pc->nameWhoFemale.c_str(), web_edit_button(ch, "whofemale", "web").c_str());        
     }
 
-    ptc(ch, "Поведение:     {Y%s{x {D(act){x\r\n", show_flag(r->act).c_str());
+    ptc(ch, "Поведение:     {Y%s{x {D(act){x\r\n", show_flag_menu(r->act, "act").c_str());
     ptc(ch, "Аффекты:       {Y%s{x {D(affects){x\r\n", 
             r->affects.toString().c_str());
-    ptc(ch, "Обнаружение:   {Y%s{x {D(det){x\r\n", show_flag(r->det).c_str());
-    ptc(ch, "Атаки:         {Y%s{x {D(off){x\r\n", show_flag(r->off).c_str());
-    ptc(ch, "Иммунитет:     {Y%s{x {D(imm){x\r\n", show_flag(r->imm).c_str());
-    ptc(ch, "Сопротивл:     {Y%s{x {D(res){x\r\n", show_flag(r->res).c_str());
-    ptc(ch, "Уязвимость:    {Y%s{x {D(vuln){x\r\n", show_flag(r->vuln).c_str());
+    ptc(ch, "Обнаружение:   {Y%s{x {D(det){x\r\n", show_flag_menu(r->det, "det").c_str());
+    ptc(ch, "Атаки:         {Y%s{x {D(off){x\r\n", show_flag_menu(r->off, "off").c_str());
+    ptc(ch, "Иммунитет:     {Y%s{x {D(imm){x\r\n", show_flag_menu(r->imm, "imm").c_str());
+    ptc(ch, "Сопротивл:     {Y%s{x {D(res){x\r\n", show_flag_menu(r->res, "res").c_str());
+    ptc(ch, "Уязвимость:    {Y%s{x {D(vuln){x\r\n", show_flag_menu(r->vuln, "vuln").c_str());
     ptc(ch, "Параметры:     {Y%s{x %s {D(stats help){x\r\n", 
             show_enum_array_web(r->stats).c_str(),
             web_edit_button(ch, "stats", "").c_str());
 
-    ptc(ch, "Размер:        {Y%s{x {D(size){x\r\n", show_enum(r->size).c_str());
+    ptc(ch, "Размер:        {Y%s{x {D(size){x\r\n",
+            web_flag_menu(true, *r->size.getTable(), "size", show_enum(r->size)).c_str());
 
     ptc(ch, "{WМодель тела{x:  формы [{Y%s{x] {D(forms){x\r\n", r->forms.empty() ? "-" : r->forms.c_str());
     ptc(ch, "  +части {Y%s{x {D(partsadd){x  -части {Y%s{x {D(partsdel){x\r\n",
-        show_flag(r->partsAdd).c_str(), show_flag(r->partsDel).c_str());
+        show_flag_menu(r->partsAdd, "partsadd").c_str(), show_flag_menu(r->partsDel, "partsdel").c_str());
     ptc(ch, "  -поведение {Y%s{x -атаки {Y%s{x -аффекты {Y%s{x -обнаружение {Y%s{x {D(actdel offdel affdel detdel){x\r\n",
-        show_flag(r->actDel).c_str(), show_flag(r->offDel).c_str(),
-        show_flag(r->affDel).c_str(), show_flag(r->detDel).c_str());
+        show_flag_menu(r->actDel, "actdel").c_str(), show_flag_menu(r->offDel, "offdel").c_str(),
+        show_flag_menu(r->affDel, "affdel").c_str(), show_flag_menu(r->detDel, "detdel").c_str());
     ptc(ch, "  -иммунитет {Y%s{x -сопротивл {Y%s{x -уязвимость {Y%s{x {D(immdel resdel vulndel){x\r\n",
-        show_flag(r->immDel).c_str(), show_flag(r->resDel).c_str(), show_flag(r->vulnDel).c_str());
+        show_flag_menu(r->immDel, "immdel").c_str(), show_flag_menu(r->resDel, "resdel").c_str(),
+        show_flag_menu(r->vulnDel, "vulndel").c_str());
     ptc(ch, "  {DИтог:{x части {G%s{x\r\n", show_flag(r->getParts()).c_str());
     ptc(ch, "        формы {G%s{x\r\n", show_flag(r->getForm()).c_str());
     ptc(ch, "        слоты {G%s{x\r\n", r->getWearloc().toString().c_str());
@@ -159,20 +172,22 @@ void OLCStateRace::show( PCharacter *ch )
         show_flag(r->getOff()).c_str(), show_flag(r->getAct()).c_str());
 
     ptc(ch, "Удары:         {Y%s{x {D(attacks){x  материал {Y%s{x {D(material){x\r\n",
-        r->attacks.empty() ? "-" : r->attacks.c_str(), r->material.empty() ? "-" : r->material.c_str());
+        r->attacks.empty() ? "-" : r->attacks.c_str(),
+        web_material_menu(true, "material", r->material.empty() ? DLString("-") : r->material, "clear").c_str());
     ptc(ch, "Множители:     здоровье {Y%s{x {D(hpmult){x урон {Y%s{x {D(dmgmult){x  походка {Y%s{x {D(moveverb){x\r\n",
         r->hpMult.empty() ? "1.0" : r->hpMult.c_str(),
         r->dmgMult.empty() ? "1.0" : r->dmgMult.c_str(),
         r->moveverb.empty() ? "-" : r->moveverb.c_str());
     ptc(ch, "Спецфункция:   {Y%s{x {D(spec){x\r\n",
-        r->spec.empty() ? "-" : r->spec.c_str());
+        web_list_menu(true, spec_function_names("clear"), "spec", r->spec.empty() ? DLString("-") : r->spec).c_str());
 
     ptc(ch, "Политика:      охотится [{r%s{x] {D(hunts){x, делится [{g%s{x] {D(donates){x\r\n",
-           r->hunts.toString().c_str(), r->donates.toString().c_str());
+           web_bitvector_menu(true, r->hunts, "hunts", r->hunts.toString()).c_str(),
+           web_bitvector_menu(true, r->donates, "donates", r->donates.toString()).c_str());
 
     if (pc) {
         ptc(ch, "Натура:        {G%s {D(align){x  мин {G%d{x макс {G%d{x {D(minalign, maxalign){x\r\n",
-             show_flag(pc->align).c_str(), pc->minAlign.getValue(), pc->maxAlign.getValue());
+             show_flag_menu(pc->align, "align").c_str(), pc->minAlign.getValue(), pc->maxAlign.getValue());
         ptc(ch, "Бонусы:        здоровье {G%d {D(hp){x мана {G%d {D(mana){x практики {G%d {D(prac){x\r\n",
                 pc->hpBonus.getValue(), pc->manaBonus.getValue(), pc->pracBonus.getValue());
     }
@@ -317,8 +332,13 @@ RACEEDIT(attacks, "удары", "типы ударов мобов расы че�
 
     return editor(argument, getOriginal()->attacks, ED_NO_NEWLINE);
 }
-RACEEDIT(material, "материал", "материал тела по умолчанию для мобов расы")
+RACEEDIT(material, "материал", "материал тела по умолчанию для мобов расы, clear -- сбросить")
 {
+    if (arg_is_clear(argument)) {
+        getOriginal()->material.clear();
+        stc("Материал сброшен.\r\n", ch);
+        return true;
+    }
     return editor(argument, getOriginal()->material, ED_NO_NEWLINE);
 }
 RACEEDIT(hpmult, "здоровьемножитель", "множитель здоровья мобов расы (1.0 по умолчанию)")
@@ -333,8 +353,13 @@ RACEEDIT(moveverb, "походка", "глагол движения мобов �
 {
     return editor(argument, getOriginal()->moveverb, ED_NO_NEWLINE);
 }
-RACEEDIT(spec, "спец", "спецфункция мобов расы, если у прототипа своей нет (spec_breath_any...)")
+RACEEDIT(spec, "спец", "спецфункция мобов расы, если у прототипа своей нет (spec_breath_any...), clear -- сбросить")
 {
+    if (arg_is_clear(argument)) {
+        getOriginal()->spec.clear();
+        stc("Спецфункция сброшена.\r\n", ch);
+        return true;
+    }
     return editor(argument, getOriginal()->spec, ED_NO_NEWLINE);
 }
 RACEEDIT(size, "размер", "размеры (? size_table)")

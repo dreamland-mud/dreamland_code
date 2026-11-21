@@ -589,12 +589,8 @@ MEDIT(show)
     }
 
     if (!mob.spec_fun.name.empty() || webMenus) {
-        StringList specNames;
-        for (int i = 0; spec_table[i].name != 0; i++)
-            specNames.push_back(spec_table[i].name);
-        specNames.push_back("clear");
         ptc(ch, "{CSpec fun:{x    [{W%s{x] {D(? spec){x\n\r",
-            web_list_menu(showWeb, specNames, "spec", mob.spec_fun.name).c_str());
+            web_list_menu(showWeb, spec_function_names("clear"), "spec", mob.spec_fun.name).c_str());
     }
     ptc(ch, "{CGroup:{x       [{W%d{x]\n\r", mob.group);
     ptc(ch, "{CPracticer:{x   [{W%s{x] {D(? groups){x\n\r",

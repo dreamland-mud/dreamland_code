@@ -292,6 +292,9 @@ extern DLString flag_table_all_names(const FlagTable &table);
 /** A field value as a web drop-down of every flag in the table: picking one sends
  *  '<cmd> <flag>'. Telnet and showWeb=false see only the label. */
 extern DLString web_flag_menu(bool showWeb, const FlagTable &table, const DLString &cmd, const DLString &label);
+/** web_flag_menu for a flagBitsEdit field: an enumerated table's zero row ('null')
+ *  is left out, since toggling it sets bit 0 and restricts to nothing. */
+extern DLString web_flag_bits_menu(bool showWeb, const FlagTable &table, const DLString &cmd, const DLString &label);
 /** A field value as a web drop-down of fixed values: picking one sends '<cmd> <value>'. */
 extern DLString web_list_menu(bool showWeb, const StringList &values, const DLString &cmd, const DLString &label);
 /** A field value as a web drop-down of every valid registry element (races, liquids,
@@ -302,8 +305,11 @@ extern DLString web_registry_menu(bool showWeb, GlobalRegistryBase *registry, co
 /** A set edited by globalBitvectorEdit as a web drop-down: a member sends '<cmd> -name',
  *  any other element '<cmd> +name'. */
 extern DLString web_bitvector_menu(bool showWeb, const GlobalBitvector &field, const DLString &cmd, const DLString &label);
+/** Full names of every mob special function (spec_...), then clearWord if given. */
+extern StringList spec_function_names(const DLString &clearWord = DLString::emptyString);
 /** A material field (fight/material.json names) as a web drop-down: '<cmd> <name>'. */
-extern DLString web_material_menu(bool showWeb, const DLString &cmd, const DLString &label);
+extern DLString web_material_menu(bool showWeb, const DLString &cmd, const DLString &label,
+                                  const DLString &clearWord = DLString::emptyString);
 /** A genderEdit field as an m/f/n/p web drop-down. */
 extern DLString web_gender_menu(bool showWeb, const DLString &cmd, const DLString &label);
 /** A boolEdit field as a y/n web drop-down. */

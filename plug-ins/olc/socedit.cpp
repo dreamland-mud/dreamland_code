@@ -66,6 +66,11 @@ void OLCStateSocial::changed( PCharacter *ch )
     isChanged = true;
 }
 
+DLString OLCStateSocial::getMenuKey( )
+{
+    return "social:" + olc_menu_key_part( socialName.getValue( ) );
+}
+
 lang_t OLCStateSocial::getLang() const
 {
     DLString value = editLang.getValue();
@@ -80,6 +85,7 @@ lang_t OLCStateSocial::getLang() const
 
 void OLCStateSocial::show( PCharacter *ch )
 {
+    OLCMenuKeyScope menuScope( getMenuKey( ) );
     Social *s = getOriginal();
     lang_t lang = getLang();
 
@@ -87,7 +93,12 @@ void OLCStateSocial::show( PCharacter *ch )
     ptc(ch, "По-русски:   {C%s{x %s {D(russian help){x\r\n",
             s->getRussianName().c_str(),
             web_edit_button(ch, "russian", "web").c_str());
-    ptc(ch, "Язык полей:  {C%s{x {D(language){x\r\n", lang2attr(lang).c_str());
+    StringList langs;
+    langs.push_back("en");
+    langs.push_back("ru");
+    langs.push_back("ua");
+    ptc(ch, "Язык полей:  {C%s{x {D(language){x\r\n",
+            web_list_menu(true, langs, "language", lang2attr(lang)).c_str());
     ptc(ch, "Описание:    {C%s{x %s {D(short help){x\r\n",
             s->shortDesc.get(lang).c_str(),
             web_edit_button(ch, "short", "web").c_str());
@@ -95,7 +106,7 @@ void OLCStateSocial::show( PCharacter *ch )
             s->aliases.toList().toString().c_str(),
             web_edit_button(ch, "aliases", "").c_str());
     ptc(ch, "Позиция:     {C%s {D(position){x\r\n", 
-            s->position.name().c_str());
+            web_flag_menu(true, position_table, "position", s->position.name()).c_str());
 
     ptc(ch, "charNoArgument:   %s  %s\r\n", web_edit_button(ch, "charNoArgument", "web").c_str(), s->msgCharNoArgument.get(lang).c_str());
     ptc(ch, "othersNoArgument: %s  %s\r\n", web_edit_button(ch, "othersNoArgument", "web").c_str(), s->msgOthersNoArgument.get(lang).c_str());
