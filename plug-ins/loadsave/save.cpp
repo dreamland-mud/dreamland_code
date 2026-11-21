@@ -194,6 +194,43 @@ static void convert_obj_values( Object *obj )
     }
 }
 
+/*
+ * Crafted, rolled and enchanted copies: the same marks the armor refit checks.
+ */
+static bool obj_has_own_marks( Object *obj )
+{
+    for (const char *mark: { "measure_m", "craft_picks", "tier", "enchanted", "propsLost" })
+        if (!obj->getProperty( mark ).empty( ))
+            return true;
+
+    return false;
+}
+
+/*
+ * Items whose five values belong together keep the whole set on save: crafted,
+ * rolled, enchanted or pinned copies, wands and staves (level, max, charges,
+ * spell), drink containers (capacity, amount, poison) and weapons with
+ * level-scaled dice. Everything else follows its prototype slot by slot.
+ * keepOld is read off the copy only: the prototype carries it on every
+ * converted 'random armor' and 'random weapon' piece.
+ */
+static bool obj_keeps_own_values( Object *obj )
+{
+    if (obj_has_own_marks( obj ) || (obj->props.isObject( ) && obj->props.isMember( "keepOld" )))
+        return true;
+
+    switch (obj->item_type) {
+    case ITEM_WAND:
+    case ITEM_STAFF:
+    case ITEM_DRINK_CON:
+        return true;
+    case ITEM_WEAPON:
+        return !obj->getsValueFromProto( 1 ) || !obj->getsValueFromProto( 2 );
+    default:
+        return false;
+    }
+}
+
 static void convert_religion( PCharacter *pc, int number )
 {
     static const char *relig_names [] =  { 
@@ -1241,14 +1278,24 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
                 fprintf( fp, "Cost %d\n",        obj->cost                     );
                 if (obj->econRev > 0)
                         fprintf( fp, "EconRev %d\n",  obj->econRev            );
+                // A stock item writes only the slots that differ (ValN), so the
+                // others follow a prototype edit on the next load: an opened container
+                // or a burnt light no longer pins every other value to the old proto.
                 if ( obj->value0() != obj->pIndexData->value[0]
                         || obj->value1() != obj->pIndexData->value[1]
                         || obj->value2() != obj->pIndexData->value[2]
                         || obj->value3() != obj->pIndexData->value[3]
                         || obj->value4() != obj->pIndexData->value[4] )
+                {
+                    if (obj_keeps_own_values( obj ))
                         fprintf( fp, "Val  %d %d %d %d %d\n",
                                 obj->value0(), obj->value1(), obj->value2(), obj->value3(),
                                 obj->value4() );
+                    else
+                        for (int i = 0; i < 5; i++)
+                            if (obj->valueByIndex( i ) != obj->pIndexData->value[i])
+                                fprintf( fp, "Val%d %d\n", i, obj->valueByIndex( i ) );
+                }
 
                 switch ( obj->item_type )
                 {
@@ -2508,9 +2555,8 @@ static void obj_refit_migrate( Object *obj )
         if (!from[i].isInt( ))
             return;
 
-    for (const char *mark: { "measure_m", "craft_picks", "tier", "enchanted", "propsLost" })
-        if (!obj->getProperty( mark ).empty( ))
-            return;
+    if (obj_has_own_marks( obj ))
+        return;
 
     for (int i = 0; i < 4; i++)
         if (obj->valueByIndex( i ) != from[(Json::ArrayIndex)i].asInt( ))
@@ -2969,6 +3015,14 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                                     obj->value0(obj->pIndexData->value[0]);
                             convert_obj_values( obj );
                             fMatch                = true;
+                            break;
+                    }
+
+                    if ( strlen( word ) == 4 && !strncmp( word, "Val", 3 )
+                            && word[3] >= '0' && word[3] <= '4' )
+                    {
+                            obj->valueByIndex( word[3] - '0', fread_number( fp ) );
+                            fMatch = true;
                             break;
                     }
 
