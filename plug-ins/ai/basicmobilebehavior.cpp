@@ -18,6 +18,7 @@
 #include "pcharacter.h"
 #include "pcharactermanager.h"
 #include "room.h"
+#include "doors.h"
 
 #include "dreamland.h"
 #include "fenia_utils.h"
@@ -341,6 +342,17 @@ void BasicMobileBehavior::remember( Room *room )
         homeVnum = room->vnum;
 }
 
+// A mob with no way home: fAlways extracts it, otherwise it stays put.
+static bool lost_home( NPCharacter *ch, bool fAlways )
+{
+    if (!fAlways)
+        return false;
+
+    oldact(_("$c1 ищет свой дом."), ch, 0, 0, TO_ROOM );
+    extract_char( ch );
+    return true;
+}
+
 // fForce: the Fenia mob AI gave up a chase (evade) and carries the mob home
 // past the no-recall and wimpy gates and the onRecallAI transport guards.
 bool BasicMobileBehavior::backHome( bool fAlways, bool fForce )
@@ -348,15 +360,8 @@ bool BasicMobileBehavior::backHome( bool fAlways, bool fForce )
     Room *home;
     int myHomeVnum = homeVnum != 0 ? homeVnum.getValue() : ch->reset_room;
 
-    if (myHomeVnum == 0 || (!fForce && IS_SET(ch->in_room->room_flags, ROOM_NO_RECALL))) {
-        if (fAlways) {
-            oldact(_("$c1 ищет свой дом."), ch, 0, 0, TO_ROOM );
-            extract_char( ch );
-            return true;
-        }
-        else 
-            return false;
-    }
+    if (myHomeVnum == 0)
+        return lost_home( ch, fAlways );
     
     home = get_room_instance( myHomeVnum );
 
@@ -365,6 +370,17 @@ bool BasicMobileBehavior::backHome( bool fAlways, bool fForce )
         return false;
     }
     
+    // A sentinel can remember a room it was pushed into as home: forget it
+    // and head for the reset room, or it settles in the wrong room for good.
+    if (home == ch->in_room && !fForce && IS_SET(ch->act, ACT_SENTINEL)
+        && homeVnum != 0 && homeVnum.getValue() != ch->reset_room && ch->reset_room != 0)
+    {
+        homeVnum = 0;
+        home = get_room_instance( ch->reset_room );
+        if (!home)
+            return false;
+    }
+
     if (home == ch->in_room) {
         // A forced trip home is an evade: settle back in place even when
         // the chase never left the lair.
@@ -380,7 +396,7 @@ bool BasicMobileBehavior::backHome( bool fAlways, bool fForce )
     if (!fForce && IS_SET(ch->act, ACT_WIMPY) && ch->getLastFightDelay() <= Date::SECOND_IN_HOUR)
         return false;
 
-    // Check if standing in the adjancent room and can just walk back there.
+    // Check if standing in the adjacent room and can just walk back there.
     int door = door_between_rooms(ch->in_room, home);
     if (door >= 0) {
         // See if it's safe to go back for a wimpy mob.
@@ -389,6 +405,10 @@ bool BasicMobileBehavior::backHome( bool fAlways, bool fForce )
             if (findMemoryFoughtRoom(home)) 
                 return false;
         }
+
+        EXIT_DATA *pexit = ch->in_room->exit[door];
+        if (pexit && IS_SET(pexit->exit_info, EX_CLOSED) && !IS_SET(pexit->exit_info, EX_LOCKED))
+            open_door_extra( ch, door, pexit );
 
         interpret_cmd(ch, dirs[door].name, "");
         if (ch->extracted)
@@ -400,6 +420,10 @@ bool BasicMobileBehavior::backHome( bool fAlways, bool fForce )
             return false;
         }
     }
+
+    // No-recall only forbids praying home, not walking one room back.
+    if (!fForce && IS_SET(ch->in_room->room_flags, ROOM_NO_RECALL))
+        return lost_home( ch, fAlways );
 
     // The walk branch above goes through Walkment and therefore obeys web,
     // entangle and the rest; this branch used to be a raw teleport that asked
