@@ -66,38 +66,50 @@ bool Wanderer::canWander( Room *const room, Object *portal )
 /////////////////////////////////////////////////////////////////////////////
 struct DoorFunc {
     
-    DoorFunc( Wanderer *bhv ) : behavior( bhv ) { }
+    DoorFunc( Wanderer *bhv, Character *v = 0 ) : behavior( bhv ), viewer( v ) { }
 
     bool operator () ( Room *const room, EXIT_DATA *exit ) const
     {
+        if (viewer && !viewer->can_see( exit ))
+            return false;
+
         return behavior->canWander( room, exit );
     }
     
     Wanderer *behavior;
+    Character *viewer;
 };
 
 struct ExtraExitFunc {
     
-    ExtraExitFunc( Wanderer *bhv ) : behavior( bhv ) { }
+    ExtraExitFunc( Wanderer *bhv, Character *v = 0 ) : behavior( bhv ), viewer( v ) { }
 
     bool operator () ( Room *const room, EXTRA_EXIT_DATA *eexit ) const
     {
+        if (viewer && !Traverse::canSpotExtraExit( viewer, eexit ))
+            return false;
+
         return behavior->canWander( room, eexit );
     }
     
     Wanderer *behavior;
+    Character *viewer;
 };
 
 struct PortalFunc {
     
-    PortalFunc( Wanderer *bhv ) : behavior( bhv ) { }
+    PortalFunc( Wanderer *bhv, Character *v = 0 ) : behavior( bhv ), viewer( v ) { }
 
     bool operator () ( Room *const room, Object *portal ) const
     {
+        if (viewer && !Traverse::canSpotPortal( viewer, portal ))
+            return false;
+
         return behavior->canWander( room, portal );
     }
     
     Wanderer *behavior;
+    Character *viewer;
 };
 
 typedef RoomRoadsIterator<DoorFunc, ExtraExitFunc, PortalFunc> MyHookIterator;
@@ -160,7 +172,12 @@ struct PathWithDepthComplete {
 
 void Wanderer::pathToTarget( Room *const start_room, Room *const target_room, int limit )
 {
-    DoorFunc goDoor(this); ExtraExitFunc goEExit(this); PortalFunc goPortal(this);
+    pathToTarget( start_room, target_room, limit, 0 );
+}
+
+void Wanderer::pathToTarget( Room *const start_room, Room *const target_room, int limit, Character *viewer )
+{
+    DoorFunc goDoor(this, viewer); ExtraExitFunc goEExit(this, viewer); PortalFunc goPortal(this, viewer);
     MyHookIterator iter(goDoor, goEExit, goPortal); 
 
     PathToTargetComplete complete( target_room, path );
@@ -280,11 +297,17 @@ void Wanderer::makeOneStep( )
 bool 
 Wanderer::makeSpeedwalk( Room *start_room, Room *target_room, ostringstream &buf, lang_t lang )
 {
+    return makeSpeedwalk( start_room, target_room, buf, lang, 0 );
+}
+
+bool 
+Wanderer::makeSpeedwalk( Room *start_room, Room *target_room, ostringstream &buf, lang_t lang, Character *viewer )
+{
     if (!start_room || !target_room)
         return false;
 
     path.clear( );
-    pathToTarget( start_room, target_room, 10000 );
+    pathToTarget( start_room, target_room, 10000, viewer );
 
     if (path.empty( ))
         return false;

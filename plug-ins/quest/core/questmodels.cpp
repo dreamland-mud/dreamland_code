@@ -259,6 +259,10 @@ struct DoorFunc {
             return false;
         }
 
+        if (!pch->can_see(exit)) {
+            return false;
+        }
+
         return model->checkRoomForTraverse(pch, exit->u1.to_room);
     }
     
@@ -275,6 +279,10 @@ struct ExtraExitFunc {
             return false;
         }
 
+        if (!Traverse::canSpotExtraExit(pch, eexit)) {
+            return false;
+        }
+
         return model->checkRoomForTraverse(pch, eexit->u1.to_room);
     }
 
@@ -288,6 +296,10 @@ struct PortalFunc {
     bool operator () ( Room *const room, Object *portal ) const
     {
         if (IS_SET(portal->value1(), EX_LOCKED )) {
+            return false;
+        }
+
+        if (!Traverse::canSpotPortal(pch, portal)) {
             return false;
         }
 

@@ -177,4 +177,13 @@ void make_speedwalk( RoomTraverseResult &elements, ostringstream &, lang_t lang 
 int room_distance( Character *ch, Room *src, Room *dst, int limit = 10000 );
 Road room_first_step( Character *ch, Room *start_room, Room *target_room,
                      bool fDoor, bool fExtra, bool fPortal, int limit = 10000 );
+
+// Concealment-only visibility for path planning: the viewer's detects against
+// the extra exit's or portal's own hiding. Unlike Character::can_see, ignores
+// the viewer's blindness and the darkness of the room they stand in, which say
+// nothing about a road far away.
+namespace Traverse {
+    bool canSpotExtraExit( Character *ch, EXTRA_EXIT_DATA *eexit );
+    bool canSpotPortal( Character *ch, Object *portal );
+}
 #endif

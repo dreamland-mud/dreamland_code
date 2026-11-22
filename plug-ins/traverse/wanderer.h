@@ -24,11 +24,16 @@ public:
         virtual bool canWander( Room *const, Object * );
 
         bool makeSpeedwalk( Room *, Room *, ostringstream &, lang_t lang = LANG_DEFAULT );
+        // Path built with the viewer's eyes: exits, extra exits and portals
+        // the viewer can't see are skipped. Overload, not a default arg, so
+        // plugins built against the old signature keep resolving.
+        bool makeSpeedwalk( Room *, Room *, ostringstream &, lang_t lang, Character *viewer );
 
 protected:
         virtual bool canEnter( Room *const );
 
         void pathToTarget( Room *const, Room *const, int );
+        void pathToTarget( Room *const, Room *const, int, Character *viewer );
         void pathWithDepth( Room *const, int, int );
         
         bool makeOneStep( Road & );
