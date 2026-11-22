@@ -228,7 +228,7 @@ Command::Pointer MultiCommandList::chooseCommand(Character *ch, const DLString &
     return sortedLookup(ch, input, guess_2);
 }
 
-static void record_distance(const DLString &cmd, const DLString &kuzdn, const DLString &candidate, InterpretArguments &iargs)
+static void record_distance(const DLString &cmd, const DLString &candidate, InterpretArguments &iargs)
 {
     DLString string2;
  
@@ -242,11 +242,46 @@ static void record_distance(const DLString &cmd, const DLString &kuzdn, const DL
         iargs.hints1.push_back(candidate);
     else if (distance == 2)
         iargs.hints2.push_back(candidate);
-
-    if (kuzdn.strPrefix(candidate))
-        iargs.translitCmd.push_back(candidate);
 }
 
+
+/*
+ * A line typed in the wrong keyboard layout: Latin "cv" meant Cyrillic "look",
+ * Cyrillic "score" typed on the Russian layout meant "score". Flip the layout
+ * toward the other alphabet and offer the flipped word only when the game would
+ * run a command for it, so the hint is exactly what typing it does.
+ */
+void MultiCommandList::gatherLayoutHint(InterpretArguments &iargs)
+{
+    const DLString &cmdName = iargs.cmdName;
+    list<lang_t> targets;
+
+    // An English reader's Latin typo is a typo, not a layout slip: no
+    // Cyrillic suggestions for them.
+    if (String::hasCyrillic(cmdName)) {
+        targets.push_back(EN);
+    } else if (Player::lang(iargs.ch) == LANG_EN) {
+        return;
+    } else if (Player::lang(iargs.ch) == LANG_UA) {
+        targets.push_back(UA);
+        targets.push_back(RU);
+    } else {
+        targets.push_back(RU);
+        targets.push_back(UA);
+    }
+
+    for (auto lang: targets) {
+        DLString flipped = translit(lang, cmdName);
+        if (flipped == cmdName)
+            continue;
+
+        if (sortedLookup(iargs.ch, flipped, lang)) {
+            iargs.translitCmd.push_back(flipped);
+            iargs.translitArgs = translit(lang, iargs.cmdArgs);
+            return;
+        }
+    }
+}
 
 void MultiCommandList::gatherHints(InterpretArguments &iargs)
 {
@@ -254,8 +289,7 @@ void MultiCommandList::gatherHints(InterpretArguments &iargs)
 
     lang_t guess_1, guess_2;
     guess_command_lang(iargs.ch, cmdName, guess_1, guess_2);
-    DLString kuzdn = translit(guess_1, cmdName);
-    iargs.translitArgs = translit(guess_1, iargs.cmdArgs);
+    gatherLayoutHint(iargs);
 
     // Suggest commands in the language the input was typed in, and nothing else:
     // offering a Russian command to a Ukrainian reader is what the typo was
@@ -269,10 +303,10 @@ void MultiCommandList::gatherHints(InterpretArguments &iargs)
             if (cmd->name[guess_1].empty())
                 continue;
 
-            record_distance(cmdName, kuzdn, cmd->name[guess_1], iargs);
+            record_distance(cmdName, cmd->name[guess_1], iargs);
 
             for (auto &alias: cmd->aliases[guess_1].split(" "))
-                record_distance(cmdName, kuzdn, alias, iargs);
+                record_distance(cmdName, alias, iargs);
         }
     }
 }

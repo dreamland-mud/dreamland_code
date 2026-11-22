@@ -25,6 +25,9 @@ struct MultiCommandList {
         // Guess what the player wanted to type from existing input.
         void gatherHints(InterpretArguments &iargs);
 
+        // Offer the input flipped to the other keyboard layout, if it runs a command.
+        void gatherLayoutHint(InterpretArguments &iargs);
+
         // Put a new command into storage, populate maps, re-sort the name lists.
         void addCommand(Command::Pointer &cmd);
 
