@@ -221,35 +221,38 @@ void OLCStateArea::changed( PCharacter *ch )
 }
 
 // Area Editor Functions.
+// Quest links kept their own bracket colour on telnet.
+static const OLCMenuFrame FRAME_QUEST = { "{W[", "{W]" };
+
 AEDIT(show, "показать", "показать все поля")
 {
     AreaIndexData *original = AreaUtils::getByVnum(vnum);
     Area *instance = original ? original->area : 0;
 
     ptc(ch, "Area:       [{C%5d{x]\n\r", vnum.getValue( ));
-    ptc(ch, "Name EN:    [{W%s{x] %s\n\r", name.get(EN).c_str(), web_edit_button(ch, "name", "web").c_str());   
-    ptc(ch, "Name UA:    [{W%s{x] %s\n\r", name.get(UA).c_str(), web_edit_button(ch, "uaname", "web").c_str());   
-    ptc(ch, "Name RU:    [{W%s{x] %s\n\r", name.get(RU).c_str(), web_edit_button(ch, "runame", "web").c_str());   
+    ptc(ch, "Name EN:    [{W%s{x] %s\n\r", name.get(EN).c_str(), olc_edit_button(ch, "name", "web").c_str());   
+    ptc(ch, "Name UA:    [{W%s{x] %s\n\r", name.get(UA).c_str(), olc_edit_button(ch, "uaname", "web").c_str());   
+    ptc(ch, "Name RU:    [{W%s{x] %s\n\r", name.get(RU).c_str(), olc_edit_button(ch, "runame", "web").c_str());   
     ptc(ch, "Authors:    [{W%s{x]\n\r", authors.getValue( ).c_str( ));
     ptc(ch, "Translator: [{W%s{x]\n\r", translator.getValue( ).c_str( ));
     ptc(ch, "File:       [{W%s{x]\n\r", file_name.getValue( ).c_str( ));
     ptc(ch, "Vnums:      [{W%u-%u{x]\n\r", min_vnum.getValue( ), max_vnum.getValue( ));
     ptc(ch, "Levels:     [{W%u-%u{x]\n\r", low_range.getValue( ), high_range.getValue( ));
-    ptc(ch, "Flags:      [{W%s{x] {D(? area_flags{w)\n\r",
+    ptc(ch, "Flags:      %s {D(? area_flags{w)\n\r",
         web_flag_menu(true, area_flags, "flags", area_flags.names(area_flag)).c_str());
     ptc(ch, "Security:   [{W%d{x]\n\r", security.getValue( ));
     ptc(ch, "Speedwalk:  EN [{W%s{x] %s  UA [{W%s{x] %s  RU [{W%s{x] %s\n\r", 
-          String::stripEOL(speedwalk.get(EN)).c_str(), web_edit_button(ch, "speedwalk", "web").c_str(),   
-          String::stripEOL(speedwalk.get(UA)).c_str(), web_edit_button(ch, "uaspeedwalk", "web").c_str(),   
-          String::stripEOL(speedwalk.get(RU)).c_str(), web_edit_button(ch, "ruspeedwalk", "web").c_str());   
+          String::stripEOL(speedwalk.get(EN)).c_str(), olc_edit_button(ch, "speedwalk", "web").c_str(),   
+          String::stripEOL(speedwalk.get(UA)).c_str(), olc_edit_button(ch, "uaspeedwalk", "web").c_str(),   
+          String::stripEOL(speedwalk.get(RU)).c_str(), olc_edit_button(ch, "ruspeedwalk", "web").c_str());   
     ptc(ch, "Preposition:EN [{W%s{x] %s  UA [{W%s{x] %s  RU [{W%s{x] %s\n\r",
-          String::stripEOL(preposition.get(EN)).c_str(), web_edit_button(ch, "preposition", "web").c_str(),
-          String::stripEOL(preposition.get(UA)).c_str(), web_edit_button(ch, "uapreposition", "web").c_str(),
-          String::stripEOL(preposition.get(RU)).c_str(), web_edit_button(ch, "rupreposition", "web").c_str());
+          String::stripEOL(preposition.get(EN)).c_str(), olc_edit_button(ch, "preposition", "web").c_str(),
+          String::stripEOL(preposition.get(UA)).c_str(), olc_edit_button(ch, "uapreposition", "web").c_str(),
+          String::stripEOL(preposition.get(RU)).c_str(), olc_edit_button(ch, "rupreposition", "web").c_str());
     ptc(ch, "Message:    EN [{W%s{x] %s  UA [{W%s{x] %s  RU [{W%s{x] %s\n\r",
-          String::stripEOL(resetMessage.get(EN)).c_str(), web_edit_button(ch, "message", "web").c_str(),   
-          String::stripEOL(resetMessage.get(UA)).c_str(), web_edit_button(ch, "uamessage", "web").c_str(),   
-          String::stripEOL(resetMessage.get(RU)).c_str(), web_edit_button(ch, "rumessage", "web").c_str());   
+          String::stripEOL(resetMessage.get(EN)).c_str(), olc_edit_button(ch, "message", "web").c_str(),   
+          String::stripEOL(resetMessage.get(UA)).c_str(), olc_edit_button(ch, "uamessage", "web").c_str(),   
+          String::stripEOL(resetMessage.get(RU)).c_str(), olc_edit_button(ch, "rumessage", "web").c_str());   
 
     if (instance)
         ptc(ch, "{DMain instance: empty [%s], age [%d], players [%d], flags [%s], rooms count [%d]{x\n\r",
@@ -265,7 +268,7 @@ AEDIT(show, "показать", "показать все поля")
         for (auto &article: original->helps) 
             if (article->getID() > 0)
                 buf += "    [{C" + article->getAllKeywordsString() + "{x] "
-                    +  web_edit_button(ch, "hedit", DLString(article->getID()))
+                    +  olc_edit_button(ch, "hedit", DLString(article->getID()))
                     + " {D(hedit " + DLString(article->getID()) + "){x\r\n";
 
         ch->pecho("Helps:\r\n" + buf);
@@ -278,7 +281,7 @@ AEDIT(show, "показать", "показать все поля")
         ostringstream buf;
 
         const DLString lineFormatQuestEdit =
-            "{W[" + web_cmd(ch, "qedit $1", "%6d") + "{W] {c%s{x, {C%d{x step(s), levels {C%d{x-{C%d{x\r\n";
+            olc_cmd(ch, "qedit $1", "%6d", FRAME_QUEST) + " {c%s{x, {C%d{x step(s), levels {C%d{x-{C%d{x\r\n";
 
         for (auto &q: original->quests) {
             buf << fmt(0, lineFormatQuestEdit.c_str(),

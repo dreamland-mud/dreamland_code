@@ -313,8 +313,8 @@ CMD(alist, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     }
 
     const DLString lineFormat = 
-            "[" + web_cmd(ch, "aedit $1", "%3d") 
-            + "] {%s%-29s {%s(%5u-%5u) %17s %s{w\n\r";
+            olc_cmd(ch, "aedit $1", "%3d", OLC_FRAME_PLAIN)
+            + " {%s%-29s {%s(%5u-%5u) %17s %s{w\n\r";
 
     ptc(ch, "[%3s] %-29s   (%5s-%5s) %-17s %s\n\r",
       "Num", "Area Name", "lvnum", "uvnum", "Filename", "Help");
@@ -332,7 +332,7 @@ CMD(alist, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             DLString id(ahelp->getID());
             // Mark zones without meaningful help articles with red asterix.
             DLString color = help_is_empty(*ahelp) ? " {R*{x": "";
-            hedit = web_cmd(ch, "hedit " + id, "hedit " + id) + color;
+            hedit = olc_cmd(ch, "hedit " + id, "hedit " + id, OLC_FRAME_NONE) + color;
         }
 
         // System areas are shown in grey colors.           
@@ -480,8 +480,8 @@ static void abc_body(Character *ch, DLString &args)
                         || (pMob->reviewed & (1 << abc_reviewed_bit(s))))
                     continue;
                 line << " " << abc_set_names[s] << " -{r" << abc_set_table(s)->names(pMob->bodyDel[s]) << "{x "
-                     << "[" << web_cmd(ch, "abc body keep " + vnum + " " + abc_set_names[s], "keep") << "]"
-                     << "[" << web_cmd(ch, "abc body drop " + vnum + " " + abc_set_names[s], "drop") << "]";
+                     << olc_cmd(ch, "abc body keep " + vnum + " " + abc_set_names[s], "keep", OLC_FRAME_PLAIN)
+                     << olc_cmd(ch, "abc body drop " + vnum + " " + abc_set_names[s], "drop", OLC_FRAME_PLAIN);
                 continue;
             }
             bitstring_t add = pMob->bodyAdd[s], del = pMob->bodyDel[s];
@@ -499,8 +499,8 @@ static void abc_body(Character *ch, DLString &args)
             continue;
 
         if (cnt < maxlines) {
-            DLString head = "[" + web_cmd(ch, "medit $1", "%5d") + "] %-18.18N1 {g"
-                            + web_cmd(ch, "raceedit $1", "%-10.10s") + "{x";
+            DLString head = olc_cmd(ch, "medit $1", "%5d", OLC_FRAME_PLAIN) + " %-18.18N1 {g"
+                            + olc_cmd(ch, "raceedit $1", "%-10.10s", OLC_FRAME_NONE) + "{x";
             buf << fmt(0, head.c_str(), pMob->vnum, pMob->getShortDescr(LANG_DEFAULT), pMob->race.c_str())
                 << line.str() << endl;
         }
@@ -597,7 +597,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         mbuf << endl << "Экстравыходы в особняках и пригородах:" << endl;
         cbuf << endl << "Экстравыходы в кланах:" << endl;
 
-        const DLString lineFormat = "[" + web_cmd(ch, "goto $1", "%5d") + "] [%15s] [{Y%30s{x] [{G%30s{x]";
+        const DLString lineFormat = olc_cmd(ch, "goto $1", "%5d", OLC_FRAME_PLAIN) + " [%15s] [{Y%30s{x] [{G%30s{x]";
         for (auto &room: roomInstances) {
             ostringstream *buf;
             if (IS_SET(room->room_flags, ROOM_MANSION) 

@@ -66,7 +66,7 @@ void OLCStateFile::show( PCharacter *ch ) const
 {
     ptc(ch, "{WКонфигурационный файл {c%s{W:\r\n", path.c_str());
     ptc(ch, "{WТекст{x: %s\r\n%s\r\n{R...{x\r\n", 
-        web_edit_button(ch, "text", "web").c_str(),
+        olc_edit_button(ch, "text", "web").c_str(),
         text.substr(0, 100).c_str());
     ptc(ch, "{WКоманды{x: {y{hccommands{x, {y{hcshow{x, {y{hccancel{x, {y{hcdone{x\r\n");
 }
@@ -207,7 +207,7 @@ CMD(fedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online configuration file editor.
 
     if (arg_is_list(arg1)) {
         ostringstream buf;
-        const DLString lineFormat = "    " + web_cmd(ch, "fedit $1|text web", "%s");
+        const DLString lineFormat = "    " + olc_cmd(ch, "fedit $1|text web", "%s", OLC_FRAME_NONE);
         DLString lastFolder = "\x01"; // sentinel: no real folder compares equal
 
         // Print a folder header whenever the folder prefix changes. getPaths() returns

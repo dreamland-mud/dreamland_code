@@ -190,14 +190,14 @@ static void show_one_message(const char *prefix, PCharacter *ch, const DLString 
 {
     ostringstream buf;
     buf << "{G" << (message.empty() ? "-" : message)
-        << " " << web_edit_button(ch, cmd, "web") << " "
+        << " " << olc_edit_button(ch, cmd, "web") << " "
         << "{D(" << cmd << ")";
     ptc(ch, "%s: %s\r\n", prefix, buf.str().c_str());
 }
 
 void OLCStateSkill::show( PCharacter *ch )
 {
-    OLCMenuKeyScope menuScope( getMenuKey( ) );
+    OLCMenuKeyScope menuScope( getMenuKey( ), ch );
     BasicSkill *r = getOriginal();
     DefaultSpell *s = getSpell(r);
     DefaultAffectHandler *a = getAffect(r);
@@ -207,12 +207,12 @@ void OLCStateSkill::show( PCharacter *ch )
     ptc(ch, "Умение:      {C%s\r\n", r->getName().c_str());
     ptc(ch, "УкИмя:       {C%s{x %s {D(uaname help){x\r\n",
             r->name[UA].c_str(),
-            web_edit_button(ch, "uaname", "web").c_str());
+            olc_edit_button(ch, "uaname", "web").c_str());
     ptc(ch, "РуИмя:       {C%s{x %s {D(runame help){x\r\n",
             r->name[RU].c_str(),
-            web_edit_button(ch, "runame", "web").c_str());
+            olc_edit_button(ch, "runame", "web").c_str());
     ptc(ch, "Группы:      {C%s {D(group){x\r\n",
-            web_bitvector_menu(skill_owns_groups(r), r->getGroups(), "group", r->getGroups().toString()).c_str());
+            web_bitvector_menu(skill_owns_groups(r), r->getGroups(), "group", r->getGroups().toString(), OLC_FRAME_NONE).c_str());
     ptc(ch, "Дает:        {C%s {D(grants){x\r\n", r->getGrants().toString().c_str());
     ptc(ch, "Задержка:    {C%d{w пульсов {D(beats){x\r\n", r->getBeats());
     ptc(ch, "Цена, очки:  {C%d мана {D(mana) {C%d шаги {D(move){x \r\n", r->getMana(), r->move.getValue());
@@ -220,28 +220,28 @@ void OLCStateSkill::show( PCharacter *ch )
         r->manaPenalty.getValue(), r->movesPenalty.getValue(), r->healthPenalty.getValue());
     ptc(ch, "Характер:    {C%s {D(align) {C%s {D(ethos){x\r\n",
         web_flag_bits_menu(true, *r->align.getTable(), "align",
-                      r->align.getValue() != 0 ? r->align.names() : DLString("-")).c_str(),
+                      r->align.getValue() != 0 ? r->align.names() : DLString("-"), OLC_FRAME_NONE).c_str(),
         web_flag_bits_menu(true, *r->ethos.getTable(), "ethos",
-                      r->ethos.getValue() != 0 ? r->ethos.names() : DLString("-")).c_str());
+                      r->ethos.getValue() != 0 ? r->ethos.names() : DLString("-"), OLC_FRAME_NONE).c_str());
     ptc(ch, "Негатив:     {C%s {D(negative){x\r\n",
-        web_bool_menu(true, "negative", r->isNegative() ? "да - дебафф, в aff красным" : "нет").c_str());
+        web_bool_menu(true, "negative", r->isNegative() ? "да - дебафф, в aff красным" : "нет", OLC_FRAME_NONE).c_str());
     ptc(ch, "Автобафф:    {C%s {D(autobuff){x\r\n",
-        web_bool_menu(true, "autobuff", r->isAutobuff() ? "да - кастуется кнопкой автобаффа" : "нет").c_str());
+        web_bool_menu(true, "autobuff", r->isAutobuff() ? "да - кастуется кнопкой автобаффа" : "нет", OLC_FRAME_NONE).c_str());
     ptc(ch, "Сообщение:   {C%s{x %s {D(dammsg) {C%s {D(damgender){x\r\n",
         r->getDammsg().getFullForm().c_str(),
-        web_edit_button(ch, "dammsg", "web").c_str(),
-        web_gender_menu(true, "damgender", r->getDammsg().getMultiGender().toString()).c_str());
+        olc_edit_button(ch, "dammsg", "web").c_str(),
+        web_gender_menu(true, "damgender", r->getDammsg().getMultiGender().toString(), OLC_FRAME_NONE).c_str());
 
     if (r->help)
         ptc(ch, "Справка:     %s {D(help или hedit %d){x\r\n",
-            web_edit_button(ch, "hedit", r->help->getID()).c_str(),
+            olc_edit_button(ch, "hedit", r->help->getID()).c_str(),
             r->help->getID());
     else
         ptc(ch, "Справка:     нет {D(help create){x\r\n");
 
     ptc(ch, "Доступно:    {c%s{x %s {D(allow help){x\r\n",
             r->accessToString().c_str(),
-            web_edit_button(ch, "allow", "").c_str());
+            olc_edit_button(ch, "allow", "").c_str());
 
     if (mob) {
         ostringstream mobBuf;
@@ -250,10 +250,10 @@ void OLCStateSkill::show( PCharacter *ch )
         mobBuf  << "разучено {c" << mob->dice << "{x*level+{c" << mob->bonus 
                 << "{x, атаки {c"
                 << web_flag_menu(true, *mob->offense.getTable(), "mob offense",
-                                 mob->offense.getValue() == 0 ? DLString("нет") : mob->offense.names())
+                                 mob->offense.getValue() == 0 ? DLString("нет") : mob->offense.names(), OLC_FRAME_NONE)
                 << "{x";
         if (pmob)
-            mobBuf << ", классовое {c" << web_bool_menu(true, "mob class", pmob->professional ? "да" : "нет") << "{x";
+            mobBuf << ", классовое {c" << web_bool_menu(true, "mob class", pmob->professional ? "да" : "нет", OLC_FRAME_NONE) << "{x";
         
         ptc(ch, "Мобы:        %s {D({hcmob{hx){x\r\n", mobBuf.str().c_str());
     }
@@ -263,35 +263,35 @@ void OLCStateSkill::show( PCharacter *ch )
         // With a command on the skill, 'position', 'flags' and 'order' edit the command.
         bool spellOwns = !c;
         ptc(ch, "Цели:        {Y%s {D(target){x\r\n",
-                web_flag_menu(true, *s->target.getTable(), "target", s->target.names()).c_str());
+                web_flag_menu(true, *s->target.getTable(), "target", s->target.names(), OLC_FRAME_NONE).c_str());
         ptc(ch, "Позиция:     {Y%s {D(position){x\r\n",
-                web_flag_menu(spellOwns, *s->position.getTable(), "position", s->position.name()).c_str());
+                web_flag_menu(spellOwns, *s->position.getTable(), "position", s->position.name(), OLC_FRAME_NONE).c_str());
         ptc(ch, "Тип:         {Y%s {D(type){x\r\n",
-                web_flag_menu(true, *s->type.getTable(), "type", s->type.name()).c_str());
+                web_flag_menu(true, *s->type.getTable(), "type", s->type.name(), OLC_FRAME_NONE).c_str());
         ptc(ch, "Флаги:       {Y%s {D(flags){x\r\n",
-                web_flag_menu(spellOwns, *s->flags.getTable(), "flags", s->flags.names()).c_str());
+                web_flag_menu(spellOwns, *s->flags.getTable(), "flags", s->flags.names(), OLC_FRAME_NONE).c_str());
         ptc(ch, "Приказ:      {Y%s {D(order){x\r\n",
                 web_flag_menu(spellOwns, *s->order.getTable(), "order",
-                              s->order == 0 ? DLString("-") : s->order.names()).c_str());
+                              s->order == 0 ? DLString("-") : s->order.names(), OLC_FRAME_NONE).c_str());
                 
         if (s->type == SPELL_OFFENSIVE) {
             StringList tiers;
             for (int t = BEST_TIER; t <= WORST_TIER; t++)
                 tiers.push_back(DLString(t));
             ptc(ch, "Тип урона:   {Y%s {D(damtype){x\r\n",
-                    web_flag_menu(true, damage_table, "damtype", s->damtype.name()).c_str());
+                    web_flag_menu(true, damage_table, "damtype", s->damtype.name(), OLC_FRAME_NONE).c_str());
             ptc(ch, "Флаги урона: {Y%s {D(damflags){x\r\n",
-                    web_flag_menu(true, *s->damflags.getTable(), "damflags", s->damflags.names()).c_str());
+                    web_flag_menu(true, *s->damflags.getTable(), "damflags", s->damflags.names(), OLC_FRAME_NONE).c_str());
             ptc(ch, "Крутость:    {Y%s {D(tier){x\r\n",
-                    web_list_menu(true, tiers, "tier", DLString(s->tier.getValue())).c_str());
+                    web_list_menu(true, tiers, "tier", DLString(s->tier.getValue()), OLC_FRAME_NONE).c_str());
 
             if (s->targetIsRanged())
                 ptc(ch, "Ранговое:    {Y%s {D(ranged){x\r\n",
-                        web_bool_menu(true, "ranged", s->ranged ? "yes" : "no").c_str());
+                        web_bool_menu(true, "ranged", s->ranged ? "yes" : "no", OLC_FRAME_NONE).c_str());
         }
 
         ptc(ch, "Сообщения:   %s  %s {D(messages){x\r\n",
-               s->messages.toList().join(" {Y|{x ").c_str(), web_edit_button(ch, "messages", "web").c_str());
+               s->messages.toList().join(" {Y|{x ").c_str(), olc_edit_button(ch, "messages", "web").c_str());
 
         feniaTriggers->showTriggers(ch, s);
     }
@@ -300,31 +300,31 @@ void OLCStateSkill::show( PCharacter *ch )
         ptc(ch, ".............{YКоманда %s{x..........\r\n", c->getName().c_str());
         ptc(ch, "УкрИмя:      {Y%s{x %s {D(ukrname help){x\r\n",
                 c->name[UA].c_str(),
-                web_edit_button(ch, "ukrname", "web").c_str());
+                olc_edit_button(ch, "ukrname", "web").c_str());
         ptc(ch, "РусИмя:      {Y%s{x %s {D(rusname help){x\r\n",
                 c->name[RU].c_str(),
-                web_edit_button(ch, "rusname", "web").c_str());
+                olc_edit_button(ch, "rusname", "web").c_str());
         ptc(ch, "Синонимы:    {Y%s{x %s {D(aliases help){x\r\n",
                 c->aliases[EN].c_str(),
-                web_edit_button(ch, "aliases", "web").c_str());
+                olc_edit_button(ch, "aliases", "web").c_str());
         ptc(ch, "УкрСинонимы: {Y%s{x %s {D(ukraliases help){x\r\n",
                 c->aliases[UA].c_str(),
-                web_edit_button(ch, "ukraliases", "web").c_str());
+                olc_edit_button(ch, "ukraliases", "web").c_str());
         ptc(ch, "РусСинонимы: {Y%s{x %s {D(rusaliases help){x\r\n",
                 c->aliases[RU].c_str(),
-                web_edit_button(ch, "rusaliases", "web").c_str());
+                olc_edit_button(ch, "rusaliases", "web").c_str());
         ptc(ch, "Аргумент:    {Y%s {D(argtype){x\r\n",
-                web_flag_menu(true, *c->argtype.getTable(), "argtype", c->argtype.name()).c_str());
+                web_flag_menu(true, *c->argtype.getTable(), "argtype", c->argtype.name(), OLC_FRAME_NONE).c_str());
         ptc(ch, "Позиция:     {Y%s {D(position){x\r\n",
-                web_flag_menu(true, *c->position.getTable(), "position", c->position.name()).c_str());
+                web_flag_menu(true, *c->position.getTable(), "position", c->position.name(), OLC_FRAME_NONE).c_str());
         ptc(ch, "Флаги:       {Y%s {D(flags){x\r\n",
-                web_flag_menu(true, *c->extra.getTable(), "flags", c->extra.names()).c_str());
+                web_flag_menu(true, *c->extra.getTable(), "flags", c->extra.names(), OLC_FRAME_NONE).c_str());
         ptc(ch, "Приказ:      {Y%s {D(order){x\r\n", 
                 web_flag_menu(true, *c->order.getTable(), "order",
-                              c->order == 0 ? DLString("-") : c->order.names()).c_str());
+                              c->order == 0 ? DLString("-") : c->order.names(), OLC_FRAME_NONE).c_str());
         ptc(ch, "Подсказка:   {Y%s{x %s {D(hint help){x\r\n",
                 c->hint[RU].c_str(),
-                web_edit_button(ch, "hint", "web").c_str());        
+                olc_edit_button(ch, "hint", "web").c_str());        
 
         feniaTriggers->showTriggers(ch, c->getWrapper(), "skillcommand");
     }
@@ -332,9 +332,9 @@ void OLCStateSkill::show( PCharacter *ch )
     if (a) {
         ptc(ch, ".............{GАффект{x.................\r\n");
         ptc(ch, "Отменяется:  {G%s {D(cancelled){x\r\n",
-                web_bool_menu(true, "cancelled", a->cancelled ? "yes" : "no").c_str());
+                web_bool_menu(true, "cancelled", a->cancelled ? "yes" : "no", OLC_FRAME_NONE).c_str());
         ptc(ch, "Снимается:   {G%s {D(dispelled){x\r\n",
-                web_bool_menu(true, "dispelled", a->dispelled ? "yes" : "no").c_str());
+                web_bool_menu(true, "dispelled", a->dispelled ? "yes" : "no", OLC_FRAME_NONE).c_str());
         show_one_message("Спадает с тебя    ", ch, a->removeCharSelf, "removeCharSelf");
         show_one_message("Спадает с соседа  ", ch, a->removeCharOthers, "removeCharOthers");
         show_one_message("Спадает с предмета", ch, a->removeObj, "removeObj");
@@ -1118,7 +1118,7 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
         ostringstream buf;
         buf << fmt(0, "{C%-20s %-4s %4s %4s %4s %1s %1s{x\r\n", "Имя", "Тип", "Мана", "Шаги", "Wait", "T", "F");
         const DLString lineFormat = 
-            "{W" + web_cmd(ch, "skedit $1", "%-20s") + "{w %-4s %4d %4d %4d %1s %1s{x\r\n";
+            "{W" + olc_cmd(ch, "skedit $1", "%-20s", OLC_FRAME_NONE) + "{w %-4s %4d %4d %4d %1s %1s{x\r\n";
 
         for (auto &s: skills) {
             DefaultSpell::Pointer spell = s->getSpell().getDynamicPointer<DefaultSpell>();
@@ -1278,32 +1278,32 @@ void OLCStateSkillGroup::statePrompt(Descriptor *d)
 
 void OLCStateSkillGroup::show(PCharacter *ch)
 {
-    OLCMenuKeyScope menuScope( getMenuKey( ) );
+    OLCMenuKeyScope menuScope( getMenuKey( ), ch );
     DefaultSkillGroup *g = getOriginal();
 
     ptc(ch, "Группа:      {C%s\r\n", g->getName().c_str());
     ptc(ch, "УкИмя:       {C%s{x %s {D(uaname help){x\r\n",
             g->name[UA].c_str(),
-            web_edit_button(ch, "uaname", "web").c_str());
+            olc_edit_button(ch, "uaname", "web").c_str());
     ptc(ch, "РуИмя:       {C%s{x %s {D(runame help){x\r\n",
             g->name[RU].c_str(),
-            web_edit_button(ch, "runame", "web").c_str());
+            olc_edit_button(ch, "runame", "web").c_str());
     ptc(ch, "Скрыта:      {C%s {D(hidden){x\r\n", 
-            web_bool_menu(true, "hidden", g->hidden ? "yes" : "no").c_str());
+            web_bool_menu(true, "hidden", g->hidden ? "yes" : "no", OLC_FRAME_NONE).c_str());
 
     MOB_INDEX_DATA *pMob = get_mob_index(g->getPracticer());
     ptc(ch, "Учитель:     {g%N1{x [%d] {D(practicer){x\r\n",
              (pMob ? pMob->getShortDescr(LANG_DEFAULT) : "-"),
              g->getPracticer());
     ptc(ch, "Боги:        {g%s {D(gods){x\r\n",
-        web_bitvector_menu(true, g->gods, "gods", g->gods.empty() ? DLString("-") : g->gods.toString()).c_str());
+        web_bitvector_menu(true, g->gods, "gods", g->gods.empty() ? DLString("-") : g->gods.toString(), OLC_FRAME_NONE).c_str());
     ptc(ch, "Путь:        {g%s{x  %s {D(path help){x\r\n",
             g->path.c_str(), 
-            web_edit_button(ch, "path", "web").c_str());
+            olc_edit_button(ch, "path", "web").c_str());
 
     if (g->help)
         ptc(ch, "Справка:     %s {D(help или hedit %d){x\r\n",
-            web_edit_button(ch, "hedit", g->help->getID()).c_str(),
+            olc_edit_button(ch, "hedit", g->help->getID()).c_str(),
             g->help->getID());
     else
         ptc(ch, "Справка:     нет {D(help create){x\r\n");
@@ -1311,13 +1311,13 @@ void OLCStateSkillGroup::show(PCharacter *ch)
     stc("{YСообщения{x:\r\n", ch);
     ptc(ch, "Себе:        %s %s {D(self){x\r\n",
               g->msgSelf.toList().join(" {Y|{x ").c_str(),
-              web_edit_button(ch, "self", "web").c_str());
+              olc_edit_button(ch, "self", "web").c_str());
     ptc(ch, "Жертве:      %s %s {D(victim){x\r\n",
               g->msgVict.toList().join(" {Y|{x ").c_str(),
-              web_edit_button(ch, "victim", "web").c_str());
+              olc_edit_button(ch, "victim", "web").c_str());
     ptc(ch, "Комнате:     %s %s {D(room){x\r\n",
               g->msgRoom.toList().join(" {Y|{x ").c_str(),
-              web_edit_button(ch, "room", "web").c_str());
+              olc_edit_button(ch, "room", "web").c_str());
 
 
     ptc(ch, "\r\n{WКоманды{x: {hc{ycommands{x, {hc{yshow{x, {hc{ydone{x, {hc{y?{x\r\n");

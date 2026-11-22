@@ -166,16 +166,19 @@ DLString OLCState::getMenuKey( )
 }
 
 DLString OLCState::currentMenuKey;
+bool OLCState::currentWeb = false;
 
-OLCMenuKeyScope::OLCMenuKeyScope( const DLString &key )
-        : saved( OLCState::currentMenuKey )
+OLCMenuKeyScope::OLCMenuKeyScope( const DLString &key, Character *viewer )
+        : saved( OLCState::currentMenuKey ), savedWeb( OLCState::currentWeb )
 {
     OLCState::currentMenuKey = key;
+    OLCState::currentWeb = is_websock( viewer );
 }
 
 OLCMenuKeyScope::~OLCMenuKeyScope( )
 {
     OLCState::currentMenuKey = saved;
+    OLCState::currentWeb = savedWeb;
 }
 
 // Inside an editor the pick names the entity it was drawn for, see OLCInterpretLayer.
@@ -1213,10 +1216,36 @@ bool OLCState::editProps(GlobalBitvector &behaviors, Json::Value &props, const D
     return true;
 }
 
-DLString web_edit_button(bool showWeb, Character *ch, const DLString &editor, const DLString &args)
+// The yellow brackets every clickable OLC thing wears on the web.
+static DLString olc_web_frame(const DLString &inner)
+{
+    return "{y[{W" + inner + "{y]{x";
+}
+
+DLString olc_link(Character *ch, const DLString &link, const OLCMenuFrame &frame)
+{
+    if (!is_websock(ch))
+        return DLString(frame.open) + link + frame.close;
+    return olc_web_frame(link);
+}
+
+DLString olc_cmd(Character *ch, const DLString &cmd, const DLString &seeFmt, const OLCMenuFrame &frame)
+{
+    return olc_link(ch, web_cmd(ch, cmd, seeFmt), frame);
+}
+
+DLString olc_edit_button(Character *ch, const DLString &editor, const DLString &args)
+{
+    DLString button = web_edit_button(ch, editor, args);
+    if (button.empty())
+        return button;
+    return olc_link(ch, button, OLC_FRAME_NONE);
+}
+
+DLString olc_edit_button(bool showWeb, Character *ch, const DLString &editor, const DLString &args)
 {
     if (showWeb)
-        return web_edit_button(ch, editor, args);
+        return olc_edit_button(ch, editor, args);
     else
         return DLString::emptyString;
 }
@@ -1236,44 +1265,62 @@ static bool web_menu_value_ok(const DLString &value)
     return !value.empty() && value.find_first_of(",'") == DLString::npos;
 }
 
-DLString web_list_menu(bool showWeb, const StringList &values, const DLString &cmd, const DLString &label)
+const OLCMenuFrame OLC_FRAME_BRACKETS = { "[{W", "{x]" };
+const OLCMenuFrame OLC_FRAME_NONE = { "", "" };
+const OLCMenuFrame OLC_FRAME_PLAIN = { "[", "]" };
+
+DLString olc_menu_widget(bool web, const StringList &commands, const DLString &id, const DLString &label,
+                         const OLCMenuFrame &frame)
+{
+    // An empty label would leave nothing to click on.
+    if (!web)
+        return DLString(frame.open) + web_menu(commands, id, label.empty() ? DLString("{Iwnone{Ix") : label) + frame.close;
+
+    // The triangle is an HTML entity (KOI8 has no such glyph) and sits inside
+    // the toggle, so it opens the menu too. The whole string reaches only a web
+    // client: no {Iw needed, which would also drop the triangle's colour. {IS
+    // keeps it from screen readers, where it would be read on every field.
+    DLString toggle = "{W" + (label.empty() ? DLString("none") : label) + "{IS {Y&#9660;{Ix";
+    return olc_web_frame(web_menu(commands, id, toggle));
+}
+
+DLString web_list_menu(bool showWeb, const StringList &values, const DLString &cmd, const DLString &label,
+                       const OLCMenuFrame &frame)
 {
     if (!showWeb)
-        return label;
+        return DLString(frame.open) + label + frame.close;
 
     StringList commands;
     for (auto &v: values)
         if (web_menu_value_ok(v))
             commands.push_back("$ " + v);
 
-    DLString id = olc_menu_id(cmd);
-
-    // An empty label would leave nothing to click on. Web-only, so telnet keeps
-    // seeing the empty field it always saw.
-    return web_menu(commands, id, label.empty() ? DLString("{Iwnone{Ix") : label);
+    return olc_menu_widget(OLCState::currentWeb, commands, olc_menu_id(cmd), label, frame);
 }
 
-DLString web_flag_menu(bool showWeb, const FlagTable &table, const DLString &cmd, const DLString &label)
+DLString web_flag_menu(bool showWeb, const FlagTable &table, const DLString &cmd, const DLString &label,
+                       const OLCMenuFrame &frame)
 {
     StringList names;
     for (int i = 0; i < table.size; i++)
         names.push_back(table.fields[i].name);
 
-    return web_list_menu(showWeb, names, cmd, label);
+    return web_list_menu(showWeb, names, cmd, label, frame);
 }
 
-DLString web_flag_bits_menu(bool showWeb, const FlagTable &table, const DLString &cmd, const DLString &label)
+DLString web_flag_bits_menu(bool showWeb, const FlagTable &table, const DLString &cmd, const DLString &label,
+                            const OLCMenuFrame &frame)
 {
     StringList names;
     for (int i = 0; i < table.size; i++)
         if (!table.enumerated || table.fields[i].value != 0)
             names.push_back(table.fields[i].name);
 
-    return web_list_menu(showWeb, names, cmd, label);
+    return web_list_menu(showWeb, names, cmd, label, frame);
 }
 
 DLString web_registry_menu(bool showWeb, GlobalRegistryBase *registry, const DLString &cmd, const DLString &label,
-                           const DLString &clearWord)
+                           const DLString &clearWord, const OLCMenuFrame &frame)
 {
     StringList names;
     for (int i = 0; i < registry->size(); i++) {
@@ -1284,10 +1331,11 @@ DLString web_registry_menu(bool showWeb, GlobalRegistryBase *registry, const DLS
     if (!clearWord.empty())
         names.push_back(clearWord);
 
-    return web_list_menu(showWeb, names, cmd, label);
+    return web_list_menu(showWeb, names, cmd, label, frame);
 }
 
-DLString web_bitvector_menu(bool showWeb, const GlobalBitvector &field, const DLString &cmd, const DLString &label)
+DLString web_bitvector_menu(bool showWeb, const GlobalBitvector &field, const DLString &cmd, const DLString &label,
+                            const OLCMenuFrame &frame)
 {
     GlobalRegistryBase *registry = field.getRegistry();
     StringList values;
@@ -1297,7 +1345,7 @@ DLString web_bitvector_menu(bool showWeb, const GlobalBitvector &field, const DL
             values.push_back(DLString(field.isSet(i) ? "-" : "+") + elem->getName());
     }
 
-    return web_list_menu(showWeb, values, cmd, label);
+    return web_list_menu(showWeb, values, cmd, label, frame);
 }
 
 StringList spec_function_names(const DLString &clearWord)
@@ -1310,7 +1358,8 @@ StringList spec_function_names(const DLString &clearWord)
     return names;
 }
 
-DLString web_material_menu(bool showWeb, const DLString &cmd, const DLString &label, const DLString &clearWord)
+DLString web_material_menu(bool showWeb, const DLString &cmd, const DLString &label, const DLString &clearWord,
+                           const OLCMenuFrame &frame)
 {
     StringList names;
     for (auto &m: material_table)
@@ -1318,23 +1367,23 @@ DLString web_material_menu(bool showWeb, const DLString &cmd, const DLString &la
     if (!clearWord.empty())
         names.push_back(clearWord);
 
-    return web_list_menu(showWeb, names, cmd, label);
+    return web_list_menu(showWeb, names, cmd, label, frame);
 }
 
-DLString web_gender_menu(bool showWeb, const DLString &cmd, const DLString &label)
+DLString web_gender_menu(bool showWeb, const DLString &cmd, const DLString &label, const OLCMenuFrame &frame)
 {
     StringList values;
     values.push_back("m");
     values.push_back("f");
     values.push_back("n");
     values.push_back("p");
-    return web_list_menu(showWeb, values, cmd, label);
+    return web_list_menu(showWeb, values, cmd, label, frame);
 }
 
-DLString web_bool_menu(bool showWeb, const DLString &cmd, const DLString &label)
+DLString web_bool_menu(bool showWeb, const DLString &cmd, const DLString &label, const OLCMenuFrame &frame)
 {
     StringList values;
     values.push_back("y");
     values.push_back("n");
-    return web_list_menu(showWeb, values, cmd, label);
+    return web_list_menu(showWeb, values, cmd, label, frame);
 }

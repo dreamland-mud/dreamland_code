@@ -95,6 +95,11 @@ void OLCStateAreaQuest::changed( PCharacter *ch )
 }
 
 // Output step target's name with a clickable link to OLC editor.
+// Command links that kept their own bracket colours on telnet.
+static const OLCMenuFrame FRAME_VNUM = { "{w[{W", "{w]" };
+static const OLCMenuFrame FRAME_MOVE = { "{D[", "]" };
+static const OLCMenuFrame FRAME_ADD = { "[{y", "{w]" };
+
 static DLString show_step_target(PCharacter *ch, const DLString &type, const Integer &vnum)
 {
     ostringstream buf;
@@ -106,7 +111,7 @@ static DLString show_step_target(PCharacter *ch, const DLString &type, const Int
             return buf.str();
         }
 
-        buf << "{w[{W" << web_cmd(ch, "medit $1", vnum.toString()) << "{w] " << russian_case(pMob->short_descr[RU], '1');
+        buf << olc_cmd(ch, "medit $1", vnum.toString(), FRAME_VNUM) << " " << russian_case(pMob->short_descr[RU], '1');
         return buf.str();
     }
 
@@ -117,7 +122,7 @@ static DLString show_step_target(PCharacter *ch, const DLString &type, const Int
             return buf.str();
         }
 
-        buf << "{w[{W" << web_cmd(ch, "oedit $1", vnum.toString()) << "{w] " << russian_case(pObj->short_descr[RU], '1');
+        buf << olc_cmd(ch, "oedit $1", vnum.toString(), FRAME_VNUM) << " " << russian_case(pObj->short_descr[RU], '1');
         return buf.str();
     }
 
@@ -128,7 +133,7 @@ static DLString show_step_target(PCharacter *ch, const DLString &type, const Int
             return buf.str();
         }
 
-        buf << "{w[{W" << web_cmd(ch, "redit $1", vnum.toString()) << "{w] " << pRoom->name[RU];
+        buf << olc_cmd(ch, "redit $1", vnum.toString(), FRAME_VNUM) << " " << pRoom->name[RU];
 
         return buf.str();
     }
@@ -136,6 +141,9 @@ static DLString show_step_target(PCharacter *ch, const DLString &type, const Int
     buf << "{Rнеизвестный тип{x";
     return buf.str();
 }
+
+// Step type and trigger menus kept their own bracket colours on telnet.
+static const OLCMenuFrame FRAME_STEP = { "{w[{y", "{w]" };
 
 static DLString menu_step_type(Integer step, const DLString &stepType, DLString beginOrEnd)
 {
@@ -148,7 +156,7 @@ static DLString menu_step_type(Integer step, const DLString &stepType, DLString 
     commands.push_back("$ room");
     DLString label = stepType;
 
-    buf << "{w[{y" << web_menu(commands, olc_menu_id(id), label) << "{w]";
+    buf << olc_menu_widget(OLCState::currentWeb, commands, olc_menu_id(id), label, FRAME_STEP);
     return buf.str();
 }
 
@@ -183,7 +191,7 @@ static DLString menu_step_trigger(Integer step, const DLString &stepType, const 
         
     DLString label = stepTrig;
 
-    buf << "{w[{y" << web_menu(commands, olc_menu_id(id), label) << "{w]";
+    buf << olc_menu_widget(OLCState::currentWeb, commands, olc_menu_id(id), label, FRAME_STEP);
     return buf.str();
 }
 
@@ -206,7 +214,7 @@ static void show_active_triggers(PCharacter *ch, ostringstream& buf, const Integ
 
     DLString cmd = "cs web " + DLString(cs->getId());
     DLString seeFmt = methodId;
-    buf << "{g" << web_cmd(ch, cmd, seeFmt) << "{w ";
+    buf << "{g" << olc_cmd(ch, cmd, seeFmt, OLC_FRAME_NONE) << "{w ";
 }
 
 
@@ -221,7 +229,7 @@ static void show_available_triggers(PCharacter *ch, ostringstream& buf, const In
 
     DLString cmd = "step " + s.toString() + " " + (isBegin ? "begin" : "end") + " fenia";
     DLString seeFmt = methodId;
-    buf << "{W" << web_cmd(ch, cmd, seeFmt) << "{w ";
+    buf << "{W" << olc_cmd(ch, cmd, seeFmt, OLC_FRAME_NONE) << "{w ";
 }
 
 static DLString aquest_title(const Integer &questId)
@@ -251,7 +259,7 @@ static DLString show_step_reward(PCharacter *ch, const QuestStep::Pointer &step)
         if (!pObj)
             buf << step->rewardVnum << " {Rне найден{x";
         else
-            buf << "{w[{W" << web_cmd(ch, "oedit $1", step->rewardVnum.toString()) << "{w] " << russian_case(pObj->short_descr[RU], '1');
+            buf << olc_cmd(ch, "oedit $1", step->rewardVnum.toString(), FRAME_VNUM) << " " << russian_case(pObj->short_descr[RU], '1');
     }
 
     return buf.str();
@@ -317,14 +325,14 @@ static void show_step(PCharacter *ch, AreaQuest *q, int s)
         << "{CШаг " << s << "{x   ";
         
     if (s > 0)
-        buf << "{D[" << web_cmd(ch, "step " + stepNum + " up", "вверх") << "]{w ";
+        buf << olc_cmd(ch, "step " + stepNum + " up", "вверх", FRAME_MOVE) << "{w ";
     if (s != q->steps.size() - 1)
-        buf << "{D[" << web_cmd(ch, "step  " + stepNum + " down", "вниз") << "]{w ";
+        buf << olc_cmd(ch, "step  " + stepNum + " down", "вниз", FRAME_MOVE) << "{w ";
 
     buf << endl
-        << "{WИнфо{w:    EN [" << step->info[EN] << "] " << web_edit_button(ch, "step " + stepNum + " info", "web")
-        << "  UA [" << step->info[UA] << "] " << web_edit_button(ch, "step " + stepNum + " uainfo", "web") 
-        << "  RU [" << step->info[RU] << "] " << web_edit_button(ch, "step " + stepNum + " ruinfo", "web") << endl
+        << "{WИнфо{w:    EN [" << step->info[EN] << "] " << olc_edit_button(ch, "step " + stepNum + " info", "web")
+        << "  UA [" << step->info[UA] << "] " << olc_edit_button(ch, "step " + stepNum + " uainfo", "web") 
+        << "  RU [" << step->info[RU] << "] " << olc_edit_button(ch, "step " + stepNum + " ruinfo", "web") << endl
         << "{WНаграда{w: " << show_step_reward(ch, step) << endl
         << "{WНачало{w:  тип " << menu_step_type(s, step->beginType, "begin") << "{w, "
         << "триггер " << menu_step_trigger(s, step->beginType, step->beginTrigger, "begin") << "{w, "
@@ -382,7 +390,7 @@ static void show_finale(PCharacter *ch, AreaQuest *q)
     if (!trigBuf.str().empty()) {
         buf << "{gУстановлен{x:  " << trigBuf.str() << endl;
     } else {
-        buf << "{WДоступен{x:    {W" << web_cmd(ch, "finale", methodId) << "{w" << endl;
+        buf << "{WДоступен{x:    {W" << olc_cmd(ch, "finale", methodId, OLC_FRAME_NONE) << "{w" << endl;
     }
 
     ch->send_to(buf);
@@ -391,7 +399,7 @@ static void show_finale(PCharacter *ch, AreaQuest *q)
 static void show_steps(PCharacter *ch, AreaQuest *q)
 {
     ostringstream buf;
-    buf <<  "{CШаги{w:          [{y" << web_cmd(ch, "step add", "добавить") << "{w] {D(step help){x" << endl;
+    buf <<  "{CШаги{w:          " << olc_cmd(ch, "step add", "добавить", FRAME_ADD) << " {D(step help){x" << endl;
     ch->send_to(buf);
 
     for (unsigned int s = 0; s < q->steps.size(); s++)
@@ -402,37 +410,37 @@ static void show_steps(PCharacter *ch, AreaQuest *q)
 
 void OLCStateAreaQuest::show( PCharacter *ch )
 {
-    OLCMenuKeyScope menuScope( getMenuKey( ) );
+    OLCMenuKeyScope menuScope( getMenuKey( ), ch );
     AreaQuest *q = getOriginal();
     AreaIndexData *area = q->pAreaIndex;
 
     ptc(ch, "Квест {C%d{x зоны {W%s{x {x\r\n", 
              q->vnum.getValue(), area->getName().c_str());
 
-    ptc(ch, "Титул EN:      {C%s{x %s {D(title help){x\n\r", q->title.get(EN).c_str(), web_edit_button(ch, "name", "web").c_str());   
-    ptc(ch, "Титул UA:      {C%s{x %s {D(uatitle help){x\n\r", q->title.get(UA).c_str(), web_edit_button(ch, "uaname", "web").c_str());   
-    ptc(ch, "Титул RU:      {C%s{x %s {D(rutitle help){x\n\r", q->title.get(RU).c_str(), web_edit_button(ch, "runame", "web").c_str());   
+    ptc(ch, "Титул EN:      {C%s{x %s {D(title help){x\n\r", q->title.get(EN).c_str(), olc_edit_button(ch, "name", "web").c_str());   
+    ptc(ch, "Титул UA:      {C%s{x %s {D(uatitle help){x\n\r", q->title.get(UA).c_str(), olc_edit_button(ch, "uaname", "web").c_str());   
+    ptc(ch, "Титул RU:      {C%s{x %s {D(rutitle help){x\n\r", q->title.get(RU).c_str(), olc_edit_button(ch, "runame", "web").c_str());   
 
-    ptc(ch, "Описание EN:   %s {D(desc help){x\r\n{W%s{x", web_edit_button(ch, "desc", "web").c_str(), q->description[EN].c_str());
-    ptc(ch, "Описание UA:   %s {D(uadesc help){x\r\n{W%s{x", web_edit_button(ch, "uadesc", "web").c_str(), q->description[UA].c_str());
-    ptc(ch, "Описание RU:   %s {D(rudesc help){x\r\n{W%s{x", web_edit_button(ch, "rudesc", "web").c_str(), q->description[RU].c_str());
+    ptc(ch, "Описание EN:   %s {D(desc help){x\r\n{W%s{x", olc_edit_button(ch, "desc", "web").c_str(), q->description[EN].c_str());
+    ptc(ch, "Описание UA:   %s {D(uadesc help){x\r\n{W%s{x", olc_edit_button(ch, "uadesc", "web").c_str(), q->description[UA].c_str());
+    ptc(ch, "Описание RU:   %s {D(rudesc help){x\r\n{W%s{x", olc_edit_button(ch, "rudesc", "web").c_str(), q->description[RU].c_str());
 
     ptc(ch, "Мин. уровень:  {c%d {D(minlevel){x\r\n", q->minLevel.getValue());
     ptc(ch, "Макс. уровень: {c%d {D(maxlevel){x\r\n", q->maxLevel.getValue());
     ptc(ch, "Натура:        {c%s{x {D(? align){x\r\n",
         web_flag_menu(true, *q->align.getTable(), "align",
-                      q->align.getValue() != 0 ? q->align.names() : DLString("-")).c_str());
+                      q->align.getValue() != 0 ? q->align.names() : DLString("-"), OLC_FRAME_NONE).c_str());
     ptc(ch, "Классы:        {c%s{x {D(? classes){x\r\n",
             web_bitvector_menu(true, q->classes, "classes",
-                               q->classes.empty() ? DLString("-") : q->classes.toString()).c_str());
+                               q->classes.empty() ? DLString("-") : q->classes.toString(), OLC_FRAME_NONE).c_str());
     ptc(ch, "Города:        {c%s{x {D(? hometowns){x\r\n",
             web_bitvector_menu(true, q->hometowns, "hometowns",
-                               q->hometowns.empty() ? DLString("-") : q->hometowns.toString()).c_str());
+                               q->hometowns.empty() ? DLString("-") : q->hometowns.toString(), OLC_FRAME_NONE).c_str());
     ptc(ch, "Раз за жизнь:  {c%d {D(perlife){x\r\n", q->limitPerLife.getValue());
     ptc(ch, "Раз в день:    {c%s {D(perday){x\r\n",
-            web_bool_menu(true, "perday", q->oncePerDay ? "да" : "нет").c_str());
+            web_bool_menu(true, "perday", q->oncePerDay ? "да" : "нет", OLC_FRAME_NONE).c_str());
     ptc(ch, "Флаги:         {c%s {D(flags){x\r\n",
-            web_flag_menu(true, *q->flags.getTable(), "flags", q->flags.names()).c_str());
+            web_flag_menu(true, *q->flags.getTable(), "flags", q->flags.names(), OLC_FRAME_NONE).c_str());
     ptc(ch, "Предыдущий:    {c%d{x %s {D(prereq){x\r\n", 
              q->prereq.getValue(), aquest_title(q->prereq).c_str());
     
@@ -950,7 +958,7 @@ CMD(qedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online area quest editor.")
         ch->send_to(fmt(0, "{C%-6s %-7s %-3s %1s %s (%s){x\r\n", "Номер", "Уровни", "Нат", "!", "Квест", "Зона"));
 
         const DLString lineFormat = 
-            "{C" + web_cmd(ch, "qedit $1", "%-6d") + "{w %-7s %-3s{x %1s %s%s {W({x%s{W){x";
+            "{C" + olc_cmd(ch, "qedit $1", "%-6d", OLC_FRAME_NONE) + "{w %-7s %-3s{x %1s %s%s {W({x%s{W){x";
 
         for (auto q: areaQuests) {
             AreaQuest *aq = q.second;

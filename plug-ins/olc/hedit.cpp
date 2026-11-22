@@ -64,6 +64,9 @@ list<HelpArticle::Pointer> help_find_by_keywords(const DLString &keywords)
     return originals;
 }
 
+// Label links kept their own bracket colour on telnet.
+static const OLCMenuFrame FRAME_LABEL = { "[{c", "{x]" };
+
 void OLCStateHelp::commit() 
 {
     HelpArticle::Pointer original = helpManager->getArticle(id);
@@ -174,24 +177,24 @@ void OLCStateHelp::show( PCharacter *ch ) const
             target ? fmt(0, " псевдоним статьи {c%d{x", target->getID()).c_str() : "");
     }
     ptc(ch, "{DВсе ключевые слова:   [%s]\r\n", allKeywords().toString().c_str());
-    ptc(ch, "{WКлючевые слова, EN{x:   [{C%s{x] %s\r\n", keyword.get(EN).c_str(), web_edit_button(ch, "keywords", "web").c_str());
-    ptc(ch, "{WКлючевые слова, UA{x:   [{C%s{x] %s\r\n", keyword.get(UA).c_str(), web_edit_button(ch, "uakeywords", "web").c_str());
-    ptc(ch, "{WКлючевые слова, RU{x:   [{C%s{x] %s\r\n", keyword.get(RU).c_str(), web_edit_button(ch, "rukeywords", "web").c_str());
-    ptc(ch, "{WСкрытые алиасы, EN{x:   [{C%s{x] %s\r\n", extra.get(EN).c_str(), web_edit_button(ch, "aka", "web").c_str());
-    ptc(ch, "{WСкрытые алиасы, UA{x:   [{C%s{x] %s\r\n", extra.get(UA).c_str(), web_edit_button(ch, "uaaka", "web").c_str());
-    ptc(ch, "{WСкрытые алиасы, RU{x:   [{C%s{x] %s\r\n", extra.get(RU).c_str(), web_edit_button(ch, "ruaka", "web").c_str());
+    ptc(ch, "{WКлючевые слова, EN{x:   [{C%s{x] %s\r\n", keyword.get(EN).c_str(), olc_edit_button(ch, "keywords", "web").c_str());
+    ptc(ch, "{WКлючевые слова, UA{x:   [{C%s{x] %s\r\n", keyword.get(UA).c_str(), olc_edit_button(ch, "uakeywords", "web").c_str());
+    ptc(ch, "{WКлючевые слова, RU{x:   [{C%s{x] %s\r\n", keyword.get(RU).c_str(), olc_edit_button(ch, "rukeywords", "web").c_str());
+    ptc(ch, "{WСкрытые алиасы, EN{x:   [{C%s{x] %s\r\n", extra.get(EN).c_str(), olc_edit_button(ch, "aka", "web").c_str());
+    ptc(ch, "{WСкрытые алиасы, UA{x:   [{C%s{x] %s\r\n", extra.get(UA).c_str(), olc_edit_button(ch, "uaaka", "web").c_str());
+    ptc(ch, "{WСкрытые алиасы, RU{x:   [{C%s{x] %s\r\n", extra.get(RU).c_str(), olc_edit_button(ch, "ruaka", "web").c_str());
     ptc(ch, "{WУровень{x:              [{C%d{x]\r\n", level.getValue());
-    ptc(ch, "{WЗаголовок, EN{x:        [{C%s{x] %s\r\n", title.get(EN).c_str(), web_edit_button(ch, "title", "web").c_str());
-    ptc(ch, "{WЗаголовок, UA{x:        [{C%s{x] %s\r\n", title.get(UA).c_str(), web_edit_button(ch, "uatitle", "web").c_str());
-    ptc(ch, "{WЗаголовок, RU{x:        [{C%s{x] %s\r\n", title.get(RU).c_str(), web_edit_button(ch, "rutitle", "web").c_str());
+    ptc(ch, "{WЗаголовок, EN{x:        [{C%s{x] %s\r\n", title.get(EN).c_str(), olc_edit_button(ch, "title", "web").c_str());
+    ptc(ch, "{WЗаголовок, UA{x:        [{C%s{x] %s\r\n", title.get(UA).c_str(), olc_edit_button(ch, "uatitle", "web").c_str());
+    ptc(ch, "{WЗаголовок, RU{x:        [{C%s{x] %s\r\n", title.get(RU).c_str(), olc_edit_button(ch, "rutitle", "web").c_str());
     ptc(ch, "{DАвтозаголовок:        [%s]\r\n", autotitle.c_str());
 
     DLString entext = text.get(EN);
     DLString uatext = text.get(UA);
     DLString rutext = text.get(RU);
-    ptc(ch, "{WТекст, EN{x: %s\r\n%s{x\r\n", web_edit_button(ch, "text", "web").c_str(), String::ellipsis(entext, 200).c_str());
-    ptc(ch, "{WТекст, UA{x: %s\r\n%s{x\r\n", web_edit_button(ch, "uatext", "web").c_str(), String::ellipsis(uatext, 200).c_str());
-    ptc(ch, "{WТекст, RU{x: %s\r\n%s{x\r\n", web_edit_button(ch, "rutext", "web").c_str(), String::ellipsis(rutext, 200).c_str());
+    ptc(ch, "{WТекст, EN{x: %s\r\n%s{x\r\n", olc_edit_button(ch, "text", "web").c_str(), String::ellipsis(entext, 200).c_str());
+    ptc(ch, "{WТекст, UA{x: %s\r\n%s{x\r\n", olc_edit_button(ch, "uatext", "web").c_str(), String::ellipsis(uatext, 200).c_str());
+    ptc(ch, "{WТекст, RU{x: %s\r\n%s{x\r\n", olc_edit_button(ch, "rutext", "web").c_str(), String::ellipsis(rutext, 200).c_str());
 
     ptc(ch, "{WКоманды{x: {hc{ycommands{x, {hc{yshow{x, {hc{yseealso{x, {hc{yalias{x, {hc{ycancel{x, {hc{ydone{x\r\n");
 }
@@ -504,7 +507,7 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
         return;
     } else if (arg_is_strict(arg1, "search")) {
         ostringstream buf;
-        const DLString lineFormat = web_cmd(ch, "hedit $1", "%4d") + " {C%s{x\r\n";
+        const DLString lineFormat = olc_cmd(ch, "hedit $1", "%4d", OLC_FRAME_NONE) + " {C%s{x\r\n";
 
         if (arg2.empty()) {
             stc("Формат: hedit search <строка>\r\n", ch);
@@ -529,7 +532,7 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
         // 'hedit label' - just show total counts
         if (arg2.empty()) {
             map<DLString, int> categoryCount, facetCount;
-            const DLString lineFormat = "[{c" + web_cmd(ch, "hedit label $1", "%12s") + "{x], статей {W%d{x%s";
+            const DLString lineFormat = olc_cmd(ch, "hedit label $1", "%12s", FRAME_LABEL) + ", статей {W%d{x%s";
 
             for (auto &a: helpManager->getArticles()) {
                 DLString category = (*a)->getCategory();
@@ -571,7 +574,7 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
         }
 
         ch->pecho("Список всех статей %s {c%s{x:", byCategory ? "в категории" : "с меткой", arg2.c_str());
-        const DLString lineFormat = web_cmd(ch, "hedit $1", "%4d") + "     %s";
+        const DLString lineFormat = olc_cmd(ch, "hedit $1", "%4d", OLC_FRAME_NONE) + "     %s";
         for (auto &id: labeledIds) {
             HelpArticle::Pointer a = helpManager->getArticle(id);
             ch->pecho(lineFormat.c_str(), a->getID(), a->getAllKeywordsString().c_str());
@@ -609,7 +612,7 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
 
         if (matches.size() > 1) {
             stc("Найдено несколько статей справки, используйте ID, чтобы прицелиться получше:\r\n", ch);
-            const DLString lineFormat = web_cmd(ch, "hedit $1", "%4d") + "     %s\r\n";
+            const DLString lineFormat = olc_cmd(ch, "hedit $1", "%4d", OLC_FRAME_NONE) + "     %s\r\n";
             for (list<HelpArticle::Pointer>::const_iterator m = matches.begin();  m != matches.end(); m++)
                 ptc(ch, lineFormat.c_str(), (*m)->getID(), (*m)->getAllKeywordsString().c_str());
             return;

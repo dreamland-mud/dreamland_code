@@ -303,7 +303,7 @@ static void olc_list_rooms(PCharacter *ch, const char *argument)
     }
 
     ostringstream buf;
-    DLString vnumLink = "[" + web_cmd(ch, "redit $1", "%5d") + "] ";
+    DLString vnumLink = olc_cmd(ch, "redit $1", "%5d", OLC_FRAME_PLAIN) + " ";
     int col = 0;
 
     for (auto &i: pArea->roomIndexes) {
@@ -333,7 +333,7 @@ static void olc_list_mobs(PCharacter *ch, char *argument)
         return;
 
     ostringstream buf;
-    DLString vnumLink = "[" + web_cmd(ch, "medit $1", "%5d") + "] ";
+    DLString vnumLink = olc_cmd(ch, "medit $1", "%5d", OLC_FRAME_PLAIN) + " ";
     bool fAll = arg_is_all(arg);
     int col = 0;
 
@@ -371,7 +371,7 @@ static void olc_list_objs(PCharacter *ch, char *argument)
         return;
 
     ostringstream buf;
-    DLString vnumLink = "[" + web_cmd(ch, "oedit $1", "%5d") + "] ";
+    DLString vnumLink = olc_cmd(ch, "oedit $1", "%5d", OLC_FRAME_PLAIN) + " ";
     bool fAll = arg_is_all(arg);
     int col = 0;
 
@@ -438,7 +438,7 @@ void
 OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
 {
     // Static: no state to ask, so the key is spelled the way getMenuKey spells it.
-    OLCMenuKeyScope menuScope( "room:" + DLString( pRoom->vnum ) );
+    OLCMenuKeyScope menuScope( "room:" + DLString( pRoom->vnum ), ch );
     int door;
     const size_t descSize = 300;
 
@@ -448,36 +448,36 @@ OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
     DLString rutext = String::ellipsis(text.get(RU), descSize);
 
     ptc(ch, "Vnum:    [{W%u{x]  Area: [{W%5d{x] %s\n\r", pRoom->vnum, pRoom->areaIndex->vnum, pRoom->areaIndex->getName().c_str());
-    ptc(ch, "Desc EN: %s\n%s\n", web_edit_button(showWeb, ch, "desc", "web").c_str(), entext.c_str());
-    ptc(ch, "Desc UA: %s\n%s\n", web_edit_button(showWeb, ch, "uadesc", "web").c_str(), uatext.c_str());
-    ptc(ch, "Desc RU: %s\n%s\n", web_edit_button(showWeb, ch, "rudesc", "web").c_str(), rutext.c_str());
-    ptc(ch, "Name EN: [{W%s{x] %s\n\r", pRoom->name.get(EN).c_str(), web_edit_button(showWeb, ch, "name", "web").c_str());   
-    ptc(ch, "Name UA: [{W%s{x] %s\n\r", pRoom->name.get(UA).c_str(), web_edit_button(showWeb, ch, "uaname", "web").c_str());   
-    ptc(ch, "Name RU: [{W%s{x] %s\n\r", pRoom->name.get(RU).c_str(), web_edit_button(showWeb, ch, "runame", "web").c_str());   
-    ptc(ch, "Clan:    [{W%s{x]  Guilds: [{W%s{x]\n",
+    ptc(ch, "Desc EN: %s\n%s\n", olc_edit_button(showWeb, ch, "desc", "web").c_str(), entext.c_str());
+    ptc(ch, "Desc UA: %s\n%s\n", olc_edit_button(showWeb, ch, "uadesc", "web").c_str(), uatext.c_str());
+    ptc(ch, "Desc RU: %s\n%s\n", olc_edit_button(showWeb, ch, "rudesc", "web").c_str(), rutext.c_str());
+    ptc(ch, "Name EN: [{W%s{x] %s\n\r", pRoom->name.get(EN).c_str(), olc_edit_button(showWeb, ch, "name", "web").c_str());   
+    ptc(ch, "Name UA: [{W%s{x] %s\n\r", pRoom->name.get(UA).c_str(), olc_edit_button(showWeb, ch, "uaname", "web").c_str());   
+    ptc(ch, "Name RU: [{W%s{x] %s\n\r", pRoom->name.get(RU).c_str(), olc_edit_button(showWeb, ch, "runame", "web").c_str());   
+    ptc(ch, "Clan:    %s  Guilds: %s\n",
             web_registry_menu(showWeb, ClanManager::getThis(), "clan", pRoom->clan->getName( )).c_str( ),
             web_bitvector_menu(showWeb, pRoom->guilds, "guilds", pRoom->guilds.toString()).c_str());
-    ptc(ch, "Sector:  [{W%s{x] {D(? sector_table){x  Liquid: [{W%s{x] {D(? liquid){x\n\r", 
+    ptc(ch, "Sector:  %s {D(? sector_table){x  Liquid: %s {D(? liquid){x\n\r", 
             web_flag_menu(showWeb, sector_table, "sector", sector_table.name(pRoom->sector_type)).c_str(),
             web_registry_menu(showWeb, liquidManager, "liquid", pRoom->liquid->getName(), "none").c_str());
     ptc(ch, "Smell:   [{W%s{x] %s [{W%s{x] %s [{W%s{x] %s\n\r", 
-          String::stripEOL(pRoom->smell.get(EN)).c_str(), web_edit_button(showWeb, ch, "smell", "web").c_str(),   
-          String::stripEOL(pRoom->smell.get(UA)).c_str(), web_edit_button(showWeb, ch, "uasmell", "web").c_str(),   
-          String::stripEOL(pRoom->smell.get(RU)).c_str(), web_edit_button(showWeb, ch, "rusmell", "web").c_str());   
+          String::stripEOL(pRoom->smell.get(EN)).c_str(), olc_edit_button(showWeb, ch, "smell", "web").c_str(),   
+          String::stripEOL(pRoom->smell.get(UA)).c_str(), olc_edit_button(showWeb, ch, "uasmell", "web").c_str(),   
+          String::stripEOL(pRoom->smell.get(RU)).c_str(), olc_edit_button(showWeb, ch, "rusmell", "web").c_str());   
     ptc(ch, "Sound:   [{W%s{x] %s [{W%s{x] %s [{W%s{x] %s\n\r", 
-          String::stripEOL(pRoom->sound.get(EN)).c_str(), web_edit_button(showWeb, ch, "sound", "web").c_str(),   
-          String::stripEOL(pRoom->sound.get(UA)).c_str(), web_edit_button(showWeb, ch, "uasound", "web").c_str(),   
-          String::stripEOL(pRoom->sound.get(RU)).c_str(), web_edit_button(showWeb, ch, "rusound", "web").c_str());   
-    ptc(ch, "Flags:   [{W%s{x] {D(? room_flags){x\n\r",
+          String::stripEOL(pRoom->sound.get(EN)).c_str(), olc_edit_button(showWeb, ch, "sound", "web").c_str(),   
+          String::stripEOL(pRoom->sound.get(UA)).c_str(), olc_edit_button(showWeb, ch, "uasound", "web").c_str(),   
+          String::stripEOL(pRoom->sound.get(RU)).c_str(), olc_edit_button(showWeb, ch, "rusound", "web").c_str());   
+    ptc(ch, "Flags:   %s {D(? room_flags){x\n\r",
             web_flag_menu(showWeb, room_flags, "flags", room_flags.names(pRoom->room_flags)).c_str());
     ptc(ch, "Health:  [{W%d{x]%%  Mana: [{W%d{x]%%\r\n", pRoom->heal_rate,  pRoom->mana_rate);
     
     if (!pRoom->extraDescriptions.empty()) {
         ptc(ch, "Extra desc: {D(ed help){x\r\n");
         for (auto &ed: pRoom->extraDescriptions) {
-            ptc(ch, "    EN [{W%s{x] %s \r\n", ed->keyword.c_str(), web_edit_button(showWeb, ch, "ed web", ed->keyword).c_str());
-            ptc(ch, "    UA [{W%s{x] %s \r\n", ed->keyword.c_str(), web_edit_button(showWeb, ch, "uaed web", ed->keyword).c_str());
-            ptc(ch, "    RU [{W%s{x] %s \r\n", ed->keyword.c_str(), web_edit_button(showWeb, ch, "rued web", ed->keyword).c_str());
+            ptc(ch, "    EN [{W%s{x] %s \r\n", ed->keyword.c_str(), olc_edit_button(showWeb, ch, "ed web", ed->keyword).c_str());
+            ptc(ch, "    UA [{W%s{x] %s \r\n", ed->keyword.c_str(), olc_edit_button(showWeb, ch, "uaed web", ed->keyword).c_str());
+            ptc(ch, "    RU [{W%s{x] %s \r\n", ed->keyword.c_str(), olc_edit_button(showWeb, ch, "rued web", ed->keyword).c_str());
         }
         
     } else {
@@ -487,7 +487,7 @@ OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
     if (!pRoom->extra_exits.empty()) {
         ptc(ch, "Extra exits: {D(eexit help){x\r\n");
         for(auto &eed: pRoom->extra_exits) {
-            ptc(ch, "    [{W%s{x] %s\r\n", String::toString(eed->keyword).c_str(), web_edit_button(showWeb, ch, "eexit set", eed->keyword.get(EN)).c_str());
+            ptc(ch, "    [{W%s{x] %s\r\n", String::toString(eed->keyword).c_str(), olc_edit_button(showWeb, ch, "eexit set", eed->keyword.get(EN)).c_str());
         }
         
     } else {
@@ -510,7 +510,7 @@ OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
             if(pexit->key > 0)
                 ptc(ch, "            Key:        [{W%7u{x]\n\r", pexit->key);
             
-            ptc(ch, "            Exit flags: [{W%s{x] {D(? exit_flags){x\n\r",
+            ptc(ch, "            Exit flags: %s {D(? exit_flags){x\n\r",
                       web_flag_menu(showWeb, exit_flags, dirs[door].name, exit_flags.names(pexit->exit_info)).c_str());
 
             ptc(ch, "            Keywords:   [{W%s{x] [{W%s{x] [{W%s{x]\n\r", 
