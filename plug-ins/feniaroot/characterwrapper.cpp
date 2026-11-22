@@ -6449,6 +6449,16 @@ static Character * ga_rootCarrier( ::Object *o )
     return top->carried_by;
 }
 
+// A PC corpse anywhere up the container chain, unless `ch` owns it: its contents are
+// spoils of PK, not loot the sage can send anyone else after.
+static bool ga_inForeignPCCorpse( ::Object *o, Character *ch )
+{
+    for (::Object *c = o->in_obj; c != 0; c = c->in_obj)
+        if (c->item_type == ITEM_CORPSE_PC && !c->hasOwner( ch ))
+            return true;
+    return false;
+}
+
 // Difficulty band 0 easy / 1 medium / 2 hard / 3 deadly. Single source of truth: the
 // Fenia render only names and colours it. Quests are always medium. The guard is read
 // as guard level plus its tier's extra levels (ga_effGuard), and the tier sets a floor:
@@ -6863,10 +6873,10 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
 
     // Live instance census per vnum (single pass over the world). `spawned` = every
     // live copy (feeds the obtainability score below); `gettable` = copies a player
-    // could still get -- those NOT locked in another player's hands (held by an NPC,
-    // lying in a room, on a shop floor, or in a container that roots to either). Zero
-    // gettable copies of a fully-claimed limited item means its reset stands bare (see
-    // the skip below).
+    // could still get -- those NOT locked in another player's hands (held by an NPC
+    // with no master, lying in a room, on a shop floor, or in a container that roots
+    // to either, except someone else's PC corpse). Zero gettable copies of a
+    // fully-claimed limited item means its reset stands bare (see the skip below).
     std::map<int,int> spawned, gettable;
     // Vnums the char carries UNWORN (loose in inventory OR inside a carried bag): an
     // upgrade in the pack must be routed "put it on" (GA_INPACK), not sent on a
@@ -6882,9 +6892,13 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
         int vn = o->pIndexData->vnum;
         spawned[vn]++;
         Character *rc = ga_rootCarrier( o );
-        if (rc == 0 || rc->is_npc( ))
+        // A pet or charmie answers to its player master: its copy is as taken as a
+        // copy in that player's own pack. NPC-led followers (guard packs) still count.
+        bool wildNpc = rc != 0 && rc->is_npc( )
+                       && (rc->master == 0 || rc->master->is_npc( ));
+        if ((rc == 0 && !ga_inForeignPCCorpse( o, target )) || wildNpc)
             gettable[vn]++;
-        if (rc != 0 && rc->is_npc( ))
+        if (wildNpc)
             liveHolders[vn].insert( rc->getNPC( )->pIndexData->vnum );
         else if (rc == target && o->wear_loc == wear_none)
             carriedVnum[vn] = 1;
