@@ -1234,6 +1234,11 @@ DLString olc_cmd(Character *ch, const DLString &cmd, const DLString &seeFmt, con
     return olc_link(ch, web_cmd(ch, cmd, seeFmt), frame);
 }
 
+DLString olc_head_pad(Character *ch)
+{
+    return is_websock(ch) ? "  " : "";
+}
+
 DLString olc_edit_button(Character *ch, const DLString &editor, const DLString &args)
 {
     DLString button = web_edit_button(ch, editor, args);

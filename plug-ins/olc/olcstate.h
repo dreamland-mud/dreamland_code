@@ -299,6 +299,8 @@ struct OLCMenuFrame;
 extern DLString olc_link(Character *ch, const DLString &link, const OLCMenuFrame &frame);
 /** olc_link around web_cmd(ch, cmd, seeFmt). */
 extern DLString olc_cmd(Character *ch, const DLString &cmd, const DLString &seeFmt, const OLCMenuFrame &frame);
+/** Spaces a list header needs after a column of OLC_FRAME_NONE links: the web frame adds two columns. */
+extern DLString olc_head_pad(Character *ch);
 /** An OLC edit button: web_edit_button in the field look. Empty for telnet and
  *  for players without OLC security, as web_edit_button is. */
 extern DLString olc_edit_button(Character *ch, const DLString &editor, const DLString &args);

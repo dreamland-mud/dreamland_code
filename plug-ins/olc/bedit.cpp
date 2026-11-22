@@ -382,7 +382,7 @@ CMD(bedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online behavior editor.")
         auto usage = behavior_usage();
 
         ch->send_to(
-            fmt(0, "{C%-22s %-25s %4s %5s{x\r\n", "Название", "Русское имя", "Тип", "Всего"));
+            fmt(0, ("{C%-22s" + olc_head_pad(ch) + " %-25s %4s %5s{x\r\n").c_str(), "Название", "Русское имя", "Тип", "Всего"));
 
         const DLString lineFormat =
             "{W" + olc_cmd(ch, "bedit $1", "%-22s", OLC_FRAME_NONE) + "{x %-25.25s {c%4s{x {y%5d{x\r\n";
