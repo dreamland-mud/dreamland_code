@@ -31,12 +31,11 @@ public:
     const DLString & getText() const { return text; }
     void setText(const DLString &text);
     const Json::Value &getValue() const { return value; }
+    DLString getAbsolutePath() const;
 
 protected:
     virtual void loaded() { }
     virtual void unloaded() { }
-
-    DLString getAbsolutePath() const;
 
     DLString path;
     DLString text;
