@@ -338,6 +338,10 @@ public:
     /** Spell level bonus. */
     int mod_level_spell;
 
+    /** Runtime cache for pc_account_hours, never saved. */
+    int accountHours;
+    long accountHoursAt;
+
     /** Amount of silver in the bank. */
     XML_VARIABLE XMLIntegerNoEmpty        bank_s;
     /** Amount of gold in the bank. */
@@ -357,6 +361,15 @@ public:
     // switch
     NPCharacter                *switchedTo;
 };
+
+/** True hours over all lives of every character on ch's account (ch's own
+ *  pc_total_hours without an account). Walking an account reads every pfile,
+ *  so the answer is kept on ch for an hour: skill code may call this per roll. */
+int pc_account_hours( PCharacter *ch );
+
+/** The account walk, plugged in by loadsave (AccountManager) while it is loaded. */
+typedef int (*AccountHoursHook)( PCMemoryInterface * );
+extern AccountHoursHook pc_account_hours_hook;
 
 #endif
 

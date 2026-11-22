@@ -355,6 +355,8 @@ void PCharacter::init( )
     mod_skill_all = 0;
     mod_level_all = 0;
     mod_level_spell = 0;
+    accountHours = 0;
+    accountHoursAt = 0;
     mod_level_skills.clear();
     mod_level_groups.clear();
 
@@ -1073,4 +1075,26 @@ short PCharacter::getModifyLevel( ) const
 PlayerConfig PCharacter::getConfig( ) const
 {
     return PlayerConfig( this );
+}
+
+/**************************************************************************
+ * hours over the whole account
+ **************************************************************************/
+AccountHoursHook pc_account_hours_hook = 0;
+
+static const long ACCOUNT_HOURS_TTL = 3600;
+
+int pc_account_hours( PCharacter *ch )
+{
+    // No loadsave (mid plug reload): the char's own hours, not cached, so the
+    // account total comes back on the next call once the hook is in again.
+    if (!pc_account_hours_hook)
+        return pc_total_hours( ch );
+
+    long now = dreamland->getCurrentTime( );
+    if (ch->accountHoursAt == 0 || now - ch->accountHoursAt >= ACCOUNT_HOURS_TTL) {
+        ch->accountHours = pc_account_hours_hook( ch );
+        ch->accountHoursAt = now;
+    }
+    return ch->accountHours;
 }

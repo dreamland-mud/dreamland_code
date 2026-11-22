@@ -10,6 +10,7 @@
 #include "mobilebehaviorplugin.h"
 #include "pcharactermanager.h"
 #include "accountmanager.h"
+#include "pcharacter.h"
 #include "objectbehaviormanager.h"
 #include "xmlattributeareaquest.h"
 #include "xmlattributevisited.h"
@@ -126,6 +127,22 @@ public:
     }
 };
 
+// Plugs the account walk into core's pc_account_hours while loadsave is loaded.
+class AccountHoursHookPlugin : public Plugin {
+public:
+    typedef ::Pointer<AccountHoursHookPlugin> Pointer;
+
+    virtual void initialization( )
+    {
+        pc_account_hours_hook = &AccountManager::totalHours;
+    }
+
+    virtual void destruction( )
+    {
+        pc_account_hours_hook = 0;
+    }
+};
+
 extern "C" {
     
     SO::PluginList initialize_loadsave( )
@@ -134,6 +151,7 @@ extern "C" {
 
         Plugin::registerPlugin<PlayerLoadTask>( ppl );
         Plugin::registerPlugin<AccountLoadTask>( ppl );
+        Plugin::registerPlugin<AccountHoursHookPlugin>( ppl );
         Plugin::registerPlugin<DropsLoadTask>( ppl );
         Plugin::registerPlugin<LimitedItemsPurgeTask>( ppl );
         Plugin::registerPlugin<ObjectBehaviorRegistrator<BasicObjectBehavior> >(ppl);
