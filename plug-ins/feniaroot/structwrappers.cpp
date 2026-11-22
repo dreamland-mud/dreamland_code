@@ -2049,13 +2049,8 @@ NMI_INVOKE( ExitWrapper, name, "([lang]): название выхода с па�
 
     // Same gate as direction_doorname: an empty RU slot means a nameless exit,
     // and the generic word goes out in the reader's language, not in Russian.
-    if (sd.get(LANG_RU).empty()) {
-        switch (lang) {
-        case LANG_EN: return Register("door");
-        case LANG_UA: return Register("двер|і|ей|ям|і|ями|ях");
-        default:      return Register("двер|ь|и|и|ь|ью|и");
-        }
-    }
+    if (sd.get(LANG_RU).empty())
+        return Register(direction_door_pad(lang));
     return Register(sd.getForLang(lang));
 }
 

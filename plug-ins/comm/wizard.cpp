@@ -1062,6 +1062,8 @@ static void format_affect(Affect *paf, ostringstream &buf)
         r->behavior.toStream(b);
     }
 
+    stat_fenia_lines( ch, r->wrapper, r->pIndexData->wrapper, b );
+
     page_to_char(b.str().c_str(), ch);
 }
 

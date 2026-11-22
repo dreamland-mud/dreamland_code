@@ -117,9 +117,13 @@ DLString OLCStateRoom::getJournalKind( ) const
     return "room";
 }
 
+// The room the builder stands in: that is the one redit edits.
 int OLCStateRoom::getJournalVnum( ) const
 {
-    return room.getValue();
+    if (!owner || !owner->character || !owner->character->in_room)
+        return room.getValue();
+
+    return owner->character->in_room->pIndexData->vnum;
 }
 
 // redit edits the room the builder stands in, not the one it was opened on,
@@ -646,19 +650,18 @@ void OLCStateRoom::default_door_names(PCharacter *ch, int door)
     RoomIndexData *pRoom;
     EDIT_ROOM(ch, pRoom);
 
-    // TODO externalize translations
     auto &kw = pRoom->exit[door]->keyword;
     if (kw.empty()) {
-        kw[EN] = "door";
-        kw[RU] = "дверь";
-        kw[UA] = "двері";
+        kw[EN] = direction_doorname(0, EN);
+        kw[RU] = direction_doorname(0, RU);
+        kw[UA] = direction_doorname(0, UA);
     }
 
     auto &sd = pRoom->exit[door]->short_descr;
     if (sd.empty()) {
-        sd[EN] = "door";
-        sd[RU] = "двер|ь|и|и|ь|ью|и";
-        sd[UA] = "двер|і|ей|ям|і|ями|ях";
+        sd[EN] = direction_door_pad(EN);
+        sd[RU] = direction_door_pad(RU);
+        sd[UA] = direction_door_pad(UA);
     }
 }
 

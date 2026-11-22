@@ -38,6 +38,7 @@
 #include "subr.h"
 #include "update_areas.h"
 #include "roomtraverse.h"
+#include "directions.h"
 #include "terrains.h"
 #include "def.h"
 
@@ -646,7 +647,7 @@ NMI_INVOKE( RoomWrapper, exitKeyword, "(номер выхода, имя экст
     return pExtraExit ? String::toString(pExtraExit->keyword) : String::toString(pExit->keyword);
 }
 
-NMI_INVOKE( RoomWrapper, exitShortDescr, "(номер выхода, имя экстра/выхода[, язык]): название выхода с падежами; язык 0=en, 1=ru, 2=ua, по умолчанию ru, пустое значение заменяется русским" )
+NMI_INVOKE( RoomWrapper, exitShortDescr, "(номер выхода, имя экстра/выхода[, язык]): название выхода с падежами; язык 0=en, 1=ru, 2=ua, по умолчанию ru; у безымянного -- door/дверь/двері на этом языке" )
 {
     EXIT_DATA *pExit;
     EXTRA_EXIT_DATA *pExtraExit;
@@ -657,12 +658,13 @@ NMI_INVOKE( RoomWrapper, exitShortDescr, "(номер выхода, имя эк�
     // Optional 2nd arg picks the language; absent keeps the old RU-only behaviour.
     lang_t lang = argnum2lang(args, 2);
 
-    // getForLang falls back to RU, then EN, when the chosen language is empty.
-    DLString desc = pExtraExit ? pExtraExit->short_desc_from.getForLang(lang) : pExit->short_descr.getForLang(lang);
-    if (desc.empty())
-        desc = "двер|ь|и|и|ь|ью|и";
+    // Same gate as direction_doorname: an empty RU slot means a nameless exit.
+    // Otherwise getForLang falls back to RU, then EN, when the language is empty.
+    const XMLMultiString &sd = pExtraExit ? pExtraExit->short_desc_from : pExit->short_descr;
+    if (sd.get(LANG_RU).empty())
+        return Register(direction_door_pad(lang));
 
-    return desc;
+    return Register(sd.getForLang(lang));
 }
 
 

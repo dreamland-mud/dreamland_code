@@ -191,6 +191,15 @@ const char * direction_doorname(EXIT_DATA *pexit, lang_t lang)
     return pexit->short_descr.getForLang(lang).c_str();
 }
 
+const char * direction_door_pad(lang_t lang)
+{
+    switch (lang) {
+    case LANG_EN: return "door";
+    case LANG_UA: return "двер|і|ей|ям|і|има|ях";
+    default:      return "двер|ь|и|и|ь|ью|и";
+    }
+}
+
 DoorName direction_doorname_langtext(const XMLMultiString &sd, char rcase)
 {
     DoorName dn;
