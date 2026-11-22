@@ -366,13 +366,13 @@ CMD(reledit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")
             "{C%-15s %-17s %-6s %s{x\r\n", "Название", "Русское имя", "VNUM", "Описание"));        
 
         const DLString lineFormat = 
-           "{W" + web_cmd(ch, "reledit $1", "%-15s") 
+           "{W" + olc_cmd(ch, "reledit $1", "%-15s", OLC_FRAME_NONE)
                 + "{w %-17s {W"
-                + web_cmd(ch, "oedit $1", "%-6d")
+                + olc_cmd(ch, "oedit $1", "%-6d", OLC_FRAME_NONE)
                 + "{x %N1"
                 + "{x\r\n";         
         const DLString lineFormatNoTattoo = 
-            web_cmd(ch, "reledit $1", "%-15s") 
+            olc_cmd(ch, "reledit $1", "%-15s", OLC_FRAME_NONE)
                 + " %-17s\r\n";
 
         for (int r = 0; r < religionManager->size(); r++) {
@@ -403,7 +403,7 @@ CMD(reledit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")
         ch->send_to(fmt(0, "{C%-15s %-17s %-3s {Y%-3s   %-3s %1s %1s{x\r\n", "Название", "Русское имя", "SEX", "ALG", "ETH", "R", "C"));
 
         const DLString lineFormat = 
-            "{W" + web_cmd(ch, "reledit $1", "%-15s") + "{w %-17s %-3s %1s%1s%1s   %1s%1s%1s %1s %1s{x\r\n";
+            "{W" + olc_cmd(ch, "reledit $1", "%-15s", OLC_FRAME_NONE) + "{w %-17s %-3s %1s%1s%1s   %1s%1s%1s %1s %1s{x\r\n";
 
         for (int r = 0; r < religionManager->size(); r++) {
             DefaultReligion *rel = dynamic_cast<DefaultReligion *>(religionManager->find(r));

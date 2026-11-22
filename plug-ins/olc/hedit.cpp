@@ -64,6 +64,9 @@ list<HelpArticle::Pointer> help_find_by_keywords(const DLString &keywords)
     return originals;
 }
 
+// Label links kept their own bracket colour on telnet.
+static const OLCMenuFrame FRAME_LABEL = { "[{c", "{x]" };
+
 void OLCStateHelp::commit() 
 {
     HelpArticle::Pointer original = helpManager->getArticle(id);
@@ -504,7 +507,7 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
         return;
     } else if (arg_is_strict(arg1, "search")) {
         ostringstream buf;
-        const DLString lineFormat = web_cmd(ch, "hedit $1", "%4d") + " {C%s{x\r\n";
+        const DLString lineFormat = olc_cmd(ch, "hedit $1", "%4d", OLC_FRAME_NONE) + " {C%s{x\r\n";
 
         if (arg2.empty()) {
             stc("Формат: hedit search <строка>\r\n", ch);
@@ -529,7 +532,7 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
         // 'hedit label' - just show total counts
         if (arg2.empty()) {
             map<DLString, int> categoryCount, facetCount;
-            const DLString lineFormat = "[{c" + web_cmd(ch, "hedit label $1", "%12s") + "{x], статей {W%d{x%s";
+            const DLString lineFormat = olc_cmd(ch, "hedit label $1", "%12s", FRAME_LABEL) + ", статей {W%d{x%s";
 
             for (auto &a: helpManager->getArticles()) {
                 DLString category = (*a)->getCategory();
@@ -571,7 +574,7 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
         }
 
         ch->pecho("Список всех статей %s {c%s{x:", byCategory ? "в категории" : "с меткой", arg2.c_str());
-        const DLString lineFormat = web_cmd(ch, "hedit $1", "%4d") + "     %s";
+        const DLString lineFormat = olc_cmd(ch, "hedit $1", "%4d", OLC_FRAME_NONE) + "     %s";
         for (auto &id: labeledIds) {
             HelpArticle::Pointer a = helpManager->getArticle(id);
             ch->pecho(lineFormat.c_str(), a->getID(), a->getAllKeywordsString().c_str());
@@ -609,7 +612,7 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
 
         if (matches.size() > 1) {
             stc("Найдено несколько статей справки, используйте ID, чтобы прицелиться получше:\r\n", ch);
-            const DLString lineFormat = web_cmd(ch, "hedit $1", "%4d") + "     %s\r\n";
+            const DLString lineFormat = olc_cmd(ch, "hedit $1", "%4d", OLC_FRAME_NONE) + "     %s\r\n";
             for (list<HelpArticle::Pointer>::const_iterator m = matches.begin();  m != matches.end(); m++)
                 ptc(ch, lineFormat.c_str(), (*m)->getID(), (*m)->getAllKeywordsString().c_str());
             return;

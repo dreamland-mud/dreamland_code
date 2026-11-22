@@ -148,7 +148,7 @@ static void show_one_trigger(PCharacter *ch, DefaultSpell *spell, const char *tr
 {
     bool hasTrigger = FeniaSkillActionHelper::spellHasTrigger(spell, trigName);
     bool hasTarget = spell->target.isSet(target_mask);
-    DLString trigLink = web_cmd(ch, "fenia $1", trigName);
+    DLString trigLink = olc_cmd(ch, "fenia $1", trigName, OLC_FRAME_NONE);
 
     if (hasTrigger)
         bufActive << trigLink << " ";
@@ -222,7 +222,7 @@ void FeniaTriggerLoader::showTriggers(PCharacter *ch, WrapperBase *wrapper, cons
                 continue;
 
             if (activeTriggers.count(trigName) == 0 && miscMethods.count(trigName) == 0) {
-                abuf << web_cmd(ch, "fenia $1", trigName) << " ";
+                abuf << olc_cmd(ch, "fenia $1", trigName, OLC_FRAME_NONE) << " ";
             }
         }
 

@@ -283,7 +283,7 @@ BEDIT(list, "список", "показать все сущности с эти�
     auto myVnums = usage[bhv->getName()];
     auto target = bhv->target.getValue();
     DLString cmd = (target == INDEX_MOB ? "medit" : (target == INDEX_ROOM ? "redit" : "oedit"));
-    DLString lineFormat = "[" + web_cmd(ch, cmd + " $1", "%6d") + "] %-18.18N1   ";
+    DLString lineFormat = olc_cmd(ch, cmd + " $1", "%6d", OLC_FRAME_PLAIN) + " %-18.18N1   ";
     int lineCount = 0;
 
     for (auto vnum: myVnums) {
@@ -385,7 +385,7 @@ CMD(bedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online behavior editor.")
             fmt(0, "{C%-22s %-25s %4s %5s{x\r\n", "Название", "Русское имя", "Тип", "Всего"));
 
         const DLString lineFormat =
-            "{W" + web_cmd(ch, "bedit $1", "%-22s") + "{x %-25.25s {c%4s{x {y%5d{x\r\n";
+            "{W" + olc_cmd(ch, "bedit $1", "%-22s", OLC_FRAME_NONE) + "{x %-25.25s {c%4s{x {y%5d{x\r\n";
 
         list<DefaultBehavior *> output;
 

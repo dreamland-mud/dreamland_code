@@ -284,16 +284,16 @@ OEDIT(show)
 
     ptc(ch, "Vnum:     [{W%d{x] Area: [{W%d{x] {W%s{x\n\r", pObj->vnum, pObj->area->vnum, pObj->area->getName().c_str());
     ptc(ch, "Name:     [{W%s{x] %s [{W%s{x] %s [{W%s{x] %s\n\r", 
-            pObj->keyword[EN].c_str(), web_edit_button(showWeb, ch, "name", "web").c_str(),
-            pObj->keyword[UA].c_str(), web_edit_button(showWeb, ch, "uaname", "web").c_str(),
-            pObj->keyword[RU].c_str(), web_edit_button(showWeb, ch, "runame", "web").c_str());
+            pObj->keyword[EN].c_str(), olc_edit_button(showWeb, ch, "name", "web").c_str(),
+            pObj->keyword[UA].c_str(), olc_edit_button(showWeb, ch, "uaname", "web").c_str(),
+            pObj->keyword[RU].c_str(), olc_edit_button(showWeb, ch, "runame", "web").c_str());
 
-    ptc(ch, "Short EN: [%s] %s\n\r", pObj->short_descr[EN].c_str(), web_edit_button(showWeb, ch, "short", "web").c_str());
-    ptc(ch, "Short UA: [%s] %s\n\r", pObj->short_descr[UA].c_str(), web_edit_button(showWeb, ch, "uashort", "web").c_str());
-    ptc(ch, "Short RU: [%s] %s\n\r", pObj->short_descr[RU].c_str(), web_edit_button(showWeb, ch, "rushort", "web").c_str());
-    ptc(ch, "Long EN:  [%s] %s\n\r", pObj->description[EN].c_str(), web_edit_button(showWeb, ch, "long", "web").c_str());
-    ptc(ch, "Long UA:  [%s] %s\n\r", pObj->description[UA].c_str(), web_edit_button(showWeb, ch, "ualong", "web").c_str());
-    ptc(ch, "Long RU:  [%s] %s\n\r", pObj->description[RU].c_str(), web_edit_button(showWeb, ch, "rulong", "web").c_str());
+    ptc(ch, "Short EN: [%s] %s\n\r", pObj->short_descr[EN].c_str(), olc_edit_button(showWeb, ch, "short", "web").c_str());
+    ptc(ch, "Short UA: [%s] %s\n\r", pObj->short_descr[UA].c_str(), olc_edit_button(showWeb, ch, "uashort", "web").c_str());
+    ptc(ch, "Short RU: [%s] %s\n\r", pObj->short_descr[RU].c_str(), olc_edit_button(showWeb, ch, "rushort", "web").c_str());
+    ptc(ch, "Long EN:  [%s] %s\n\r", pObj->description[EN].c_str(), olc_edit_button(showWeb, ch, "long", "web").c_str());
+    ptc(ch, "Long UA:  [%s] %s\n\r", pObj->description[UA].c_str(), olc_edit_button(showWeb, ch, "ualong", "web").c_str());
+    ptc(ch, "Long RU:  [%s] %s\n\r", pObj->description[RU].c_str(), olc_edit_button(showWeb, ch, "rulong", "web").c_str());
     ptc(ch, "Type:     %s {D(? item_table){x\n\r",
             web_flag_menu(showWeb, item_table, "type", item_table.name(pObj->item_type), OLC_FRAME_PLAIN).c_str());
     ptc(ch, "Level:    [%5d]\n\r", pObj->level);    
@@ -305,13 +305,13 @@ OEDIT(show)
     ptc(ch, "Material: %s {D(? material){x\n\r",
             web_material_menu(showWeb, "material", pObj->material, DLString::emptyString, OLC_FRAME_PLAIN).c_str());
     ptc(ch, "Smell:    [{W%s{x] %s [{W%s{x] %s [{W%s{x] %s\n\r", 
-          String::stripEOL(pObj->smell.get(EN)).c_str(), web_edit_button(showWeb, ch, "smell", "web").c_str(),   
-          String::stripEOL(pObj->smell.get(UA)).c_str(), web_edit_button(showWeb, ch, "uasmell", "web").c_str(),   
-          String::stripEOL(pObj->smell.get(RU)).c_str(), web_edit_button(showWeb, ch, "rusmell", "web").c_str());   
+          String::stripEOL(pObj->smell.get(EN)).c_str(), olc_edit_button(showWeb, ch, "smell", "web").c_str(),   
+          String::stripEOL(pObj->smell.get(UA)).c_str(), olc_edit_button(showWeb, ch, "uasmell", "web").c_str(),   
+          String::stripEOL(pObj->smell.get(RU)).c_str(), olc_edit_button(showWeb, ch, "rusmell", "web").c_str());   
     ptc(ch, "Sound:    [{W%s{x] %s [{W%s{x] %s [{W%s{x] %s\n\r", 
-          String::stripEOL(pObj->sound.get(EN)).c_str(), web_edit_button(showWeb, ch, "sound", "web").c_str(),   
-          String::stripEOL(pObj->sound.get(UA)).c_str(), web_edit_button(showWeb, ch, "uasound", "web").c_str(),   
-          String::stripEOL(pObj->sound.get(RU)).c_str(), web_edit_button(showWeb, ch, "rusound", "web").c_str());   
+          String::stripEOL(pObj->sound.get(EN)).c_str(), olc_edit_button(showWeb, ch, "sound", "web").c_str(),   
+          String::stripEOL(pObj->sound.get(UA)).c_str(), olc_edit_button(showWeb, ch, "uasound", "web").c_str(),   
+          String::stripEOL(pObj->sound.get(RU)).c_str(), olc_edit_button(showWeb, ch, "rusound", "web").c_str());   
 
     ptc(ch, "Condition:[%5d]\n\r", pObj->condition);
     ptc(ch, "Gender:   %s\n\r", web_gender_menu(showWeb, "gender", pObj->gram_gender.toString(), OLC_FRAME_PLAIN).c_str());
@@ -330,9 +330,9 @@ OEDIT(show)
 
         ptc(ch, "Extra desc: {D(ed help){x\n\r");
         for (auto &ed: pObj->extraDescriptions) {
-            ptc(ch, "    EN [%s] %s \r\n", ed->keyword.c_str(), web_edit_button(showWeb, ch, "ed web", ed->keyword).c_str());
-            ptc(ch, "    UA [%s] %s \r\n", ed->keyword.c_str(), web_edit_button(showWeb, ch, "uaed web", ed->keyword).c_str());
-            ptc(ch, "    RU [%s] %s \r\n", ed->keyword.c_str(), web_edit_button(showWeb, ch, "rued web", ed->keyword).c_str());
+            ptc(ch, "    EN [%s] %s \r\n", ed->keyword.c_str(), olc_edit_button(showWeb, ch, "ed web", ed->keyword).c_str());
+            ptc(ch, "    UA [%s] %s \r\n", ed->keyword.c_str(), olc_edit_button(showWeb, ch, "uaed web", ed->keyword).c_str());
+            ptc(ch, "    RU [%s] %s \r\n", ed->keyword.c_str(), olc_edit_button(showWeb, ch, "rued web", ed->keyword).c_str());
         }
 
     } else {
@@ -1184,8 +1184,8 @@ OEDIT(list)
         MOB_INDEX_DATA *lastMob = 0;
         // Built only for a matching reset: most rooms have none.
         auto inRoom = [&]() {
-            return fmt(0, "in room [%s] {g%s{x",
-                    web_cmd(ch, "redit $1", DLString(pRoom->vnum)).c_str(),
+            return fmt(0, "in room %s {g%s{x",
+                    olc_cmd(ch, "redit $1", DLString(pRoom->vnum), OLC_FRAME_PLAIN).c_str(),
                     pRoom->name.get(LANG_DEFAULT).c_str());
         };
 
@@ -1199,8 +1199,8 @@ OEDIT(list)
                 // A Fenia shop keeper sells its props stock, no G reset needed.
                 list<int> shopStock = mob_index_shop_stock(lastMob);
                 if (std::find(shopStock.begin(), shopStock.end(), pObj->vnum) != shopStock.end()) {
-                    stock << fmt(0, "  [%s] {g%N1{x %s\n\r",
-                            web_cmd(ch, "medit $1", DLString(lastMob->vnum)).c_str(),
+                    stock << fmt(0, "  %s {g%N1{x %s\n\r",
+                            olc_cmd(ch, "medit $1", DLString(lastMob->vnum), OLC_FRAME_PLAIN).c_str(),
                             lastMob->getShortDescr(LANG_DEFAULT), inRoom().c_str());
                     cnt++;
                 }
@@ -1217,8 +1217,8 @@ OEDIT(list)
             case 'P':
                 if (reset_loads_obj(pReset, pObj->vnum)) {
                     OBJ_INDEX_DATA *pContainer = get_obj_index(pReset->arg3);
-                    container << fmt(0, "  [%s] {g%N1{x %s\n\r",
-                            web_cmd(ch, "oedit $1", DLString(pReset->arg3)).c_str(),
+                    container << fmt(0, "  %s {g%N1{x %s\n\r",
+                            olc_cmd(ch, "oedit $1", DLString(pReset->arg3), OLC_FRAME_PLAIN).c_str(),
                             pContainer ? pContainer->getShortDescr(LANG_DEFAULT) : "?",
                             inRoom().c_str());
                     cnt++;
@@ -1232,8 +1232,8 @@ OEDIT(list)
 
                 DLString mob = "  [?] (no mob)";
                 if (lastMob)
-                    mob = fmt(0, "  [%s] {g%N1{x%s",
-                            web_cmd(ch, "medit $1", DLString(lastMob->vnum)).c_str(),
+                    mob = fmt(0, "  %s {g%N1{x%s",
+                            olc_cmd(ch, "medit $1", DLString(lastMob->vnum), OLC_FRAME_PLAIN).c_str(),
                             lastMob->getShortDescr(LANG_DEFAULT),
                             mob_index_is_shopper(lastMob) ? " {Gshopkeeper{x" : "");
 

@@ -168,14 +168,11 @@ DLString OLCState::getMenuKey( )
 DLString OLCState::currentMenuKey;
 bool OLCState::currentWeb = false;
 
-// Without a viewer the scope keeps the web flag it found: a child editor shown
-// from a parent's subcommand draws for the same player.
 OLCMenuKeyScope::OLCMenuKeyScope( const DLString &key, Character *viewer )
         : saved( OLCState::currentMenuKey ), savedWeb( OLCState::currentWeb )
 {
     OLCState::currentMenuKey = key;
-    if (viewer)
-        OLCState::currentWeb = is_websock( viewer );
+    OLCState::currentWeb = is_websock( viewer );
 }
 
 OLCMenuKeyScope::~OLCMenuKeyScope( )
@@ -1219,15 +1216,33 @@ bool OLCState::editProps(GlobalBitvector &behaviors, Json::Value &props, const D
     return true;
 }
 
+// The yellow brackets every clickable OLC thing wears on the web.
+static DLString olc_web_frame(const DLString &inner)
+{
+    return "{y[{W" + inner + "{y]{x";
+}
+
+DLString olc_link(Character *ch, const DLString &link, const OLCMenuFrame &frame)
+{
+    if (!is_websock(ch))
+        return DLString(frame.open) + link + frame.close;
+    return olc_web_frame(link);
+}
+
+DLString olc_cmd(Character *ch, const DLString &cmd, const DLString &seeFmt, const OLCMenuFrame &frame)
+{
+    return olc_link(ch, web_cmd(ch, cmd, seeFmt), frame);
+}
+
 DLString olc_edit_button(Character *ch, const DLString &editor, const DLString &args)
 {
     DLString button = web_edit_button(ch, editor, args);
     if (button.empty())
         return button;
-    return "{y[{W" + button + "{y]{x";
+    return olc_link(ch, button, OLC_FRAME_NONE);
 }
 
-DLString web_edit_button(bool showWeb, Character *ch, const DLString &editor, const DLString &args)
+DLString olc_edit_button(bool showWeb, Character *ch, const DLString &editor, const DLString &args)
 {
     if (showWeb)
         return olc_edit_button(ch, editor, args);
@@ -1263,9 +1278,10 @@ DLString olc_menu_widget(bool web, const StringList &commands, const DLString &i
 
     // The triangle is an HTML entity (KOI8 has no such glyph) and sits inside
     // the toggle, so it opens the menu too. The whole string reaches only a web
-    // client: no {Iw needed, which would also drop the triangle's colour.
-    DLString toggle = "{W" + (label.empty() ? DLString("none") : label) + " {Y&#9660;";
-    return "{y[" + web_menu(commands, id, toggle) + "{y]{x";
+    // client: no {Iw needed, which would also drop the triangle's colour. {IS
+    // keeps it from screen readers, where it would be read on every field.
+    DLString toggle = "{W" + (label.empty() ? DLString("none") : label) + "{IS {Y&#9660;{Ix";
+    return olc_web_frame(web_menu(commands, id, toggle));
 }
 
 DLString web_list_menu(bool showWeb, const StringList &values, const DLString &cmd, const DLString &label,

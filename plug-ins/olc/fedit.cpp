@@ -207,7 +207,7 @@ CMD(fedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online configuration file editor.
 
     if (arg_is_list(arg1)) {
         ostringstream buf;
-        const DLString lineFormat = "    " + web_cmd(ch, "fedit $1|text web", "%s");
+        const DLString lineFormat = "    " + olc_cmd(ch, "fedit $1|text web", "%s", OLC_FRAME_NONE);
         DLString lastFolder = "\x01"; // sentinel: no real folder compares equal
 
         // Print a folder header whenever the folder prefix changes. getPaths() returns

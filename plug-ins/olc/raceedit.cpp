@@ -550,9 +550,9 @@ CMD(raceedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online race editor.")
             Race *race = ri.race;
             const DLString searchFormat = "searcher mq race='" + race->getName() + "'";
             const DLString lineFormat = 
-                web_cmd(ch, "raceedit $1", "{C%-15s") 
-                    + " {%s%-19s " 
-                    + web_cmd(ch, searchFormat, "{Y%4d") 
+                olc_cmd(ch, "raceedit $1", "{C%-15s", OLC_FRAME_NONE)
+                    + " {%s%-19s "
+                    + olc_cmd(ch, searchFormat, "{Y%4d", OLC_FRAME_NONE)
                     + "{x\r\n";
 
             ch->send_to(fmt(0, lineFormat.c_str(),

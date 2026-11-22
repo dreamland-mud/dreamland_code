@@ -41,6 +41,8 @@ static char get_item_colour(OBJ_INDEX_DATA *pObj, RESET_DATA *pReset)
 
 // Reset menus were always yellow brackets on telnet.
 static const OLCMenuFrame FRAME_RESET = { "{y[", "]" };
+// The room link in the header kept its own colour on telnet.
+static const OLCMenuFrame FRAME_ROOM = { "[{C", "{x]" };
 
 static DLString show_reset_wearloc(Character *ch, int iReset, RESET_DATA *pReset, OBJ_INDEX_DATA *pObjIndex, RoomIndexData *pRoom)
 {
@@ -199,7 +201,7 @@ static void display_resets(ostringstream &result, Character * ch, RoomIndexData 
 
             if (matches) {
                 found = true;
-                line = "M[" + web_cmd(ch, "medit $1", "%5d") + "] %-24.24N1{x %2d-%2d {g%s{x\n\r";
+                line = "M" + olc_cmd(ch, "medit $1", "%5d", OLC_FRAME_PLAIN) + " %-24.24N1{x %2d-%2d {g%s{x\n\r";
                 buf << fmt(0, line.c_str(),
                         pReset->arg1, 
                         pMob->getShortDescr(LANG_DEFAULT),
@@ -225,7 +227,7 @@ static void display_resets(ostringstream &result, Character * ch, RoomIndexData 
 
             if (matches) {
                 found = true;
-                line = "O[" + web_cmd(ch, "oedit $1", "%5d") +"] {%c%-24.24N1{x %s{x\n\r";
+                line = "O" + olc_cmd(ch, "oedit $1", "%5d", OLC_FRAME_PLAIN) + " {%c%-24.24N1{x %s{x\n\r";
                 buf << fmt(0, line.c_str(),
                         pReset->arg1, 
                         get_item_colour(pObj, pReset),
@@ -252,7 +254,7 @@ static void display_resets(ostringstream &result, Character * ch, RoomIndexData 
                     buf << "        ";
 
                 found = true;
-                line = "         [" + web_cmd(ch, "oedit $1", "%5d") + "] {%c%-24.24N1{x %2d-%2d %s{x\n\r";
+                line = "         " + olc_cmd(ch, "oedit $1", "%5d", OLC_FRAME_PLAIN) + " {%c%-24.24N1{x %2d-%2d %s{x\n\r";
                 buf << fmt(0, line.c_str(),
                         pReset->arg1,
                         get_item_colour(pObj, pReset),
@@ -265,7 +267,7 @@ static void display_resets(ostringstream &result, Character * ch, RoomIndexData 
                 if (pReset->vnums.size( ) > 1) {
                     buf << "                 or:";
                     for (size_t v = 1; v < pReset->vnums.size( ); v++)
-                        buf << " " << web_cmd(ch, "oedit $1", DLString(pReset->vnums[v]));
+                        buf << " " << olc_cmd(ch, "oedit $1", DLString(pReset->vnums[v]), OLC_FRAME_NONE);
                     buf << "\n\r";
                 }
             }
@@ -287,7 +289,7 @@ static void display_resets(ostringstream &result, Character * ch, RoomIndexData 
 
             if (matches) {
                 found = true;
-                line = "         [" + web_cmd(ch, "oedit $1", "%5d") +"] {%c%-24.24N1{x %s %s{x\n\r";
+                line = "         " + olc_cmd(ch, "oedit $1", "%5d", OLC_FRAME_PLAIN) + " {%c%-24.24N1{x %s %s{x\n\r";
                 buf << fmt(0, line.c_str(),
                         pReset->arg1,
                         get_item_colour(pObj, pReset),
@@ -324,7 +326,7 @@ static void display_resets(ostringstream &result, Character * ch, RoomIndexData 
     }
 
     if (found) {        
-        result << "Resets for room [{C" << web_cmd(ch, "redit $1", pRoom->vnum) << "{x] {W" << pRoom->name.get(LANG_DEFAULT) << "{x:" << endl;
+        result << "Resets for room " << olc_cmd(ch, "redit $1", pRoom->vnum, FRAME_ROOM) << " {W" << pRoom->name.get(LANG_DEFAULT) << "{x:" << endl;
         result << buf.str();
     }
 }

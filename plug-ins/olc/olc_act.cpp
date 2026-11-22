@@ -462,12 +462,15 @@ DLString show_enum_array_web(const EnumerationArray &array)
 }
 
 // Display all assigned behaviors, their properties and active behavior triggers.
+// Behavior and trigger links kept their own bracket colour on telnet.
+static const OLCMenuFrame FRAME_BEHAVIOR = { "[{C", "{x]" };
+
 void show_behaviors(PCharacter *ch, const GlobalBitvector &behaviors, const Json::Value &props)
 {
     ptc(ch, "\r\n{cПоведение{x:            ");
     for (int &bhvIndex: behaviors.toArray()) {
 		Behavior *bhv = behaviorManager->find(bhvIndex);
-        ptc(ch, "[{C%s{x] ", web_cmd(ch, "bedit $1", bhv->getName()).c_str());
+        ptc(ch, "%s ", olc_cmd(ch, "bedit $1", bhv->getName(), FRAME_BEHAVIOR).c_str());
     }
     ptc(ch, " {D(behaviors){x\n\r");
 
@@ -484,7 +487,7 @@ void show_behaviors(PCharacter *ch, const GlobalBitvector &behaviors, const Json
         for (auto &trig: activeTriggers) {
             DLString cmd = "cs web behaviors/" + bhv->getName() + "/" + trig;
             DLString seeFmt = bhv->getName() + "." + trig;
-            ptc(ch, "[{C%s{x] ", web_cmd(ch, cmd, seeFmt).c_str());
+            ptc(ch, "%s ", olc_cmd(ch, cmd, seeFmt, FRAME_BEHAVIOR).c_str());
         }
     }
     ptc(ch, "\r\n");

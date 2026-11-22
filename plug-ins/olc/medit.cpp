@@ -485,17 +485,17 @@ MEDIT(show)
         !mob.area ? -1 : mob.area->vnum,
         !mob.area ? "No Area" : mob.area->getName().c_str());
 
-    ptc(ch, "{GName EN:{x  [{W%s{w]{x %s\n\r", mob.keyword.get(EN).c_str(), web_edit_button(showWeb, ch, "name", "web").c_str());
-    ptc(ch, "{GName UA:{x  [{W%s{w]{x %s\n\r", mob.keyword.get(UA).c_str(), web_edit_button(showWeb, ch, "uaname", "web").c_str());
-    ptc(ch, "{GName RU:{x  [{W%s{w]{x %s\n\r", mob.keyword.get(RU).c_str(), web_edit_button(showWeb, ch, "runame", "web").c_str());
+    ptc(ch, "{GName EN:{x  [{W%s{w]{x %s\n\r", mob.keyword.get(EN).c_str(), olc_edit_button(showWeb, ch, "name", "web").c_str());
+    ptc(ch, "{GName UA:{x  [{W%s{w]{x %s\n\r", mob.keyword.get(UA).c_str(), olc_edit_button(showWeb, ch, "uaname", "web").c_str());
+    ptc(ch, "{GName RU:{x  [{W%s{w]{x %s\n\r", mob.keyword.get(RU).c_str(), olc_edit_button(showWeb, ch, "runame", "web").c_str());
 
-    ptc(ch, "{GShort EN:{x [{W%s{w]{x %s\n\r", mob.short_descr.get(EN).c_str(), web_edit_button(showWeb, ch, "short", "web").c_str());
-    ptc(ch, "{GShort UA:{x [{W%s{w]{x %s\n\r", mob.short_descr.get(UA).c_str(), web_edit_button(showWeb, ch, "uashort", "web").c_str());
-    ptc(ch, "{GShort RU:{x [{W%s{w]{x %s\n\r", mob.short_descr.get(RU).c_str(), web_edit_button(showWeb, ch, "rushort", "web").c_str());
+    ptc(ch, "{GShort EN:{x [{W%s{w]{x %s\n\r", mob.short_descr.get(EN).c_str(), olc_edit_button(showWeb, ch, "short", "web").c_str());
+    ptc(ch, "{GShort UA:{x [{W%s{w]{x %s\n\r", mob.short_descr.get(UA).c_str(), olc_edit_button(showWeb, ch, "uashort", "web").c_str());
+    ptc(ch, "{GShort RU:{x [{W%s{w]{x %s\n\r", mob.short_descr.get(RU).c_str(), olc_edit_button(showWeb, ch, "rushort", "web").c_str());
 
-    ptc(ch, "{GLong EN:{x  [{W%s{w]{x %s\n\r", String::stripEOL(mob.long_descr.get(EN)).c_str(), web_edit_button(showWeb, ch, "long", "web").c_str());        
-    ptc(ch, "{GLong UA:{x  [{W%s{w]{x %s\n\r", String::stripEOL(mob.long_descr.get(UA)).c_str(), web_edit_button(showWeb, ch, "ualong", "web").c_str());        
-    ptc(ch, "{GLong RU:{x  [{W%s{w]{x %s\n\r", String::stripEOL(mob.long_descr.get(RU)).c_str(), web_edit_button(showWeb, ch, "rulong", "web").c_str());        
+    ptc(ch, "{GLong EN:{x  [{W%s{w]{x %s\n\r", String::stripEOL(mob.long_descr.get(EN)).c_str(), olc_edit_button(showWeb, ch, "long", "web").c_str());        
+    ptc(ch, "{GLong UA:{x  [{W%s{w]{x %s\n\r", String::stripEOL(mob.long_descr.get(UA)).c_str(), olc_edit_button(showWeb, ch, "ualong", "web").c_str());        
+    ptc(ch, "{GLong RU:{x  [{W%s{w]{x %s\n\r", String::stripEOL(mob.long_descr.get(RU)).c_str(), olc_edit_button(showWeb, ch, "rulong", "web").c_str());        
     
     StringList tierNames;
     for (int t = MobTiers::TIER_BEST; t <= MobTiers::TIER_WORST; t++)
@@ -542,9 +542,13 @@ MEDIT(show)
     ptc(ch, "{CWealth:{x      [{W%10d{x]  {CAlign{x: [{W%5d{x]\n\r",
         mob.wealth, mob.alignment);
 
+    // Telnet pads the damtype to a column; inside the web widget it would show as blank space.
+    DLString damtypeLabel = weapon_flags.name(mob.dam_type);
+    if (!webMenus || !OLCState::currentWeb)
+        damtypeLabel = fmt(0, "%10s", damtypeLabel.c_str());
     ptc(ch, "{CHitroll:{x     [{W%5d{x]  {CDamtype{x: %s {D(damtype; ? weapon_flags){x\n\r",
         mob.hitroll,
-        web_flag_menu(showWeb, weapon_flags, "damtype", fmt(0, "%10s", weapon_flags.name(mob.dam_type).c_str())).c_str( ));
+        web_flag_menu(showWeb, weapon_flags, "damtype", damtypeLabel).c_str( ));
 
     ptc(ch, "{CArmor{x:       [{Wpierce: %d  bash: %d  slash: %d  magic: %d{x] {D(? ac_type){x\n\r",
         mob.ac[AC_PIERCE], mob.ac[AC_BASH],
@@ -614,24 +618,24 @@ MEDIT(show)
             web_registry_menu(showWeb, ClanManager::getThis(), "clan", mob.clan->getName()).c_str());
 
     ptc(ch, "{GSmell:{x       [{W%s{x] %s [{W%s{x] %s [{W%s{x] %s\n\r", 
-          String::stripEOL(mob.smell.get(EN)).c_str(), web_edit_button(showWeb, ch, "smell", "web").c_str(),   
-          String::stripEOL(mob.smell.get(UA)).c_str(), web_edit_button(showWeb, ch, "uasmell", "web").c_str(),   
-          String::stripEOL(mob.smell.get(RU)).c_str(), web_edit_button(showWeb, ch, "rusmell", "web").c_str());   
+          String::stripEOL(mob.smell.get(EN)).c_str(), olc_edit_button(showWeb, ch, "smell", "web").c_str(),   
+          String::stripEOL(mob.smell.get(UA)).c_str(), olc_edit_button(showWeb, ch, "uasmell", "web").c_str(),   
+          String::stripEOL(mob.smell.get(RU)).c_str(), olc_edit_button(showWeb, ch, "rusmell", "web").c_str());   
 
     const size_t descSize = 100;
     DLString entext = String::ellipsis(mob.description.get(EN), descSize);
     DLString uatext = String::ellipsis(mob.description.get(UA), descSize);
     DLString rutext = String::ellipsis(mob.description.get(RU), descSize);
-    ptc(ch, "{GDesc EN:{x %s\n%s\n", web_edit_button(showWeb, ch, "desc", "web").c_str(), entext.c_str());
-    ptc(ch, "{GDesc UA:{x %s\n%s\n", web_edit_button(showWeb, ch, "uadesc", "web").c_str(), uatext.c_str());
-    ptc(ch, "{GDesc RU:{x %s\n%s\n", web_edit_button(showWeb, ch, "rudesc", "web").c_str(), rutext.c_str());
+    ptc(ch, "{GDesc EN:{x %s\n%s\n", olc_edit_button(showWeb, ch, "desc", "web").c_str(), entext.c_str());
+    ptc(ch, "{GDesc UA:{x %s\n%s\n", olc_edit_button(showWeb, ch, "uadesc", "web").c_str(), uatext.c_str());
+    ptc(ch, "{GDesc RU:{x %s\n%s\n", olc_edit_button(showWeb, ch, "rudesc", "web").c_str(), rutext.c_str());
 
     if (mob.behavior) {
         try {
             std::basic_ostringstream<char> ostr;
             mob.behavior->save( ostr );
             ptc(ch, "Legacy behavior: {D(oldbehavior{x) %s\r\n%s",
-                web_edit_button(showWeb, ch, "oldbehavior", "web").c_str(),
+                olc_edit_button(showWeb, ch, "oldbehavior", "web").c_str(),
                 ostr.str( ).c_str( ));
 
         } catch (const ExceptionXMLError &e) {

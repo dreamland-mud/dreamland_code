@@ -178,10 +178,10 @@ protected:
 };
 
 /** Sets OLCState::currentMenuKey for the lifetime of one subcommand, and
- *  OLCState::currentWeb from the viewer when one is given. */
+ *  OLCState::currentWeb from the viewer. */
 class OLCMenuKeyScope {
 public:
-    OLCMenuKeyScope( const DLString &key, Character *viewer = 0 );
+    OLCMenuKeyScope( const DLString &key, Character *viewer );
     ~OLCMenuKeyScope( );
 private:
     DLString saved;
@@ -292,11 +292,18 @@ public:
     }
 };    
 
-/** An OLC edit button: web_edit_button in the field widget's yellow brackets.
- *  Empty for telnet and for players without OLC security, as web_edit_button is. */
+struct OLCMenuFrame;
+/** A clickable OLC link (a web_cmd, an edit button) in the field look. A web
+ *  viewer gets '{y[{W' link '{y]{x'; anyone else gets frame.open + link +
+ *  frame.close, the link as telnet printed it before. */
+extern DLString olc_link(Character *ch, const DLString &link, const OLCMenuFrame &frame);
+/** olc_link around web_cmd(ch, cmd, seeFmt). */
+extern DLString olc_cmd(Character *ch, const DLString &cmd, const DLString &seeFmt, const OLCMenuFrame &frame);
+/** An OLC edit button: web_edit_button in the field look. Empty for telnet and
+ *  for players without OLC security, as web_edit_button is. */
 extern DLString olc_edit_button(Character *ch, const DLString &editor, const DLString &args);
 /** olc_edit_button, or nothing when showWeb is off ('show noweb'). */
-extern DLString web_edit_button(bool showWeb, Character *ch, const DLString &editor, const DLString &args);
+extern DLString olc_edit_button(bool showWeb, Character *ch, const DLString &editor, const DLString &args);
 /** Every name in a flag table, space-separated. */
 extern DLString flag_table_all_names(const FlagTable &table);
 

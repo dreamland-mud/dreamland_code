@@ -221,6 +221,9 @@ void OLCStateArea::changed( PCharacter *ch )
 }
 
 // Area Editor Functions.
+// Quest links kept their own bracket colour on telnet.
+static const OLCMenuFrame FRAME_QUEST = { "{W[", "{W]" };
+
 AEDIT(show, "показать", "показать все поля")
 {
     AreaIndexData *original = AreaUtils::getByVnum(vnum);
@@ -278,7 +281,7 @@ AEDIT(show, "показать", "показать все поля")
         ostringstream buf;
 
         const DLString lineFormatQuestEdit =
-            "{W[" + web_cmd(ch, "qedit $1", "%6d") + "{W] {c%s{x, {C%d{x step(s), levels {C%d{x-{C%d{x\r\n";
+            olc_cmd(ch, "qedit $1", "%6d", FRAME_QUEST) + " {c%s{x, {C%d{x step(s), levels {C%d{x-{C%d{x\r\n";
 
         for (auto &q: original->quests) {
             buf << fmt(0, lineFormatQuestEdit.c_str(),

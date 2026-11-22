@@ -311,7 +311,7 @@ CMD(cmdedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online command editor.")
         ostringstream buf;
 
         for (auto &cmd: commandManager->getCommands()) {
-            DLString format = DLString("{Y") + web_cmd(ch, "cmdedit $1", "%-13.13s") + " {G%-13.13s{x {R%-13.13s{x [{y%-15.15s{x] [{g%-15.15s{x] [{r%-15.15s{x]\r\n";
+            DLString format = DLString("{Y") + olc_cmd(ch, "cmdedit $1", "%-13.13s", OLC_FRAME_NONE) + " {G%-13.13s{x {R%-13.13s{x [{y%-15.15s{x] [{g%-15.15s{x] [{r%-15.15s{x]\r\n";
             buf << fmt(0, format.c_str(), 
                     cmd->name[EN].c_str(), 
                     cmd->name[RU].c_str(), 
@@ -367,10 +367,10 @@ CMD(cmdedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online command editor.")
         ch->send_to(fmt(0, "{C%-15s %-17s{x\r\n", "Команда", "Русское имя"));
 
         const DLString lineFormatCmdEdit = 
-            "{W" + web_cmd(ch, "cmdedit $1", "%-15s") + "{w %-17s{x\r\n";
+            "{W" + olc_cmd(ch, "cmdedit $1", "%-15s", OLC_FRAME_NONE) + "{w %-17s{x\r\n";
 
         const DLString lineFormatSkillEdit = 
-            "{C" + web_cmd(ch, "skedit $1", "%-15s") + "{w (умение %s){x\r\n";
+            "{C" + olc_cmd(ch, "skedit $1", "%-15s", OLC_FRAME_NONE) + "{w (умение %s){x\r\n";
 
         for (auto &c: commandManager->getCommands()) {
             const DefaultSkillCommand *skillCmd = c.getDynamicPointer<DefaultSkillCommand>();
