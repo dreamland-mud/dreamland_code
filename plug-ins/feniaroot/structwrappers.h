@@ -7,6 +7,8 @@
 
 #include "xmlvariablecontainer.h"
 #include "xmlstring.h"
+#include "xmlinteger.h"
+#include "xmlregister.h"
 
 // MOC_SKIP_BEGIN
 #include "lex.h"
@@ -18,6 +20,7 @@
 #include "basicskill.h"
 
 using Scripting::NativeHandler;
+using Scripting::XMLRegister;
 
 /*----------------------------------------------------------------------
  * Area
@@ -320,6 +323,41 @@ public:
 
 protected:
     Language * getTarget() const;
+};
+
+
+/*----------------------------------------------------------------------
+ * Exit: a regular or extra exit of a room, looked up again on every access
+ *----------------------------------------------------------------------*/
+class Room;
+struct exit_data;
+struct extra_exit_data;
+
+class ExitWrapper : public PluginNativeImpl<ExitWrapper>, 
+                    public NativeHandler,
+                    public XMLVariableContainer 
+{
+XML_OBJECT
+NMI_OBJECT
+public:
+    typedef ::Pointer<ExitWrapper> Pointer;
+
+    ExitWrapper() { }
+            
+    virtual void setSelf(Scripting::Object *) { }
+    virtual Scripting::Object *getSelf() const { return 0; }
+    static Scripting::Register wrap(Room *room, int door);
+    static Scripting::Register wrap(Room *room, extra_exit_data *eexit);
+
+    XML_VARIABLE XMLRegister room;
+    XML_VARIABLE XMLInteger door;
+    XML_VARIABLE XMLString keyword;
+
+protected:
+    Room * getRoom() const;
+    void resolve(Room *&r, exit_data *&pexit, extra_exit_data *&peexit) const;
+    int &exitInfo() const;
+    void setDoorFlags(int flags, bool fSet) const;
 };
 
 #endif

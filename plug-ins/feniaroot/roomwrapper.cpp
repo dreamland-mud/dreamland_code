@@ -66,7 +66,7 @@ static void resolve_exits(const RegisterList &args, Room *room, EXIT_DATA *&pExi
 
     if (door < 0) {
         pExtraExit = room->extra_exits.find(arg.toString());
-    } else {
+    } else if (door < DIR_SOMEWHERE) {
         pExit = room->exit[door];
     }
 
@@ -408,6 +408,59 @@ NMI_INVOKE( RoomWrapper, exits, "(ch): список номеров всех до
     return Register( listObj );
 }
 
+static Register exit_list(Room *room, bool regular, bool extra)
+{
+    RegList::Pointer list(NEW);
+
+    if (regular)
+        for (int door = 0; door < DIR_SOMEWHERE; door++)
+            if (room->exit[door])
+                list->push_back(ExitWrapper::wrap(room, door));
+
+    if (extra)
+        for (auto &eexit: room->extra_exits)
+            list->push_back(ExitWrapper::wrap(room, eexit));
+
+    Scripting::Object *listObj = &Scripting::Object::manager->allocate();
+    listObj->setHandler(list);
+    return Register(listObj);
+}
+
+NMI_INVOKE( RoomWrapper, exit, "(направление, номер или имя экстра-выхода): объект выхода (.api() у него) или null" )
+{
+    checkTarget( );
+    if (args.empty())
+        throw Scripting::NotEnoughArgumentsException();
+
+    const Register &arg = args.front();
+    int door = -1;
+    if (arg.type == Register::NUMBER) {
+        door = arg.toNumber();
+        if (door < 0 || door >= DIR_SOMEWHERE)
+            return Register();
+    } else {
+        door = direction_lookup(arg.toString().c_str());
+    }
+
+    if (door >= 0)
+        return target->exit[door] ? ExitWrapper::wrap(target, door) : Register();
+
+    EXTRA_EXIT_DATA *eexit = target->extra_exits.find(arg.toString());
+    return eexit ? ExitWrapper::wrap(target, eexit) : Register();
+}
+
+NMI_GET( RoomWrapper, exitList, "список всех выходов комнаты (объекты выходов): обычные, потом экстра" )
+{
+    checkTarget( );
+    return exit_list(target, true, true);
+}
+
+NMI_GET( RoomWrapper, extraExits, "список экстра-выходов комнаты (объекты выходов)" )
+{
+    checkTarget( );
+    return exit_list(target, false, true);
+}
+
 NMI_INVOKE( RoomWrapper, trackDoor, "(ch): номер выхода, через который отсюда ушел ch по следам в комнате, или -1" )
 {
     checkTarget( );
@@ -611,28 +664,28 @@ NMI_INVOKE( RoomWrapper, exitShortDescr, "(номер выхода, имя эк�
 }
 
 
-NMI_INVOKE(RoomWrapper, close, "(номер выхода, имя экстра/выхода): закрыть дверь по указанному направлению")
+NMI_INVOKE(RoomWrapper, close, "(номер выхода, имя экстра/выхода): закрыть дверь по указанному направлению; только эта сторона, обе стороны -- room.exit(dir).close()")
 {
     checkTarget( );
     update_door_flags( target, args, EX_CLOSED, true ); 
     return Register( ); 
 }
 
-NMI_INVOKE(RoomWrapper, open, "(номер выхода, имя экстра/выхода): открыть дверь по указанному направлению")
+NMI_INVOKE(RoomWrapper, open, "(номер выхода, имя экстра/выхода): открыть дверь по указанному направлению; только эта сторона, обе стороны -- room.exit(dir).open()")
 {
     checkTarget( );
     update_door_flags( target, args, EX_CLOSED|EX_LOCKED, false ); 
     return Register( ); 
 }
 
-NMI_INVOKE(RoomWrapper, lock, "(номер выхода, имя экстра/выхода): запереть дверь по указанному направлению")
+NMI_INVOKE(RoomWrapper, lock, "(номер выхода, имя экстра/выхода): запереть дверь по указанному направлению; только эта сторона, обе стороны -- room.exit(dir).lock()")
 {
     checkTarget( );
     update_door_flags( target, args, EX_CLOSED|EX_LOCKED, true ); 
     return Register( ); 
 }
 
-NMI_INVOKE(RoomWrapper, unlock, "(номер выхода, имя экстра/выхода): отпереть дверь по указанному направлению")
+NMI_INVOKE(RoomWrapper, unlock, "(номер выхода, имя экстра/выхода): отпереть дверь по указанному направлению; только эта сторона, обе стороны -- room.exit(dir).unlock()")
 {
     checkTarget( );
     update_door_flags( target, args, EX_LOCKED, false ); 
