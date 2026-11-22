@@ -3,9 +3,6 @@
  * ruffina, 2004
  */
 
-#include "wrapperbase.h"
-#include "register-impl.h"
-#include "objectbehavior.h"
 #include "pcharacter.h"
 #include "roomtraverse.h"
 #include "stringlist.h"
@@ -259,23 +256,12 @@ bool Traverse::canSpotExtraExit( Character *ch, EXTRA_EXIT_DATA *eexit )
     return true;
 }
 
-static bool portal_invisible( Object *obj, Character *ch )
-{
-    FENIA_CALL( obj, "Invisible", "C", ch )
-    FENIA_NDX_CALL( obj, "Invisible", "OC", obj, ch )
-
-    if (obj->behavior)
-        return !obj->behavior->visible( ch );
-
-    return false;
-}
-
 /*
  * Mirrors Character::can_see(const Object*) minus the blind/dark checks.
  */
 bool Traverse::canSpotPortal( Character *ch, Object *portal )
 {
-    if (portal_invisible( portal, ch ))
+    if (oprog_invisible( portal, ch ))
         return false;
 
     if (!ch->is_npc( ) && (IS_SET(ch->act, PLR_HOLYLIGHT) || IS_GHOST( ch ) || IS_DEATH_TIME( ch )))

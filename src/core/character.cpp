@@ -438,7 +438,7 @@ bool Character::can_see( const Character *victim, bool ignoreDark ) const
 }
 
 
-static bool oprog_invisible( Object *obj, const Character *ch ) 
+bool oprog_invisible( Object *obj, const Character *ch )
 {
     FENIA_CALL( obj, "Invisible", "C", ch )
     FENIA_NDX_CALL( obj, "Invisible", "OC", obj, ch )

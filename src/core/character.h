@@ -372,5 +372,8 @@ extern Character * char_list;
  */
 extern Character * newbie_list;
 
+// Fenia/behavior 'Invisible' hook of an object; part of Character::can_see.
+bool oprog_invisible( Object *obj, const Character *ch );
+
 
 #endif
