@@ -97,6 +97,29 @@ GSN(identify);
 
 #define PULSE_AUCTION             (45 * dreamland->getPulsePerSecond( )) /* 60 seconds */
 #define AUC_TIMER_CUTOFF          24
+#define AUC_RELIST_DELAY          (3 * 60) /* seconds a seller waits after a cancel */
+
+/* Seller name -> time of their last cancel. In memory only: a reboot or a
+   plugin reload forgets it, which is harmless for a three-minute delay and
+   keeps pfiles untouched. Without it, list + cancel loops the global channel
+   (and the Discord/Telegram new-lot relay) at input speed. */
+static map<DLString, time_t> auction_cancels;
+
+/* Seconds left before ch may list again after a cancel, 0 if free. */
+static int auction_relist_wait( Character *ch )
+{
+    auto c = auction_cancels.find( DLString( ch->getNameC( ) ) );
+    if (c == auction_cancels.end( ))
+        return 0;
+
+    int left = AUC_RELIST_DELAY - (int)(dreamland->getCurrentTime( ) - c->second);
+    if (left <= 0) {
+        auction_cancels.erase( c );
+        return 0;
+    }
+
+    return left;
+}
 
 static bool buyer_can_trade()
 {
@@ -203,6 +226,18 @@ static int parsebet (const int currentbet, const DLString &constArgument)
     return newbet;    
 }
 
+/* An unsold or withdrawn lot goes back to its seller, and the auction is clear. */
+static void auction_return_lot()
+{
+    oldact_p(_("Из дымки перед тобой появляется аукционер и возвращает тебе {W$o4{w."),
+          auction->seller,auction->item,0,TO_CHAR,POS_DEAD);
+    oldact_p(_("Аукционер появляется перед $c5 и возвращает $m {W$o4{w."),
+          auction->seller,auction->item,0,TO_ROOM,POS_RESTING);
+    obj_to_char (auction->item,auction->seller);
+    auction->item = 0; /* clear auction */
+    auction->seller = 0;
+}
+
 void auction_update (void)
 {
     DLString msg;
@@ -271,14 +306,7 @@ void auction_update (void)
             else /* not sold */
             {
                 talk_auction(_("Ставок не получено -- %1$#O1{Y снят%1$Gо||а|ы с аукциона{x."), auction->item);
-
-                oldact_p(_("Из дымки перед тобой появляется аукционер и возвращает тебе {W$o4{w."),
-                      auction->seller,auction->item,0,TO_CHAR,POS_DEAD);
-                oldact_p(_("Аукционер появляется перед $c5 и возвращает $m {W$o4{w."),
-                      auction->seller,auction->item,0,TO_ROOM,POS_RESTING);
-                obj_to_char (auction->item,auction->seller);
-                auction->item = 0; /* clear auction */
-                auction->seller = 0;
+                auction_return_lot();
             } /* else */
 
             } /* switch */
@@ -449,6 +477,33 @@ CMDRUNP( auction )
                 }
         }
 
+        if (arg_is_strict(arg1, "cancel"))
+        {
+                if (auction->item == 0)
+                {
+                        ch->pecho(_("В данный момент на аукцион ничего не выставлено."));
+                        return;
+                }
+
+                if (ch != auction->seller)
+                {
+                        ch->pecho(_("Снять с аукциона можно только свой лот."));
+                        return;
+                }
+
+                if (auction->buyer != 0)
+                {
+                        ch->pecho(_("На лот уже сделана ставка -- снять его нельзя."));
+                        return;
+                }
+
+                talk_auction(_("Лот %1$O1{Y снят с аукциона владельцем{x."), auction->item);
+                auction_return_lot();
+                auction_cancels[DLString( ch->getNameC( ) )] = dreamland->getCurrentTime( );
+                ch->setWaitViolence( 1 );
+                return;
+        }
+
         if (arg_is_strict(arg1, "bet"))
         {
                 if (auction->item != 0)
@@ -546,6 +601,14 @@ CMDRUNP( auction )
         if (auction->item == 0) {
                 if (ch->desc && banManager->check( ch->desc, BAN_COMMUNICATE )) {
                     ch->pecho( _("Ты не можешь ничего выставлять на аукцион.") );
+                    return;
+                }
+
+                int relist = auction_relist_wait( ch );
+                if (relist > 0) {
+                    int minutes = (relist + 59) / 60;
+                    ch->pecho( _("Ты недавно снял%1$Gо||а лот с аукциона. Новый можно выставить через %2$d минут%2$Iу|ы|."),
+                               ch, minutes );
                     return;
                 }
 
