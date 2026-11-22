@@ -40,6 +40,10 @@ public:
     static DLString findByIdentity(const DLString &type, const DLString &value); // "" when none
     static DLString accountOf(const DLString &charName);        // "" when unattached
     static std::list<DLString> charsOf(const DLString &id);     // member character names
+    // True hours over all lives of every char on pc's account (pc_total_hours
+    // each), pc's own total when unattached. Walks every pfile: callers cache
+    // (pc_account_hours, the hook loadsave plugs into core).
+    static int totalHours(PCMemoryInterface *pc);
     static std::list<DLString> allIds();                        // every registered account id
     // id -> member character names for the WHOLE playerbase in one pass, so a
     // full-registry report costs O(pfiles) once instead of charsOf per account.

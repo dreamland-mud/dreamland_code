@@ -526,6 +526,21 @@ list<DLString> AccountManager::charsOf(const DLString &id)
     return names;
 }
 
+int AccountManager::totalHours(PCMemoryInterface *pc)
+{
+    DLString id = accountOf(pc->getName());
+    if (id.empty())
+        return pc_total_hours(pc);
+
+    int hours = 0;
+    for (const DLString &name : charsOf(id)) {
+        PCMemoryInterface *pci = PCharacterManager::find(name);
+        if (pci != 0)
+            hours += pc_total_hours(pci);
+    }
+    return hours;
+}
+
 list<DLString> AccountManager::allIds()
 {
     list<DLString> ids;

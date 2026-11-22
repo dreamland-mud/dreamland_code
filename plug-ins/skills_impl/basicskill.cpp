@@ -163,6 +163,17 @@ void BasicSkill::hintPractice( PCharacter *pch, int learned ) const
               getNameFor( pch ).c_str( ) );
 }
 
+// Aging: young learn, old do. Constants, not config/aging.json: that file is
+// loaded by the communication plugin, which skills_impl does not link.
+// A life this short is still young: fresh chars and fresh remorts learn faster.
+static const int YOUNG_LIFE_HOURS = 100;
+// Young improve chance, permille of the normal one.
+static const int YOUNG_IMPROVE_PERMILLE = 1100;
+// An account this old (all lives of all its chars) is a seasoned veteran.
+static const int VETERAN_ACCOUNT_HOURS = 5000;
+// The veteran's edge on every skill they actually have, before the 100 clamp.
+static const int VETERAN_SKILL_BONUS = 2;
+
 void 
 BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_type, int dam_flags ) const 
 {
@@ -220,6 +231,9 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
         if (diff < -10)
             chance += 20 * (diff + 10);
     }
+
+    if (chance > 0 && pch->getPlayedHours( ) < YOUNG_LIFE_HOURS)
+        chance = (chance * YOUNG_IMPROVE_PERMILLE + 500) / 1000;
 
     //humans always have bonus learning. does not stack with other bonuses
     bool fBonus = (bonus_learning->isActive(pch, time_info) || ch->getRace()->getName() == "human");
@@ -331,6 +345,9 @@ int BasicSkill::getEffective( Character *ch ) const
     // Influence by worn items and affects.
     if (!ch->is_npc())
         result += skill_learned_from_affects(this, ch->getPC());
+
+    if (!ch->is_npc() && pc_account_hours(ch->getPC()) >= VETERAN_ACCOUNT_HOURS)
+        result += VETERAN_SKILL_BONUS;
 
     // Daze state makes everything worse.
     if (ch->daze > 0) {
