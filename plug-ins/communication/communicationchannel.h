@@ -33,6 +33,12 @@ public:
 protected:
     virtual bool checkIsolator( Character *, Character * ) const;
 
+    /** True when applyGarble turns this speaker's line into gibberish:
+     *  the channel garbles and the speaker has the garble affect. */
+    bool garblesMagic( Character * ) const;
+    /** Slur percent applyGarble uses for this speaker's line: 0 when the
+     *  channel does not garble, the speaker is sober or garble wins. */
+    int slurLevel( Character * ) const;
     virtual void applyGarble( Character *, DLString & ) const;
 
     // Neutralize player-injected web/command tags ({hc, {hh, ...) in channel text

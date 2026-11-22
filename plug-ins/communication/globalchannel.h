@@ -31,8 +31,15 @@ protected:
     virtual bool needOutputSelf( Character * ) const;
     virtual bool needOutputOther( Character * ) const;
 
+    /** Old-man noise for this line: an index into the config/aging.json word
+     *  lists, or -1. Rolled once per line, on channels with grumble set. */
+    virtual int grumbleRoll( Character * ) const;
+    /** The interjection appended to the reader's copy, in the reader's language,
+     *  slurred at the given percent (the speaker's slurLevel, 0 = sober). */
+    DLString grumbleText( int, Character *, int ) const;
+
     XML_VARIABLE XMLBooleanNoFalse soap, translate, nochannel, deafenOther;
-    XML_VARIABLE XMLBooleanNoFalse quiet, nomob, confirmed, dig;
+    XML_VARIABLE XMLBooleanNoFalse quiet, nomob, confirmed, dig, grumble;
 
     XML_VARIABLE XMLStringNoEmpty msgSelf, msgOther, msgSelfNoarg, msgOtherNoarg;
     XML_VARIABLE XMLStringNoEmpty msgSelfMild, msgOtherMild;

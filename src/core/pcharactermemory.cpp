@@ -15,6 +15,8 @@
 #include "character.h"
 #include "string_utils.h"
 #include "lang.h"
+#include "remortdata.h"
+#include "dreamland.h"
 #include "merc.h"
 #include "def.h"
 
@@ -454,6 +456,31 @@ int PCharacterMemory::getPlayedHours( ) const
 void PCharacterMemory::setPlayedHours( int hours )
 {
     playedHours = hours;
+}
+
+static const long LIFE_HOURS_MAX = 50000;
+
+long pc_life_hours_cap( PCMemoryInterface *pci )
+{
+    long created = pci->getCreated( );
+    long cap = LIFE_HOURS_MAX;
+    if (created > 0 && (dreamland->getCurrentTime( ) - created) / 3600 > cap)
+        cap = (dreamland->getCurrentTime( ) - created) / 3600;
+    return cap;
+}
+
+long pc_life_hours( long hours, long cap )
+{
+    return (hours > 0 && hours <= cap) ? hours : 0;
+}
+
+int pc_total_hours( PCMemoryInterface *pci )
+{
+    long cap = pc_life_hours_cap( pci );
+    long hours = pc_life_hours( pci->getPlayedHours( ), cap );
+    for (auto &life : pci->getRemorts( ))
+        hours += pc_life_hours( life.time.getValue( ), cap );
+    return (int)hours;
 }
 
 using namespace Grammar;

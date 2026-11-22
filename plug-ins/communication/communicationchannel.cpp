@@ -114,6 +114,19 @@ bool CommunicationChannel::canHear( Character *ch ) const
     return ch->get_trust( ) >= trustHear.getValue( );
 }
 
+bool CommunicationChannel::garblesMagic( Character *ch ) const
+{
+    return garble && ch->isAffected( gsn_garble );
+}
+
+int CommunicationChannel::slurLevel( Character *ch ) const
+{
+    if (!garble || ch->isAffected( gsn_garble ))
+        return 0;
+
+    return slur_percent( ch );
+}
+
 void CommunicationChannel::applyGarble( Character *ch, DLString &msg ) const
 {
     ostringstream srcStream;
@@ -121,11 +134,8 @@ void CommunicationChannel::applyGarble( Character *ch, DLString &msg ) const
     const char *src;
     char *dst;
 
-    if (!garble)
-        return;
-
-    bool fGarble = ch->isAffected( gsn_garble );
-    int slur = fGarble ? 0 : slur_percent( ch );
+    bool fGarble = garblesMagic( ch );
+    int slur = slurLevel( ch );
 
     if (!fGarble && slur <= 0)
         return;

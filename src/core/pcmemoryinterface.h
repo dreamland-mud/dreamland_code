@@ -155,5 +155,15 @@ public:
     virtual void setLoyalty(int value) = 0;
 };
 
+/** True played hours across lives. One life can honestly hold at most the
+ *  character's age, never less than LIFE_HOURS_MAX (old characters carry an
+ *  estimated creation date); a longer one is a corrupt record (one pfile
+ *  carries a 379637-hour life) and counts as 0. Fenia's
+ *  .tmp.achievements.charHours applies the same rule. */
+long pc_life_hours_cap( PCMemoryInterface *pci );
+long pc_life_hours( long hours, long cap );
+
+/** The current life plus every remort, each through pc_life_hours. */
+int pc_total_hours( PCMemoryInterface *pci );
 
 #endif
