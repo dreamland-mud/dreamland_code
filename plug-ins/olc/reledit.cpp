@@ -363,7 +363,7 @@ CMD(reledit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")
 
     if (arg_is(cmd, "mark")) {
         ch->send_to(fmt(0, 
-            "{C%-15s %-17s %-6s %s{x\r\n", "Название", "Русское имя", "VNUM", "Описание"));        
+            ("{C%-15s" + olc_head_pad(ch) + " %-17s %-6s" + olc_head_pad(ch) + " %s{x\r\n").c_str(), "Название", "Русское имя", "VNUM", "Описание"));        
 
         const DLString lineFormat = 
            "{W" + olc_cmd(ch, "reledit $1", "%-15s", OLC_FRAME_NONE)
@@ -400,7 +400,7 @@ CMD(reledit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")
     }
 
     if (arg_is_list(cmd)) {
-        ch->send_to(fmt(0, "{C%-15s %-17s %-3s {Y%-3s   %-3s %1s %1s{x\r\n", "Название", "Русское имя", "SEX", "ALG", "ETH", "R", "C"));
+        ch->send_to(fmt(0, ("{C%-15s" + olc_head_pad(ch) + " %-17s %-3s {Y%-3s   %-3s %1s %1s{x\r\n").c_str(), "Название", "Русское имя", "SEX", "ALG", "ETH", "R", "C"));
 
         const DLString lineFormat = 
             "{W" + olc_cmd(ch, "reledit $1", "%-15s", OLC_FRAME_NONE) + "{w %-17s %-3s %1s%1s%1s   %1s%1s%1s %1s %1s{x\r\n";

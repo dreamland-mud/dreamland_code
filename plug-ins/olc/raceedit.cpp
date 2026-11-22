@@ -544,7 +544,7 @@ CMD(raceedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online race editor.")
         else if (arg_is(args, "rname"))
             sort(races.begin(), races.end(), RaceInfo::compareRusName);
 
-        ch->send_to(fmt(0, "{C%-15s %-19s {Y%s{x\r\n", "Название", "По-русски", "Мобов"));
+        ch->send_to(fmt(0, ("{C%-15s" + olc_head_pad(ch) + " %-19s {Y%s{x\r\n").c_str(), "Название", "По-русски", "Мобов"));
 
         for (auto &ri: races) {
             Race *race = ri.race;

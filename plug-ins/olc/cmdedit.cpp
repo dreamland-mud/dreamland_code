@@ -364,7 +364,7 @@ CMD(cmdedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online command editor.")
     }
 
     if (arg_is_list(cmd)) {
-        ch->send_to(fmt(0, "{C%-15s %-17s{x\r\n", "Команда", "Русское имя"));
+        ch->send_to(fmt(0, ("{C%-15s" + olc_head_pad(ch) + " %-17s{x\r\n").c_str(), "Команда", "Русское имя"));
 
         const DLString lineFormatCmdEdit = 
             "{W" + olc_cmd(ch, "cmdedit $1", "%-15s", OLC_FRAME_NONE) + "{w %-17s{x\r\n";
