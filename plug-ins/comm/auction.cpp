@@ -97,6 +97,29 @@ GSN(identify);
 
 #define PULSE_AUCTION             (45 * dreamland->getPulsePerSecond( )) /* 60 seconds */
 #define AUC_TIMER_CUTOFF          24
+#define AUC_RELIST_DELAY          (3 * 60) /* seconds a seller waits after a cancel */
+
+/* Seller name -> time of their last cancel. In memory only: a reboot or a
+   plugin reload forgets it, which is harmless for a three-minute delay and
+   keeps pfiles untouched. Without it, list + cancel loops the global channel
+   (and the Discord/Telegram new-lot relay) at input speed. */
+static map<DLString, time_t> auction_cancels;
+
+/* Seconds left before ch may list again after a cancel, 0 if free. */
+static int auction_relist_wait( Character *ch )
+{
+    auto c = auction_cancels.find( DLString( ch->getNameC( ) ) );
+    if (c == auction_cancels.end( ))
+        return 0;
+
+    int left = AUC_RELIST_DELAY - (int)(dreamland->getCurrentTime( ) - c->second);
+    if (left <= 0) {
+        auction_cancels.erase( c );
+        return 0;
+    }
+
+    return left;
+}
 
 static bool buyer_can_trade()
 {
@@ -474,8 +497,10 @@ CMDRUNP( auction )
                         return;
                 }
 
-                talk_auction(_("%1$^C1{Y снимает с аукциона свой лот %2$O4{Y{x."), ch, auction->item);
+                talk_auction(_("Лот %1$O1{Y снят с аукциона владельцем{x."), auction->item);
                 auction_return_lot();
+                auction_cancels[DLString( ch->getNameC( ) )] = dreamland->getCurrentTime( );
+                ch->setWaitViolence( 1 );
                 return;
         }
 
@@ -576,6 +601,14 @@ CMDRUNP( auction )
         if (auction->item == 0) {
                 if (ch->desc && banManager->check( ch->desc, BAN_COMMUNICATE )) {
                     ch->pecho( _("Ты не можешь ничего выставлять на аукцион.") );
+                    return;
+                }
+
+                int relist = auction_relist_wait( ch );
+                if (relist > 0) {
+                    int minutes = (relist + 59) / 60;
+                    ch->pecho( _("Ты недавно снял%1$Gо||а лот с аукциона. Новый можно выставить через %2$d минут%2$Iу|ы|."),
+                               ch, minutes );
                     return;
                 }
 
