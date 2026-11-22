@@ -28,6 +28,44 @@ const DLString XMLRegister::REGTYPE_IDENTIFIER = "identifier";
 const DLString XMLRegister::REGTYPE_NUMBER = "number";
 const DLString XMLRegister::REGTYPE_FUNCTION = "function";
 const DLString XMLRegister::REGTYPE_OBJECT = "object";
+const DLString XMLRegister::KEY_NODE = "_key";
+const DLString XMLRegister::ATTRIBUTE_KEY = "key";
+
+/* Mirrors NODE_NAME in src/xml/xmlparser.l++. */
+static bool isXMLName(const DLString &name)
+{
+    if (name.empty())
+        return false;
+
+    for (DLString::size_type i = 0; i < name.size(); i++) {
+        unsigned char c = name[i];
+        bool letter = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
+        bool tail = (c >= '0' && c <= '9') || c == '-' || c == ':';
+
+        if (!letter && (i == 0 || !tail))
+            return false;
+    }
+
+    return true;
+}
+
+void XMLRegister::keyToXML(XMLNode::Pointer &node, const DLString &key)
+{
+    if (isXMLName(key)) {
+        node->setName(key);
+    } else {
+        node->setName(KEY_NODE);
+        node->insertAttribute(ATTRIBUTE_KEY, key);
+    }
+}
+
+DLString XMLRegister::keyFromXML(const XMLNode::Pointer &node)
+{
+    if (node->getName() == KEY_NODE && node->hasAttribute(ATTRIBUTE_KEY))
+        return node->getAttribute(ATTRIBUTE_KEY);
+
+    return node->getName();
+}
 
 long brokenClosuresDropped = 0;
 

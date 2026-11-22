@@ -73,6 +73,8 @@ public:
 
     void load( );
     virtual void seq( key_t, Data & ) = 0;
+    // A record seq() could not read; load() logs it and moves on.
+    virtual void seqFailed( key_t ) { }
 
     void get( key_t, Data & );
     void put( key_t, Data & );

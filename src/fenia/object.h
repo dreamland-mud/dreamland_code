@@ -124,6 +124,15 @@ public:
     void put( id_t id, const string &s );
 
     virtual void seq( id_t, Data & );
+    virtual void seqFailed( id_t );
+
+    /*
+     * One-shot DB cleanup at boot. Ids listed in the file (one per line) are
+     * deleted by purgeFailed() after load(), but only those whose record
+     * failed to parse in this load. The file is renamed to <path>.done.
+     */
+    void readPurgeList( const DLString &path );
+    void purgeFailed( );
 
     bool tlim(struct timeval *);
     bool syncPut(struct timeval *);

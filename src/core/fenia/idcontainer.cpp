@@ -6,6 +6,7 @@
 #include "idcontainer.h"
 #include "register-impl.h"
 #include "schedulerwrapper.h"
+#include "xmlregister.h"
 
 using namespace Scripting;
 
@@ -123,7 +124,7 @@ IdContainer::toXML( XMLNode::Pointer& parent ) const
         XMLNode::Pointer node(NEW);
         
         i->second.toXML(node);
-        node->setName(Lex::getThis()->getName(i->first));
+        XMLRegister::keyToXML(node, Lex::getThis()->getName(i->first));
         
         parent->appendChild(node);
     }
@@ -141,8 +142,7 @@ IdContainer::fromXML( const XMLNode::Pointer& parent )
 bool
 IdContainer::nodeFromXML( const XMLNode::Pointer& child)
 {
-    const DLString &name = child->getName();
-    Lex::id_t id = Lex::getThis()->resolve(name);
+    Lex::id_t id = Lex::getThis()->resolve(XMLRegister::keyFromXML(child));
     
     idmap[id].fromXML(child);
     return true;

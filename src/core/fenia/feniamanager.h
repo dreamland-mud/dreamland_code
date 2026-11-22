@@ -47,6 +47,7 @@ public:
     }
     void load( ) {
         Scripting::Object::Manager::load( );
+        Scripting::Object::Manager::purgeFailed( );
         Scripting::CodeSource::Manager::load( );
     }
 

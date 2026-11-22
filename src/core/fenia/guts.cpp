@@ -15,7 +15,7 @@ Guts::toXML( XMLNode::Pointer& parent ) const
     for(i = begin(); i != end(); i++) {
         XMLNode::Pointer node(NEW);
         
-        node->setName(Lex::getThis()->getName(i->first));
+        XMLRegister::keyToXML(node, Lex::getThis()->getName(i->first));
 
         if (i->second.toXML(node))
             parent->appendChild(node);
@@ -34,8 +34,7 @@ Guts::fromXML( const XMLNode::Pointer& parent )
 bool
 Guts::nodeFromXML( const XMLNode::Pointer& child)
 {
-    const DLString &name = child->getName();
-    Lex::id_t id = Lex::getThis()->resolve(name);
+    Lex::id_t id = Lex::getThis()->resolve(XMLRegister::keyFromXML(child));
     
     (*this)[id].fromXML(child);
     return true;

@@ -10,6 +10,9 @@
 #include <sstream>
 #include <fstream>
 #include <sys/time.h>
+#include <cstdio>
+#include <set>
+#include <vector>
 
 #include <logstream.h>
 #include <integer.h>
@@ -249,6 +252,54 @@ Object::Manager::seq(id_t id, Data &val)
 
     if(id > lastId)
         lastId = id;
+}
+
+static std::set<DbContext::key_t> purgeListed;
+static std::vector<DbContext::key_t> purgeDoomed;
+static DLString purgeListPath;
+
+void
+Object::Manager::readPurgeList( const DLString &path )
+{
+    ifstream f(path.c_str( ));
+    if (!f)
+        return;
+
+    DbContext::key_t id;
+    while (f >> id)
+        purgeListed.insert(id);
+
+    purgeListPath = path;
+    LogStream::sendNotice( ) 
+        << "Fenia purge list " << path << ": " << purgeListed.size( ) << " ids" << endl;
+}
+
+void
+Object::Manager::seqFailed( id_t id )
+{
+    if (purgeListed.count(id))
+        purgeDoomed.push_back(id);
+}
+
+void
+Object::Manager::purgeFailed( )
+{
+    if (purgeListPath.empty( ))
+        return;
+
+    for (size_t i = 0; i < purgeDoomed.size( ); i++)
+        del(purgeDoomed[i]);
+
+    commit( );
+
+    LogStream::sendNotice( ) 
+        << "Fenia purge: deleted " << purgeDoomed.size( ) 
+        << " of " << purgeListed.size( ) << " listed unreadable records" << endl;
+
+    std::rename(purgeListPath.c_str( ), (purgeListPath + ".done").c_str( ));
+    purgeListed.clear( );
+    purgeDoomed.clear( );
+    purgeListPath.clear( );
 }
 
 void
