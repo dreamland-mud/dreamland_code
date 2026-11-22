@@ -203,6 +203,18 @@ static int parsebet (const int currentbet, const DLString &constArgument)
     return newbet;    
 }
 
+/* An unsold or withdrawn lot goes back to its seller, and the auction is clear. */
+static void auction_return_lot()
+{
+    oldact_p(_("Из дымки перед тобой появляется аукционер и возвращает тебе {W$o4{w."),
+          auction->seller,auction->item,0,TO_CHAR,POS_DEAD);
+    oldact_p(_("Аукционер появляется перед $c5 и возвращает $m {W$o4{w."),
+          auction->seller,auction->item,0,TO_ROOM,POS_RESTING);
+    obj_to_char (auction->item,auction->seller);
+    auction->item = 0; /* clear auction */
+    auction->seller = 0;
+}
+
 void auction_update (void)
 {
     DLString msg;
@@ -271,14 +283,7 @@ void auction_update (void)
             else /* not sold */
             {
                 talk_auction(_("Ставок не получено -- %1$#O1{Y снят%1$Gо||а|ы с аукциона{x."), auction->item);
-
-                oldact_p(_("Из дымки перед тобой появляется аукционер и возвращает тебе {W$o4{w."),
-                      auction->seller,auction->item,0,TO_CHAR,POS_DEAD);
-                oldact_p(_("Аукционер появляется перед $c5 и возвращает $m {W$o4{w."),
-                      auction->seller,auction->item,0,TO_ROOM,POS_RESTING);
-                obj_to_char (auction->item,auction->seller);
-                auction->item = 0; /* clear auction */
-                auction->seller = 0;
+                auction_return_lot();
             } /* else */
 
             } /* switch */
@@ -447,6 +452,31 @@ CMDRUNP( auction )
                         }
                         return;
                 }
+        }
+
+        if (arg_is_strict(arg1, "cancel"))
+        {
+                if (auction->item == 0)
+                {
+                        ch->pecho(_("В данный момент на аукцион ничего не выставлено."));
+                        return;
+                }
+
+                if (ch != auction->seller)
+                {
+                        ch->pecho(_("Снять с аукциона можно только свой лот."));
+                        return;
+                }
+
+                if (auction->buyer != 0)
+                {
+                        ch->pecho(_("На лот уже сделана ставка -- снять его нельзя."));
+                        return;
+                }
+
+                talk_auction(_("%1$^C1{Y снимает с аукциона свой лот %2$O4{Y{x."), ch, auction->item);
+                auction_return_lot();
+                return;
         }
 
         if (arg_is_strict(arg1, "bet"))
