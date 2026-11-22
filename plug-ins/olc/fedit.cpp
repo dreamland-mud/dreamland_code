@@ -10,6 +10,8 @@
 #include "act.h"
 #include "comm.h"
 #include "websocketrpc.h"
+#include <fstream>
+#include <sstream>
 
 #include "def.h"
 
@@ -127,6 +129,63 @@ FEDIT(cancel, "отменить", "отменить все изменения и
     return false;
 }
 
+// fedit reload <path>: re-read one configurable from disk and run its normal
+// load path, so its CONFIGURABLE_LOADED handler rebuilds whatever it caches,
+// without a plugin reload (the same loaded() call fedit's own 'done' makes).
+// The file is parsed first: load() hands even a half-parsed value to loaded(),
+// and the handlers clear their tables before refilling them.
+static void fedit_reload(Character *ch, DLString name)
+{
+    if (name.empty()) {
+        ch->pecho("Формат: fedit reload <json path>, например fedit reload config/aging");
+        return;
+    }
+
+    if (name.size() > 5 && name.substr(name.size() - 5) == ".json")
+        name = name.substr(0, name.size() - 5);
+
+    Configurable::Pointer cfg = configReg->get(name);
+    if (!cfg) {
+        list<Configurable::Pointer> matches = configReg->getAll(name);
+        if (matches.empty()) {
+            ch->pecho("Не найдено ни одного файла с именем {W%s{x.", name.c_str());
+            return;
+        }
+        if (matches.size() > 1) {
+            ch->pecho("Под {W%s{x подходит несколько файлов, укажи точный путь:", name.c_str());
+            for (auto &m: matches)
+                ch->pecho("    %s", m->getPath().c_str());
+            return;
+        }
+        cfg = matches.front();
+    }
+
+    try {
+        std::ifstream ifs(cfg->getAbsolutePath().c_str());
+        if (!ifs) {
+            ch->pecho("Не могу прочитать {W%s{x.", cfg->getAbsolutePath().c_str());
+            return;
+        }
+
+        std::stringstream buffer;
+        buffer << ifs.rdbuf();
+
+        ostringstream errbuf;
+        if (!JsonUtils::validate(buffer.str(), errbuf)) {
+            ch->pecho("Ошибка парсинга JSON в {W%s{x, файл не перезагружен:", cfg->getPath().c_str());
+            ch->pecho("%s", errbuf.str().c_str());
+            return;
+        }
+
+        cfg->load();
+        ch->pecho("Файл {W%s{x перезагружен с диска: %d записей.",
+                  cfg->getPath().c_str(), (int)cfg->getValue().size());
+
+    } catch (const std::exception &ex) {
+        ch->pecho("Ошибка при перезагрузке {W%s{x: %s", cfg->getPath().c_str(), ex.what());
+    }
+}
+
 CMD(fedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online configuration file editor.")
 {
     DLString args = argument;
@@ -137,6 +196,12 @@ CMD(fedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online configuration file editor.
         stc("Формат:  fedit <json path>    - редактировать файл\r\n", ch);
         stc("         fedit list           - список всех конфигурационных файлов\r\n", ch);
         stc("         fedit list <строка>  - список всех файлов со строкой в имени\r\n", ch);
+        stc("         fedit reload <json path> - перечитать файл с диска без перезагрузки плагина\r\n", ch);
+        return;
+    }
+
+    if (arg_oneof_strict(arg1, "reload")) {
+        fedit_reload(ch, arg2);
         return;
     }
 
