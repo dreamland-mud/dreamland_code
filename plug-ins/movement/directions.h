@@ -57,6 +57,10 @@ int direction_lookup( const char *arg );
  *  generic word for "door" in that language if the exit carries no name. */
 const char * direction_doorname(exit_data *, lang_t lang);
 
+/** Case pad of the generic door word for a nameless exit in `lang`, in the
+ *  Flexer form exit short descriptions are stored in. */
+const char * direction_door_pad(lang_t lang);
+
 /** Per-viewer door name for the %w / $w act code and single-viewer string
  *  building. Owns its three language forms; the RU form is pre-declined to a
  *  grammatical case (russian_case is viewer-independent), EN is caseless, UA
