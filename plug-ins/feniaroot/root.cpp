@@ -5,8 +5,12 @@
 #include <cmath>
 #include <math.h>
 #include <string.h>
+#include <sys/stat.h>
 
 #include "logstream.h"
+#include "iconvmap.h"
+#include "dldirectory.h"
+#include "dlfilestream.h"
 #include "morphology.h"
 #include "core/object.h"
 #include "npcharacter.h"
@@ -806,6 +810,57 @@ NMI_INVOKE(Root, telegram, "(msg): послать сырое сообщение 
         TAGS_CONVERT_COLOR|TAGS_ENFORCE_NOCOLOR);
     send_telegram_no_escape(buf.str());
     return Register( );
+}
+
+static IconvMap ai_koi2utf("koi8-u", "utf-8");
+
+// Game -> AI worker (scripts/ai-worker, docs/plans/AI_FEATURES.md 3.1): one
+// JSON file per request in var/misc/ai, the messenger spool pattern. The game
+// never waits on the model; the answer comes back over /api/fenia into
+// .tmp.ai.deliver. The worker polls the directory instead of watching
+// close-write, so the file is written under mkstemp's name and only then
+// renamed to *.json: the worker reads *.json only and never sees half a file.
+NMI_INVOKE(Root, aiRequest, "(kind, payload): записать запрос ИИ-воркеру в спул var/misc/ai: kind -- латиница/цифры/_ до 32 символов, payload -- Map, Array, List или строка; true если файл записан, false при ошибке записи")
+{
+    static const DLString kindChars = "abcdefghijklmnopqrstuvwxyz0123456789_";
+    static const size_t maxBytes = 65536;
+
+    DLString kind = argnum2string(args, 1);
+    if (kind.empty() || kind.size() > 32 || kind.find_first_not_of(kindChars) != DLString::npos)
+        throw Scripting::Exception("kind: lowercase latin letters, digits or _, up to 32 characters");
+
+    Json::Value body;
+    body["kind"] = kind;
+    body["time"] = (Json::Int64)dreamland->getCurrentTime();
+    body["payload"] = JsonUtils::fromRegister(argnum(args, 2));
+
+    Json::FastWriter writer;
+    // FastWriter passes KOI8 bytes through untouched, so the whole document
+    // converts at once, as jsonservlet.cpp does.
+    DLString text = ai_koi2utf(writer.write(body));
+    if (text.size() > maxBytes)
+        throw Scripting::Exception("aiRequest: payload over 64 KB");
+
+    try {
+        DLDirectory dir(dreamland->getMiscDir(), "ai");
+        if (!dir.exist() && ::mkdir(dir.getCPath(), 0755) < 0 && !dir.exist()) {
+            LogStream::sendError() << "aiRequest: cannot create " << dir.getPath() << endl;
+            return Register(false);
+        }
+
+        DLFile tmp = dir.tempEntry();
+        DLFileStream(tmp).fromString(text);
+        if (!tmp.rename(tmp.getPath() + ".json")) {
+            tmp.remove();
+            return Register(false);
+        }
+
+    } catch (const ::Exception &e) {
+        LogStream::sendError() << "aiRequest: " << e.what() << endl;
+        return Register(false);
+    }
+
+    return Register(true);
 }
 
 NMI_INVOKE(Root, infonet, "(msg, ch): выдать сообщение msg в новости мира (слышат все игроки) с участием ch" )
