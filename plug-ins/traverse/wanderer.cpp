@@ -86,7 +86,7 @@ struct ExtraExitFunc {
 
     bool operator () ( Room *const room, EXTRA_EXIT_DATA *eexit ) const
     {
-        if (viewer && !viewer->can_see( eexit ))
+        if (viewer && !Traverse::canSpotExtraExit( viewer, eexit ))
             return false;
 
         return behavior->canWander( room, eexit );
@@ -102,7 +102,7 @@ struct PortalFunc {
 
     bool operator () ( Room *const room, Object *portal ) const
     {
-        if (viewer && !viewer->can_see( portal ))
+        if (viewer && !Traverse::canSpotPortal( viewer, portal ))
             return false;
 
         return behavior->canWander( room, portal );

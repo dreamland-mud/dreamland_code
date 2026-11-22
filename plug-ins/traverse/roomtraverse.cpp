@@ -3,6 +3,10 @@
  * ruffina, 2004
  */
 
+#include "wrapperbase.h"
+#include "register-impl.h"
+#include "objectbehavior.h"
+#include "pcharacter.h"
 #include "roomtraverse.h"
 #include "stringlist.h"
 #include "morphology.h"
@@ -223,3 +227,65 @@ Road room_first_step( Character *ch, Room *start_room, Room *target_room,
     return road;
 }
 
+/*
+ * Mirrors Character::can_see(EXTRA_EXIT_DATA*) minus the blind/dark checks.
+ */
+bool Traverse::canSpotExtraExit( Character *ch, EXTRA_EXIT_DATA *eexit )
+{
+    if (!eexit->u1.to_room || !ch->can_see( eexit->u1.to_room ))
+        return false;
+
+    if (!ch->is_npc( ) && (IS_GHOST( ch ) || IS_DEATH_TIME( ch )))
+        return true;
+
+    if ((!ch->is_npc( ) && IS_SET(ch->act, PLR_HOLYLIGHT)) || (ch->is_npc( ) && ch->is_immortal( )))
+        return true;
+
+    if (IS_SET(eexit->exit_info, EX_INVISIBLE) && !CAN_DETECT(ch, DETECT_INVIS))
+        return false;
+
+    if (IS_SET(eexit->exit_info, EX_IMPROVED) && !CAN_DETECT(ch, DETECT_IMP_INVIS))
+        return false;
+
+    if (IS_SET(eexit->exit_info, EX_CAMOUFLAGE) && !CAN_DETECT(ch, ACUTE_VISION))
+        return false;
+
+    if (IS_SET(eexit->exit_info, EX_HIDDEN) && !CAN_DETECT(ch, DETECT_HIDDEN))
+        return false;
+
+    if (IS_SET(eexit->exit_info, EX_FADE) && !CAN_DETECT(ch, DETECT_FADE))
+        return false;
+
+    return true;
+}
+
+static bool portal_invisible( Object *obj, Character *ch )
+{
+    FENIA_CALL( obj, "Invisible", "C", ch )
+    FENIA_NDX_CALL( obj, "Invisible", "OC", obj, ch )
+
+    if (obj->behavior)
+        return !obj->behavior->visible( ch );
+
+    return false;
+}
+
+/*
+ * Mirrors Character::can_see(const Object*) minus the blind/dark checks.
+ */
+bool Traverse::canSpotPortal( Character *ch, Object *portal )
+{
+    if (portal_invisible( portal, ch ))
+        return false;
+
+    if (!ch->is_npc( ) && (IS_SET(ch->act, PLR_HOLYLIGHT) || IS_GHOST( ch ) || IS_DEATH_TIME( ch )))
+        return true;
+
+    if (IS_SET(portal->extra_flags, ITEM_VIS_DEATH))
+        return false;
+
+    if (IS_SET(portal->extra_flags, ITEM_INVIS) && !CAN_DETECT(ch, DETECT_INVIS))
+        return false;
+
+    return true;
+}

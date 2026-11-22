@@ -279,7 +279,7 @@ struct ExtraExitFunc {
             return false;
         }
 
-        if (!pch->can_see(eexit)) {
+        if (!Traverse::canSpotExtraExit(pch, eexit)) {
             return false;
         }
 
@@ -299,7 +299,7 @@ struct PortalFunc {
             return false;
         }
 
-        if (!pch->can_see(portal)) {
+        if (!Traverse::canSpotPortal(pch, portal)) {
             return false;
         }
 
