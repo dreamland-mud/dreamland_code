@@ -93,6 +93,7 @@ GSN(dark_shroud);
 GSN(peek);
 GSN(curl);
 GSN(corrosion);
+GSN(chill_touch);
 RELIG(godiva);
 PROF(druid);
 
@@ -1812,6 +1813,28 @@ DLString obj_own_extra_descr( Character *ch, Object *obj )
         return desc;
 }
 
+// A fountain whose liquid can be drunk right now: endless (v0 = -1) or not dried
+// out, and not frozen over. Same test as the Fenia fountain behavior.
+bool fountain_has_liquid( Object *obj )
+{
+    if (obj->isAffected( gsn_chill_touch ))
+        return false;
+
+    return obj->value0( ) < 0 || obj->value1( ) > 0;
+}
+
+// Name what flows in a fountain, so nobody drinks blood expecting water.
+// Shared by look and examine.
+void show_fountain_liquid( Character *ch, Object *obj )
+{
+    if (!fountain_has_liquid( obj ))
+        return;
+
+    Liquid *liq = liquidManager->find( obj->value2( ) );
+    ch->pecho( _("Здесь плещется %1$s."),
+               liq->getShortDescr( Player::lang( ch ) ).ruscase( '1' ).c_str( ) );
+}
+
 // TODO show act msg, item type and wear.
 static void do_look_object( Character *ch, Object *obj )
 {
@@ -1886,6 +1909,9 @@ static void do_look_object( Character *ch, Object *obj )
                 }
             }
         }
+
+        if (obj->item_type == ITEM_FOUNTAIN)
+            show_fountain_liquid( ch, obj );
 
         oprog_look( obj, ch, keywords.c_str() );
 }
