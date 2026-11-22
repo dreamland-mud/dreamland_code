@@ -51,6 +51,36 @@ static bool oprog_examine_money( Object *obj, Character *ch, const DLString& )
     return true;
 }
 
+bool fountain_has_liquid( Object *obj );
+void show_fountain_liquid( Character *ch, Object *obj );
+
+// How full a vessel is and what colour its liquid is. A negative max means an
+// endless source, always full to the brim; so is a finite one at capacity.
+static void show_liquid_fill( Character *ch, int liquid, int cur, int max )
+{
+    lang_t lang = Player::lang(ch);
+    const char *level;
+
+    if (max < 0 || (max > 0 && cur >= max))
+        level = lmsg(lang, "Completely", "До краев", "По вінця");
+    else
+        level = lmsg(lang,
+            cur < max / 4 ? "Less than half" :
+                cur < 3 * max / 4 ? "Half" : "A bit over half",
+            cur < max / 4 ? "Меньше, чем до половины" :
+                cur < 3 * max / 4 ? "До половины" : "Чуть более, чем наполовину",
+            cur < max / 4 ? "Менш ніж наполовину" :
+                cur < 3 * max / 4 ? "Наполовину" : "Трохи більше половини");
+
+    ch->pecho( lmsg(lang,
+                "%s filled with %s liquid.",
+                "%s наполнен жидкостью %s цвета.",
+                "%s наповнений рідиною %s кольору."),
+                level,
+                liquidManager->find( liquid )->getColor( lang ).ruscase( '2' ).c_str( )
+              );
+}
+
 static bool oprog_examine_drink_container( Object *obj, Character *ch, const DLString& )
 {
     lang_t lang = Player::lang(ch);
@@ -68,21 +98,20 @@ static bool oprog_examine_drink_container( Object *obj, Character *ch, const DLS
         return true;
     }
 
-    const char *level = lmsg(lang,
-            obj->value1() < obj->value0() / 4 ? "Less than half" :
-                obj->value1() < 3 * obj->value0() / 4 ? "Half" : "A bit over half",
-            obj->value1() < obj->value0() / 4 ? "Меньше, чем до половины" :
-                obj->value1() < 3 * obj->value0() / 4 ? "До половины" : "Чуть более, чем наполовину",
-            obj->value1() < obj->value0() / 4 ? "Менш ніж наполовину" :
-                obj->value1() < 3 * obj->value0() / 4 ? "Наполовину" : "Трохи більше половини");
+    show_liquid_fill( ch, obj->value2(), obj->value1(), obj->value0() );
+    return true;
+}
 
-    ch->pecho( lmsg(lang,
-                "%s filled with %s liquid.",
-                "%s наполнен жидкостью %s цвета.",
-                "%s наповнений рідиною %s кольору."),
-                level,
-                liquidManager->find( obj->value2() )->getColor( lang ).ruscase( '2' ).c_str( )
-              );
+static bool oprog_examine_fountain( Object *obj, Character *ch, const DLString& )
+{
+    if (!fountain_has_liquid( obj )) {
+        lang_t lang = Player::lang(ch);
+        ch->pecho(lmsg(lang, "It is empty.", "Тут пусто.", "Тут порожньо."));
+        return true;
+    }
+
+    show_liquid_fill( ch, obj->value2(), obj->value1(), obj->value0() );
+    show_fountain_liquid( ch, obj );
     return true;
 }
 
@@ -182,6 +211,10 @@ static bool oprog_examine( Object *obj, Character *ch, const DLString &arg )
 
     case ITEM_DRINK_CON:
         rc = oprog_examine_drink_container( obj, ch, arg );
+        break;
+
+    case ITEM_FOUNTAIN:
+        rc = oprog_examine_fountain( obj, ch, arg );
         break;
         
     case ITEM_CONTAINER:
