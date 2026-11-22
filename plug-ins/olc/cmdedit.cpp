@@ -116,39 +116,39 @@ DLString OLCStateCommand::getMenuKey( )
 
 void OLCStateCommand::show( PCharacter *ch )
 {
-    OLCMenuKeyScope menuScope( getMenuKey( ) );
+    OLCMenuKeyScope menuScope( getMenuKey( ), ch );
     ::Command *c = getOriginal();
     WrappedCommand *wcmd = dynamic_cast<WrappedCommand *>(c);
 
     ptc(ch, "Команда {C%s{x {x\r\n", c->getName().c_str());
     ptc(ch, "УкрИмя:      {Y%s{x %s {D(ukrname help){x\r\n",
             c->name[UA].c_str(),
-            web_edit_button(ch, "ukrname", "web").c_str());
+            olc_edit_button(ch, "ukrname", "web").c_str());
     ptc(ch, "РусИмя:      {Y%s{x %s {D(rusname help){x\r\n",
             c->name[RU].c_str(),
-            web_edit_button(ch, "rusname", "web").c_str());
+            olc_edit_button(ch, "rusname", "web").c_str());
     ptc(ch, "Синонимы:    {Y%s{x %s {D(aliases help){x\r\n",
             c->aliases[EN].c_str(),
-            web_edit_button(ch, "aliases", "web").c_str());
+            olc_edit_button(ch, "aliases", "web").c_str());
     ptc(ch, "УкрСинонимы: {Y%s{x %s {D(ukraliases help){x\r\n",
             c->aliases[UA].c_str(),
-            web_edit_button(ch, "ukraliases", "web").c_str());
+            olc_edit_button(ch, "ukraliases", "web").c_str());
     ptc(ch, "РусСинонимы: {Y%s{x %s {D(rusaliases help){x\r\n",
             c->aliases[RU].c_str(),
-            web_edit_button(ch, "rusaliases", "web").c_str());
+            olc_edit_button(ch, "rusaliases", "web").c_str());
     ptc(ch, "Уровень:     {Y%d {D(level){x\r\n", c->level.getValue());
     ptc(ch, "Позиция:     {Y%s {D(position){x\r\n",
-            web_flag_menu(true, *c->position.getTable(), "position", c->position.name()).c_str());
+            web_flag_menu(true, *c->position.getTable(), "position", c->position.name(), OLC_FRAME_NONE).c_str());
     ptc(ch, "Флаги:       {Y%s {D(flags){x\r\n",
-            web_flag_menu(true, *c->extra.getTable(), "flags", c->extra.names()).c_str());
+            web_flag_menu(true, *c->extra.getTable(), "flags", c->extra.names(), OLC_FRAME_NONE).c_str());
     ptc(ch, "Приказ:      {Y%s {D(order){x\r\n", 
             web_flag_menu(true, *c->order.getTable(), "order",
-                          c->order == 0 ? DLString("-") : c->order.names()).c_str());
+                          c->order == 0 ? DLString("-") : c->order.names(), OLC_FRAME_NONE).c_str());
     ptc(ch, "Категории:   {Y%s {D(category){x\r\n",
-            web_flag_menu(true, *c->cat.getTable(), "category", c->cat.names()).c_str());
+            web_flag_menu(true, *c->cat.getTable(), "category", c->cat.names(), OLC_FRAME_NONE).c_str());
     ptc(ch, "Подсказка:   {Y%s{x %s {D(hint help){x\r\n",
             c->hint[RU].c_str(),
-            web_edit_button(ch, "hint", "web").c_str());        
+            olc_edit_button(ch, "hint", "web").c_str());        
 
     // Can edit all commands but allow to override 'runFunc' only for CommandElement and CommandPlugin.
     if (wcmd)
@@ -157,7 +157,7 @@ void OLCStateCommand::show( PCharacter *ch )
     CommandHelp::Pointer help = resolveHelp(c);
     if (help) {
         ptc(ch, "Справка: %s {D(hedit %d",
-            web_edit_button(ch, "hedit", help->getID()).c_str(),
+            olc_edit_button(ch, "hedit", help->getID()).c_str(),
             help->getID());
 
         if (c->help != help)

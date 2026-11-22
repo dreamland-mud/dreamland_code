@@ -66,7 +66,7 @@ void OLCStateFile::show( PCharacter *ch ) const
 {
     ptc(ch, "{WКонфигурационный файл {c%s{W:\r\n", path.c_str());
     ptc(ch, "{WТекст{x: %s\r\n%s\r\n{R...{x\r\n", 
-        web_edit_button(ch, "text", "web").c_str(),
+        olc_edit_button(ch, "text", "web").c_str(),
         text.substr(0, 100).c_str());
     ptc(ch, "{WКоманды{x: {y{hccommands{x, {y{hcshow{x, {y{hccancel{x, {y{hcdone{x\r\n");
 }

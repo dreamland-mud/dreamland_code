@@ -174,24 +174,24 @@ void OLCStateHelp::show( PCharacter *ch ) const
             target ? fmt(0, " псевдоним статьи {c%d{x", target->getID()).c_str() : "");
     }
     ptc(ch, "{DВсе ключевые слова:   [%s]\r\n", allKeywords().toString().c_str());
-    ptc(ch, "{WКлючевые слова, EN{x:   [{C%s{x] %s\r\n", keyword.get(EN).c_str(), web_edit_button(ch, "keywords", "web").c_str());
-    ptc(ch, "{WКлючевые слова, UA{x:   [{C%s{x] %s\r\n", keyword.get(UA).c_str(), web_edit_button(ch, "uakeywords", "web").c_str());
-    ptc(ch, "{WКлючевые слова, RU{x:   [{C%s{x] %s\r\n", keyword.get(RU).c_str(), web_edit_button(ch, "rukeywords", "web").c_str());
-    ptc(ch, "{WСкрытые алиасы, EN{x:   [{C%s{x] %s\r\n", extra.get(EN).c_str(), web_edit_button(ch, "aka", "web").c_str());
-    ptc(ch, "{WСкрытые алиасы, UA{x:   [{C%s{x] %s\r\n", extra.get(UA).c_str(), web_edit_button(ch, "uaaka", "web").c_str());
-    ptc(ch, "{WСкрытые алиасы, RU{x:   [{C%s{x] %s\r\n", extra.get(RU).c_str(), web_edit_button(ch, "ruaka", "web").c_str());
+    ptc(ch, "{WКлючевые слова, EN{x:   [{C%s{x] %s\r\n", keyword.get(EN).c_str(), olc_edit_button(ch, "keywords", "web").c_str());
+    ptc(ch, "{WКлючевые слова, UA{x:   [{C%s{x] %s\r\n", keyword.get(UA).c_str(), olc_edit_button(ch, "uakeywords", "web").c_str());
+    ptc(ch, "{WКлючевые слова, RU{x:   [{C%s{x] %s\r\n", keyword.get(RU).c_str(), olc_edit_button(ch, "rukeywords", "web").c_str());
+    ptc(ch, "{WСкрытые алиасы, EN{x:   [{C%s{x] %s\r\n", extra.get(EN).c_str(), olc_edit_button(ch, "aka", "web").c_str());
+    ptc(ch, "{WСкрытые алиасы, UA{x:   [{C%s{x] %s\r\n", extra.get(UA).c_str(), olc_edit_button(ch, "uaaka", "web").c_str());
+    ptc(ch, "{WСкрытые алиасы, RU{x:   [{C%s{x] %s\r\n", extra.get(RU).c_str(), olc_edit_button(ch, "ruaka", "web").c_str());
     ptc(ch, "{WУровень{x:              [{C%d{x]\r\n", level.getValue());
-    ptc(ch, "{WЗаголовок, EN{x:        [{C%s{x] %s\r\n", title.get(EN).c_str(), web_edit_button(ch, "title", "web").c_str());
-    ptc(ch, "{WЗаголовок, UA{x:        [{C%s{x] %s\r\n", title.get(UA).c_str(), web_edit_button(ch, "uatitle", "web").c_str());
-    ptc(ch, "{WЗаголовок, RU{x:        [{C%s{x] %s\r\n", title.get(RU).c_str(), web_edit_button(ch, "rutitle", "web").c_str());
+    ptc(ch, "{WЗаголовок, EN{x:        [{C%s{x] %s\r\n", title.get(EN).c_str(), olc_edit_button(ch, "title", "web").c_str());
+    ptc(ch, "{WЗаголовок, UA{x:        [{C%s{x] %s\r\n", title.get(UA).c_str(), olc_edit_button(ch, "uatitle", "web").c_str());
+    ptc(ch, "{WЗаголовок, RU{x:        [{C%s{x] %s\r\n", title.get(RU).c_str(), olc_edit_button(ch, "rutitle", "web").c_str());
     ptc(ch, "{DАвтозаголовок:        [%s]\r\n", autotitle.c_str());
 
     DLString entext = text.get(EN);
     DLString uatext = text.get(UA);
     DLString rutext = text.get(RU);
-    ptc(ch, "{WТекст, EN{x: %s\r\n%s{x\r\n", web_edit_button(ch, "text", "web").c_str(), String::ellipsis(entext, 200).c_str());
-    ptc(ch, "{WТекст, UA{x: %s\r\n%s{x\r\n", web_edit_button(ch, "uatext", "web").c_str(), String::ellipsis(uatext, 200).c_str());
-    ptc(ch, "{WТекст, RU{x: %s\r\n%s{x\r\n", web_edit_button(ch, "rutext", "web").c_str(), String::ellipsis(rutext, 200).c_str());
+    ptc(ch, "{WТекст, EN{x: %s\r\n%s{x\r\n", olc_edit_button(ch, "text", "web").c_str(), String::ellipsis(entext, 200).c_str());
+    ptc(ch, "{WТекст, UA{x: %s\r\n%s{x\r\n", olc_edit_button(ch, "uatext", "web").c_str(), String::ellipsis(uatext, 200).c_str());
+    ptc(ch, "{WТекст, RU{x: %s\r\n%s{x\r\n", olc_edit_button(ch, "rutext", "web").c_str(), String::ellipsis(rutext, 200).c_str());
 
     ptc(ch, "{WКоманды{x: {hc{ycommands{x, {hc{yshow{x, {hc{yseealso{x, {hc{yalias{x, {hc{ycancel{x, {hc{ydone{x\r\n");
 }

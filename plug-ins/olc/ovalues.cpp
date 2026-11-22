@@ -58,7 +58,7 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj, bool showWeb)
         break;
 
     case ITEM_RECIPE:
-        ptc(ch, "[v0] Флаги рецепта     : %s {D(? recipe_flags){x\r\n", web_flag_menu(showWeb, recipe_flags, "v0", recipe_flags.names(obj->value[0])).c_str());
+        ptc(ch, "[v0] Флаги рецепта     : %s {D(? recipe_flags){x\r\n", web_flag_menu(showWeb, recipe_flags, "v0", recipe_flags.names(obj->value[0]), OLC_FRAME_NONE).c_str());
         ptc(ch, "[v2] Сложность         : [%d]\r\n", obj->value[2]);
         break;
 
@@ -111,8 +111,8 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj, bool showWeb)
                   "[v3] Ведет в (внум): [%d]\n\r"
                   "[v4] Ключ (внум):    [%d]\n\r",
                   obj->value[0],
-                  web_flag_menu(showWeb, exit_flags, "v1", exit_flags.names(obj->value[1])).c_str(),
-                  web_flag_menu(showWeb, portal_flags, "v2", portal_flags.names(obj->value[2])).c_str(),
+                  web_flag_menu(showWeb, exit_flags, "v1", exit_flags.names(obj->value[1]), OLC_FRAME_NONE).c_str(),
+                  web_flag_menu(showWeb, portal_flags, "v2", portal_flags.names(obj->value[2]), OLC_FRAME_NONE).c_str(),
                   obj->value[3], obj->value[4]);
         break;
 
@@ -125,7 +125,7 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj, bool showWeb)
                   "[v4] Бонус маны:      [%d]\n\r",
                   obj->value[0],
                   obj->value[1],
-                  web_flag_menu(showWeb, furniture_flags, "v2", furniture_flags.names(obj->value[2])).c_str(),
+                  web_flag_menu(showWeb, furniture_flags, "v2", furniture_flags.names(obj->value[2]), OLC_FRAME_NONE).c_str(),
                   obj->value[3],
                   obj->value[4]);
         break;
@@ -162,7 +162,7 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj, bool showWeb)
         random = item_is_random(obj);
 
         ptc(ch, "[v0] Вид оружия:   %s {D(? weapon_class){x\n\r",
-            web_flag_menu(showWeb, weapon_class, "v0", weapon_class.name(obj->value[0])).c_str());
+            web_flag_menu(showWeb, weapon_class, "v0", weapon_class.name(obj->value[0]), OLC_FRAME_NONE).c_str());
             
         if (!random) {
             ptc(ch, "[v1] Число бросков кубика: [%d]\n\r", obj->value[1]);
@@ -171,11 +171,11 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj, bool showWeb)
         }
 
         ptc(ch, "[v3] Тип удара:    %s {D(? weapon_flags){x\n\r",
-            web_flag_menu(showWeb, weapon_flags, "v3", weapon_flags.name(obj->value[3])).c_str());
+            web_flag_menu(showWeb, weapon_flags, "v3", weapon_flags.name(obj->value[3]), OLC_FRAME_NONE).c_str());
 
         if (!random) {
             ptc(ch, "[v4] Флаги оружия: %s {D(? weapon_type2){x\n\r",
-                web_flag_menu(showWeb, weapon_type2, "v4", weapon_type2.names(obj->value[4])).c_str());
+                web_flag_menu(showWeb, weapon_type2, "v4", weapon_type2.names(obj->value[4]), OLC_FRAME_NONE).c_str());
         }
         break;
 
@@ -183,12 +183,12 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj, bool showWeb)
         pKey = obj->value[2] > 0 ? get_obj_index(obj->value[2]) : 0;
         ch->pecho(
             "[v0] Вместимость:[%d фунтов]\n\r"
-            "[v1] Флаги:      [%s] {D(? container_flags){x\n\r"
+            "[v1] Флаги:      %s {D(? container_flags){x\n\r"
             "[v2] Ключ:       [%d] %N1\n\r"
             "[v3] Макс. вес:  [%d фунтов]\n\r"
             "[v4] Коэф. снижения веса: [%d]\n\r",
             obj->value[0],
-            web_flag_menu(showWeb, container_flags, "v1", container_flags.names(obj->value[1])).c_str(),
+            web_flag_menu(showWeb, container_flags, "v1", container_flags.names(obj->value[1]), OLC_FRAME_PLAIN).c_str(),
             obj->value[2],
             pKey ? pKey->getShortDescr(LANG_DEFAULT) : "нет",
             obj->value[3],
@@ -204,9 +204,9 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj, bool showWeb)
             "[v4] Пробка:           %d\n\r",
             obj->value[0],
             obj->value[1],
-            web_registry_menu(showWeb, liquidManager, "v2", liquidManager->find( obj->value[2] )->getName( ), "none").c_str( ),
+            web_registry_menu(showWeb, liquidManager, "v2", liquidManager->find( obj->value[2] )->getName( ), "none", OLC_FRAME_NONE).c_str( ),
             liquidManager->find( obj->value[2] )->getShortDescr( ).ruscase( '1' ).c_str( ),
-            web_flag_menu(showWeb, drink_flags, "v3", drink_flags.names(obj->value[3])).c_str( ),
+            web_flag_menu(showWeb, drink_flags, "v3", drink_flags.names(obj->value[3]), OLC_FRAME_NONE).c_str( ),
             obj->value[4]);
         break;
 
@@ -219,10 +219,10 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj, bool showWeb)
             "[v4] Флаги мебели:    %s {D(? furniture_flags){x\n\r",
             obj->value[0],
             obj->value[1],
-            web_registry_menu(showWeb, liquidManager, "v2", liquidManager->find( obj->value[2] )->getName( ), "none").c_str( ),
+            web_registry_menu(showWeb, liquidManager, "v2", liquidManager->find( obj->value[2] )->getName( ), "none", OLC_FRAME_NONE).c_str( ),
             liquidManager->find( obj->value[2] )->getShortDescr( ).ruscase( '1' ).c_str( ),
             obj->value[3],
-            web_flag_menu(showWeb, furniture_flags, "v4", furniture_flags.names(obj->value[4])).c_str());
+            web_flag_menu(showWeb, furniture_flags, "v4", furniture_flags.names(obj->value[4]), OLC_FRAME_NONE).c_str());
         break;
 
     case ITEM_FOOD:
@@ -232,7 +232,7 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj, bool showWeb)
             "[v3] Отравлено:         %s\n\r",
             obj->value[0],
             obj->value[1],
-            web_bool_menu(showWeb, "v3", obj->value[3] != 0 ? "да" : "нет").c_str());
+            web_bool_menu(showWeb, "v3", obj->value[3] != 0 ? "да" : "нет", OLC_FRAME_NONE).c_str());
         break;
 
     case ITEM_MONEY:

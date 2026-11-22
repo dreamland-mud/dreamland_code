@@ -88,30 +88,30 @@ DLString OLCStateReligion::getMenuKey( )
 
 void OLCStateReligion::show( PCharacter *ch )
 {
-    OLCMenuKeyScope menuScope( getMenuKey( ) );
+    OLCMenuKeyScope menuScope( getMenuKey( ), ch );
     DefaultReligion *r = getOriginal();
 
     ptc(ch, "Короткое описание: {C%s{x  %s {D(short help){x\r\n", 
         r->getShortDescr().c_str(),
-        web_edit_button(ch, "short", "web").c_str());
+        olc_edit_button(ch, "short", "web").c_str());
 
     ptc(ch, "Русское описание:  {C%s{x  %s {D(russian help){x\r\n",
         r->getRussianName().c_str(),
-        web_edit_button(ch, "russian", "web").c_str());
+        olc_edit_button(ch, "russian", "web").c_str());
 
     ptc(ch, "Пол божества:      {C%s{x {D(? sex){x\r\n",
-        web_flag_menu(true, *r->sex.getTable(), "sex", sex_table.name(r->getSex())).c_str());
+        web_flag_menu(true, *r->sex.getTable(), "sex", sex_table.name(r->getSex()), OLC_FRAME_NONE).c_str());
 
     ptc(ch, "Пол последователей: {C%s{x {D(followersex; ? sex){x\r\n",
-        web_flag_menu(true, *r->followerSex.getTable(), "followersex", sex_table.name(r->followerSex.getValue())).c_str());
+        web_flag_menu(true, *r->followerSex.getTable(), "followersex", sex_table.name(r->followerSex.getValue()), OLC_FRAME_NONE).c_str());
 
     ptc(ch, "Описание:          {C%s{x  %s {D(desc help){x\r\n",
         r->getDescription().c_str(),
-        web_edit_button(ch, "desc", "web").c_str());        
+        olc_edit_button(ch, "desc", "web").c_str());        
 
     ptc(ch, "Флаги:             {C%s{x {D(? religion_flags){x\r\n",
         web_flag_menu(true, *r->flags.getTable(), "flags",
-                      r->flags.getValue() != 0 ? r->flags.names() : DLString("-")).c_str());
+                      r->flags.getValue() != 0 ? r->flags.names() : DLString("-"), OLC_FRAME_NONE).c_str());
 
     OBJ_INDEX_DATA *tattoo = r->tattooVnum == 0 ? 0 : get_obj_index(r->tattooVnum);
     ptc(ch, "Знак:              {C%d{x [{W%N1{x] {D(tattoo help){x\r\n",
@@ -120,25 +120,25 @@ void OLCStateReligion::show( PCharacter *ch )
 
     if (r->help)
         ptc(ch, "Справка: %s {D(hedit %d){x\r\n",
-            web_edit_button(ch, "hedit", r->help->getID()).c_str(),
+            olc_edit_button(ch, "hedit", r->help->getID()).c_str(),
             r->help->getID());
 
     ptc(ch, "Натура:            {Y%s{x {D(? align){x\r\n",
         web_flag_menu(true, *r->align.getTable(), "align",
-                      r->align.getValue() != 0 ? r->align.names() : DLString("-")).c_str());
+                      r->align.getValue() != 0 ? r->align.names() : DLString("-"), OLC_FRAME_NONE).c_str());
 
     ptc(ch, "Этос:              {Y%s{x {D(? ethos){x\r\n",
         web_flag_menu(true, *r->ethos.getTable(), "ethos",
-                      r->ethos.getValue() != 0 ? r->ethos.names() : DLString("-")).c_str());
+                      r->ethos.getValue() != 0 ? r->ethos.names() : DLString("-"), OLC_FRAME_NONE).c_str());
 
     ptc(ch, "Расы:              {Y%s{x {D(? races){x\r\n",
-        web_bitvector_menu(true, r->races, "races", r->races.empty() ? DLString("-") : r->races.toString()).c_str());
+        web_bitvector_menu(true, r->races, "races", r->races.empty() ? DLString("-") : r->races.toString(), OLC_FRAME_NONE).c_str());
 
     ptc(ch, "Классы:            {Y%s{x {D(? classes){x\r\n",
-        web_bitvector_menu(true, r->classes, "classes", r->classes.empty() ? DLString("-") : r->classes.toString()).c_str());
+        web_bitvector_menu(true, r->classes, "classes", r->classes.empty() ? DLString("-") : r->classes.toString(), OLC_FRAME_NONE).c_str());
 
     ptc(ch, "Кланы:             {Y%s{x {D(? clans){x\r\n",
-        web_bitvector_menu(true, r->clans, "clans", r->clans.empty() ? DLString("-") : r->clans.toString()).c_str());
+        web_bitvector_menu(true, r->clans, "clans", r->clans.empty() ? DLString("-") : r->clans.toString(), OLC_FRAME_NONE).c_str());
 
     ptc(ch, "Мин. параметры:    {Y%s{x {D(minstat help){x\r\n", 
             show_enum_array(r->minstat).c_str());
@@ -152,11 +152,11 @@ void OLCStateReligion::show( PCharacter *ch )
 
     ptc(ch, "Покровительство:   расы {Y%s {D(praces){x классы {Y%s {D(pclasses){x кланы {Y%s {D(pclans){x\r\n",
          web_bitvector_menu(true, r->patronsRaces, "praces",
-                            r->patronsRaces.empty() ? DLString("-") : r->patronsRaces.toString()).c_str(),
+                            r->patronsRaces.empty() ? DLString("-") : r->patronsRaces.toString(), OLC_FRAME_NONE).c_str(),
          web_bitvector_menu(true, r->patronsClasses, "pclasses",
-                            r->patronsClasses.empty() ? DLString("-") : r->patronsClasses.toString()).c_str(),
+                            r->patronsClasses.empty() ? DLString("-") : r->patronsClasses.toString(), OLC_FRAME_NONE).c_str(),
          web_bitvector_menu(true, r->patronsClans, "pclans",
-                            r->patronsClans.empty() ? DLString("-") : r->patronsClans.toString()).c_str());
+                            r->patronsClans.empty() ? DLString("-") : r->patronsClans.toString(), OLC_FRAME_NONE).c_str());
          
     ptc(ch, "Пути:              {Y%s{x {D(paths: light dark reason rage order chaos nature society freedom){x\r\n",
         r->paths.empty() ? "-" : r->paths.c_str());

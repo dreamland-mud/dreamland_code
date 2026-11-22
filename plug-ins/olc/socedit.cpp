@@ -85,45 +85,45 @@ lang_t OLCStateSocial::getLang() const
 
 void OLCStateSocial::show( PCharacter *ch )
 {
-    OLCMenuKeyScope menuScope( getMenuKey( ) );
+    OLCMenuKeyScope menuScope( getMenuKey( ), ch );
     Social *s = getOriginal();
     lang_t lang = getLang();
 
     ptc(ch, "Социал:      {C%s\r\n", s->getName().c_str());
     ptc(ch, "По-русски:   {C%s{x %s {D(russian help){x\r\n",
             s->getRussianName().c_str(),
-            web_edit_button(ch, "russian", "web").c_str());
+            olc_edit_button(ch, "russian", "web").c_str());
     StringList langs;
     langs.push_back("en");
     langs.push_back("ru");
     langs.push_back("ua");
     ptc(ch, "Язык полей:  {C%s{x {D(language){x\r\n",
-            web_list_menu(true, langs, "language", lang2attr(lang)).c_str());
+            web_list_menu(true, langs, "language", lang2attr(lang), OLC_FRAME_NONE).c_str());
     ptc(ch, "Описание:    {C%s{x %s {D(short help){x\r\n",
             s->shortDesc.get(lang).c_str(),
-            web_edit_button(ch, "short", "web").c_str());
+            olc_edit_button(ch, "short", "web").c_str());
     ptc(ch, "Синонимы:    {C%s{x %s {D(alias help){x\r\n",
             s->aliases.toList().toString().c_str(),
-            web_edit_button(ch, "aliases", "").c_str());
+            olc_edit_button(ch, "aliases", "").c_str());
     ptc(ch, "Позиция:     {C%s {D(position){x\r\n", 
-            web_flag_menu(true, position_table, "position", s->position.name()).c_str());
+            web_flag_menu(true, position_table, "position", s->position.name(), OLC_FRAME_NONE).c_str());
 
-    ptc(ch, "charNoArgument:   %s  %s\r\n", web_edit_button(ch, "charNoArgument", "web").c_str(), s->msgCharNoArgument.get(lang).c_str());
-    ptc(ch, "othersNoArgument: %s  %s\r\n", web_edit_button(ch, "othersNoArgument", "web").c_str(), s->msgOthersNoArgument.get(lang).c_str());
-    ptc(ch, "charFound1:        %s  %s\r\n", web_edit_button(ch, "charFound1", "web").c_str(), s->msgCharFound.get(lang).c_str());
-    ptc(ch, "othersFound1:      %s  %s\r\n", web_edit_button(ch, "othersFound1", "web").c_str(), s->msgOthersFound.get(lang).c_str());
-    ptc(ch, "victimFound1:      %s  %s\r\n", web_edit_button(ch, "victimFound1", "web").c_str(), s->msgVictimFound.get(lang).c_str());
-    ptc(ch, "charNotFound:     %s  %s\r\n", web_edit_button(ch, "charNotFound", "web").c_str(), s->msgCharNotFound.get(lang).c_str());
-    ptc(ch, "othersAuto:       %s  %s\r\n", web_edit_button(ch, "othersAuto", "web").c_str(), s->msgOthersAuto.get(lang).c_str());
-    ptc(ch, "charFound2:       %s  %s\r\n", web_edit_button(ch, "charFound2", "web").c_str(), s->msgCharFound2.get(lang).c_str());
-    ptc(ch, "othersFound2:     %s  %s\r\n", web_edit_button(ch, "othersFound2", "web").c_str(), s->msgOthersFound2.get(lang).c_str());
-    ptc(ch, "victimFound2:     %s  %s\r\n", web_edit_button(ch, "victimFound2", "web").c_str(), s->msgVictimFound2.get(lang).c_str());
-    ptc(ch, "victimObj:        %s  %s\r\n", web_edit_button(ch, "victimObj", "web").c_str(), s->msgVictimObj.get(lang).c_str());
-    ptc(ch, "charVictimObj:    %s  %s\r\n", web_edit_button(ch, "charVictimObj", "web").c_str(), s->msgCharVictimObj.get(lang).c_str());
-    ptc(ch, "othersVictimObj:  %s  %s\r\n", web_edit_button(ch, "othersVictimObj", "web").c_str(), s->msgOthersVictimObj.get(lang).c_str());
-    ptc(ch, "charObj:          %s  %s\r\n", web_edit_button(ch, "charObj", "web").c_str(), s->msgCharObj.get(lang).c_str());
-    ptc(ch, "othersObj:        %s  %s\r\n", web_edit_button(ch, "othersObj", "web").c_str(), s->msgOthersObj.get(lang).c_str());
-    ptc(ch, "beastHint:        %s  %s\r\n", web_edit_button(ch, "beastHint", "web").c_str(), s->msgCharBeastHint.get(lang).c_str());
+    ptc(ch, "charNoArgument:   %s  %s\r\n", olc_edit_button(ch, "charNoArgument", "web").c_str(), s->msgCharNoArgument.get(lang).c_str());
+    ptc(ch, "othersNoArgument: %s  %s\r\n", olc_edit_button(ch, "othersNoArgument", "web").c_str(), s->msgOthersNoArgument.get(lang).c_str());
+    ptc(ch, "charFound1:        %s  %s\r\n", olc_edit_button(ch, "charFound1", "web").c_str(), s->msgCharFound.get(lang).c_str());
+    ptc(ch, "othersFound1:      %s  %s\r\n", olc_edit_button(ch, "othersFound1", "web").c_str(), s->msgOthersFound.get(lang).c_str());
+    ptc(ch, "victimFound1:      %s  %s\r\n", olc_edit_button(ch, "victimFound1", "web").c_str(), s->msgVictimFound.get(lang).c_str());
+    ptc(ch, "charNotFound:     %s  %s\r\n", olc_edit_button(ch, "charNotFound", "web").c_str(), s->msgCharNotFound.get(lang).c_str());
+    ptc(ch, "othersAuto:       %s  %s\r\n", olc_edit_button(ch, "othersAuto", "web").c_str(), s->msgOthersAuto.get(lang).c_str());
+    ptc(ch, "charFound2:       %s  %s\r\n", olc_edit_button(ch, "charFound2", "web").c_str(), s->msgCharFound2.get(lang).c_str());
+    ptc(ch, "othersFound2:     %s  %s\r\n", olc_edit_button(ch, "othersFound2", "web").c_str(), s->msgOthersFound2.get(lang).c_str());
+    ptc(ch, "victimFound2:     %s  %s\r\n", olc_edit_button(ch, "victimFound2", "web").c_str(), s->msgVictimFound2.get(lang).c_str());
+    ptc(ch, "victimObj:        %s  %s\r\n", olc_edit_button(ch, "victimObj", "web").c_str(), s->msgVictimObj.get(lang).c_str());
+    ptc(ch, "charVictimObj:    %s  %s\r\n", olc_edit_button(ch, "charVictimObj", "web").c_str(), s->msgCharVictimObj.get(lang).c_str());
+    ptc(ch, "othersVictimObj:  %s  %s\r\n", olc_edit_button(ch, "othersVictimObj", "web").c_str(), s->msgOthersVictimObj.get(lang).c_str());
+    ptc(ch, "charObj:          %s  %s\r\n", olc_edit_button(ch, "charObj", "web").c_str(), s->msgCharObj.get(lang).c_str());
+    ptc(ch, "othersObj:        %s  %s\r\n", olc_edit_button(ch, "othersObj", "web").c_str(), s->msgOthersObj.get(lang).c_str());
+    ptc(ch, "beastHint:        %s  %s\r\n", olc_edit_button(ch, "beastHint", "web").c_str(), s->msgCharBeastHint.get(lang).c_str());
 
     ptc(ch, "\r\n{WКоманды{x: {hc{ycommands{x, {hc{yshow{x, {hc{ydone{x, {hc{y?{x\r\n");                    
 }

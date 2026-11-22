@@ -294,16 +294,16 @@ OEDIT(show)
     ptc(ch, "Long EN:  [%s] %s\n\r", pObj->description[EN].c_str(), web_edit_button(showWeb, ch, "long", "web").c_str());
     ptc(ch, "Long UA:  [%s] %s\n\r", pObj->description[UA].c_str(), web_edit_button(showWeb, ch, "ualong", "web").c_str());
     ptc(ch, "Long RU:  [%s] %s\n\r", pObj->description[RU].c_str(), web_edit_button(showWeb, ch, "rulong", "web").c_str());
-    ptc(ch, "Type:     [%s] {D(? item_table){x\n\r",
-            web_flag_menu(showWeb, item_table, "type", item_table.name(pObj->item_type)).c_str());
+    ptc(ch, "Type:     %s {D(? item_table){x\n\r",
+            web_flag_menu(showWeb, item_table, "type", item_table.name(pObj->item_type), OLC_FRAME_PLAIN).c_str());
     ptc(ch, "Level:    [%5d]\n\r", pObj->level);    
     ptc(ch, "Limit:    [%5d]\n\r", pObj->limit);
-    ptc(ch, "Wear:     [%s] {D(wear; ? wear_flags){x\n\r",
-            web_flag_menu(showWeb, wear_flags, "wear", wear_flags.names(pObj->wear_flags)).c_str());
-    ptc(ch, "Extra:    [%s] {D(? extra_flags){x\n\r",
-            web_flag_menu(showWeb, extra_flags, "extra", extra_flags.names(pObj->extra_flags)).c_str());
-    ptc(ch, "Material: [%s] {D(? material){x\n\r",
-            web_material_menu(showWeb, "material", pObj->material).c_str());
+    ptc(ch, "Wear:     %s {D(wear; ? wear_flags){x\n\r",
+            web_flag_menu(showWeb, wear_flags, "wear", wear_flags.names(pObj->wear_flags), OLC_FRAME_PLAIN).c_str());
+    ptc(ch, "Extra:    %s {D(? extra_flags){x\n\r",
+            web_flag_menu(showWeb, extra_flags, "extra", extra_flags.names(pObj->extra_flags), OLC_FRAME_PLAIN).c_str());
+    ptc(ch, "Material: %s {D(? material){x\n\r",
+            web_material_menu(showWeb, "material", pObj->material, DLString::emptyString, OLC_FRAME_PLAIN).c_str());
     ptc(ch, "Smell:    [{W%s{x] %s [{W%s{x] %s [{W%s{x] %s\n\r", 
           String::stripEOL(pObj->smell.get(EN)).c_str(), web_edit_button(showWeb, ch, "smell", "web").c_str(),   
           String::stripEOL(pObj->smell.get(UA)).c_str(), web_edit_button(showWeb, ch, "uasmell", "web").c_str(),   
@@ -314,7 +314,7 @@ OEDIT(show)
           String::stripEOL(pObj->sound.get(RU)).c_str(), web_edit_button(showWeb, ch, "rusound", "web").c_str());   
 
     ptc(ch, "Condition:[%5d]\n\r", pObj->condition);
-    ptc(ch, "Gender:   [%s]\n\r", web_gender_menu(showWeb, "gender", pObj->gram_gender.toString()).c_str());
+    ptc(ch, "Gender:   %s\n\r", web_gender_menu(showWeb, "gender", pObj->gram_gender.toString(), OLC_FRAME_PLAIN).c_str());
     if (pObj->xml_weight > 0)
         ptc(ch, "Weight:   [%5d] {D(set; model %d, 'weight 0' = model){x\n\r", pObj->xml_weight, item_weight(pObj));
     else

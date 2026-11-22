@@ -39,13 +39,16 @@ static char get_item_colour(OBJ_INDEX_DATA *pObj, RESET_DATA *pReset)
         return clr.at(0);
 }
 
+// Reset menus were always yellow brackets on telnet.
+static const OLCMenuFrame FRAME_RESET = { "{y[", "]" };
+
 static DLString show_reset_wearloc(Character *ch, int iReset, RESET_DATA *pReset, OBJ_INDEX_DATA *pObjIndex, RoomIndexData *pRoom)
 {
     ostringstream buf;
     Wearlocation *wearloc = 
         (pReset->command == 'E' ? wearlocationManager->find(pReset->arg3) : wear_none.getElement());
     DLString id = "at " + DLString(pRoom->vnum) + " reset " + DLString(iReset) + " wear";
-    DLString label = "{y[" + wearloc->getName() + "]";
+    DLString label = wearloc->getName();
 
     StringList commands;
     for (int i = 0; i < wearlocationManager->size(); i++) {
@@ -55,11 +58,11 @@ static DLString show_reset_wearloc(Character *ch, int iReset, RESET_DATA *pReset
             commands.push_back("$ " + wname);
     }
 
-    buf << web_menu(commands, id, label);        
+    buf << olc_menu_widget(is_websock(ch), commands, id, label, FRAME_RESET);
     return buf.str();
 }
 
-static DLString show_reset_flags(int iReset, RESET_DATA *pReset, RoomIndexData *pRoom)
+static DLString show_reset_flags(Character *ch, int iReset, RESET_DATA *pReset, RoomIndexData *pRoom)
 {
     // Built by hand like the wear menu: the 'at <room>' id already names the room,
     // and it must stay a plain command outside any editor.
@@ -68,8 +71,7 @@ static DLString show_reset_flags(int iReset, RESET_DATA *pReset, RoomIndexData *
     for (int i = 0; i < reset_flags.size; i++)
         commands.push_back("$ " + DLString(reset_flags.fields[i].name));
 
-    DLString label = pReset->flags.names();
-    return web_menu(commands, id, label.empty() ? DLString("{Iwnone{Ix") : label);
+    return olc_menu_widget(is_websock(ch), commands, id, pReset->flags.names(), OLC_FRAME_NONE);
 }
 
 static DLString show_reset_rand(Character *ch, int iReset, RESET_DATA *pReset, OBJ_INDEX_DATA *pObjIndex, RoomIndexData *pRoom)
@@ -85,9 +87,7 @@ static DLString show_reset_rand(Character *ch, int iReset, RESET_DATA *pReset, O
         commands.push_back("$ normal");
         commands.push_back("$ rand_stat");
         commands.push_back("$ rand_all");
-        DLString label = "{y[" + pReset->rand.name() + "]";
-
-        buf << web_menu(commands, id, label) << " ";
+        buf << olc_menu_widget(is_websock(ch), commands, id, pReset->rand.name(), FRAME_RESET) << " ";
     }
 
     if (pReset->rand != RAND_NONE || item_is_random(pObjIndex)) {
@@ -97,9 +97,9 @@ static DLString show_reset_rand(Character *ch, int iReset, RESET_DATA *pReset, O
         for (int t = BEST_TIER + 1; t <= WORST_TIER; t++)
             commands.push_back("$ " + DLString(t));
 
-        DLString label = "{y[tier " + DLString(pReset->bestTier) + "]";
+        DLString label = "tier " + DLString(pReset->bestTier);
 
-        buf << web_menu(commands, id, label);
+        buf << olc_menu_widget(is_websock(ch), commands, id, label, FRAME_RESET);
     }
 
     return buf.str();
@@ -205,7 +205,7 @@ static void display_resets(ostringstream &result, Character * ch, RoomIndexData 
                         pMob->getShortDescr(LANG_DEFAULT),
                         pReset->arg2, 
                         pReset->arg4,
-                        show_reset_flags(iReset+1, pReset, pRoom).c_str());
+                        show_reset_flags(ch, iReset+1, pReset, pRoom).c_str());
             }
             break;
 

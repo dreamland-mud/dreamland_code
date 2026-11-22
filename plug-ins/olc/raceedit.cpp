@@ -103,9 +103,13 @@ static DLString show_flag(const Flags &f)
     return f.getValue() == 0 ? "-" : f.names();
 }
 
+// The hunt and donate sets kept their own bracket colours on telnet.
+static const OLCMenuFrame FRAME_HUNTS = { "[{r", "{x]" };
+static const OLCMenuFrame FRAME_DONATES = { "[{g", "{x]" };
+
 static DLString show_flag_menu(const Flags &f, const DLString &cmd)
 {
-    return web_flag_bits_menu(true, *f.getTable(), cmd, show_flag(f));
+    return web_flag_bits_menu(true, *f.getTable(), cmd, show_flag(f), OLC_FRAME_NONE);
 }
 
 static DLString show_enum(const Enumeration &e)
@@ -116,29 +120,29 @@ static DLString show_enum(const Enumeration &e)
 
 void OLCStateRace::show( PCharacter *ch )
 {
-    OLCMenuKeyScope menuScope( getMenuKey( ) );
+    OLCMenuKeyScope menuScope( getMenuKey( ), ch );
     DefaultRace *r = getOriginal();
     DefaultPCRace *pc = getPC();
 
     ptc(ch, "Раса:      {C%s\r\n", r->getName().c_str());
     ptc(ch, "Названия:  мужское [{C%s{x]  %s {D(male help){x\r\n",
-        r->nameMale.c_str(), web_edit_button(ch, "male", "web").c_str());
+        r->nameMale.c_str(), olc_edit_button(ch, "male", "web").c_str());
     ptc(ch, "           женское [{C%s{x]  %s {D(female help){x\r\n", 
-        r->nameFemale.c_str(), web_edit_button(ch, "female", "web").c_str());
+        r->nameFemale.c_str(), olc_edit_button(ch, "female", "web").c_str());
     ptc(ch, "           среднее [{C%s{x]  %s {D(neut help){x\r\n", 
-        r->nameNeuter.c_str(), web_edit_button(ch, "neuter", "web").c_str());
+        r->nameNeuter.c_str(), olc_edit_button(ch, "neuter", "web").c_str());
     ptc(ch, "           множественное [{C%s{x]  %s {D(mult help){x\r\n", 
-        r->nameMlt.c_str(), web_edit_button(ch, "mult", "web").c_str());
+        r->nameMlt.c_str(), olc_edit_button(ch, "mult", "web").c_str());
 
     if (pc) {
         ptc(ch, "           в счете [{C%s{x]  %s {D(score help){x\r\n", 
-            pc->nameScore.c_str(), web_edit_button(ch, "score", "web").c_str());        
+            pc->nameScore.c_str(), olc_edit_button(ch, "score", "web").c_str());        
         ptc(ch, "           'кто' по-английски [{C%s{x]  %s {D(whoeng help){x\r\n", 
-            pc->nameWho.c_str(), web_edit_button(ch, "whoeng", "web").c_str());        
+            pc->nameWho.c_str(), olc_edit_button(ch, "whoeng", "web").c_str());        
         ptc(ch, "           'кто' по-русски [{C%s{x]  %s {D(whorus help){x\r\n", 
-            pc->nameWhoRus.c_str(), web_edit_button(ch, "whorus", "web").c_str());        
+            pc->nameWhoRus.c_str(), olc_edit_button(ch, "whorus", "web").c_str());        
         ptc(ch, "           'кто' по-женски [{C%s{x]  %s {D(whofemale help){x\r\n", 
-            pc->nameWhoFemale.c_str(), web_edit_button(ch, "whofemale", "web").c_str());        
+            pc->nameWhoFemale.c_str(), olc_edit_button(ch, "whofemale", "web").c_str());        
     }
 
     ptc(ch, "Поведение:     {Y%s{x {D(act){x\r\n", show_flag_menu(r->act, "act").c_str());
@@ -151,10 +155,10 @@ void OLCStateRace::show( PCharacter *ch )
     ptc(ch, "Уязвимость:    {Y%s{x {D(vuln){x\r\n", show_flag_menu(r->vuln, "vuln").c_str());
     ptc(ch, "Параметры:     {Y%s{x %s {D(stats help){x\r\n", 
             show_enum_array_web(r->stats).c_str(),
-            web_edit_button(ch, "stats", "").c_str());
+            olc_edit_button(ch, "stats", "").c_str());
 
     ptc(ch, "Размер:        {Y%s{x {D(size){x\r\n",
-            web_flag_menu(true, *r->size.getTable(), "size", show_enum(r->size)).c_str());
+            web_flag_menu(true, *r->size.getTable(), "size", show_enum(r->size), OLC_FRAME_NONE).c_str());
 
     ptc(ch, "{WМодель тела{x:  формы [{Y%s{x] {D(forms){x\r\n", r->forms.empty() ? "-" : r->forms.c_str());
     ptc(ch, "  +части {Y%s{x {D(partsadd){x  -части {Y%s{x {D(partsdel){x\r\n",
@@ -173,17 +177,17 @@ void OLCStateRace::show( PCharacter *ch )
 
     ptc(ch, "Удары:         {Y%s{x {D(attacks){x  материал {Y%s{x {D(material){x\r\n",
         r->attacks.empty() ? "-" : r->attacks.c_str(),
-        web_material_menu(true, "material", r->material.empty() ? DLString("-") : r->material, "clear").c_str());
+        web_material_menu(true, "material", r->material.empty() ? DLString("-") : r->material, "clear", OLC_FRAME_NONE).c_str());
     ptc(ch, "Множители:     здоровье {Y%s{x {D(hpmult){x урон {Y%s{x {D(dmgmult){x  походка {Y%s{x {D(moveverb){x\r\n",
         r->hpMult.empty() ? "1.0" : r->hpMult.c_str(),
         r->dmgMult.empty() ? "1.0" : r->dmgMult.c_str(),
         r->moveverb.empty() ? "-" : r->moveverb.c_str());
     ptc(ch, "Спецфункция:   {Y%s{x {D(spec){x\r\n",
-        web_list_menu(true, spec_function_names("clear"), "spec", r->spec.empty() ? DLString("-") : r->spec).c_str());
+        web_list_menu(true, spec_function_names("clear"), "spec", r->spec.empty() ? DLString("-") : r->spec, OLC_FRAME_NONE).c_str());
 
-    ptc(ch, "Политика:      охотится [{r%s{x] {D(hunts){x, делится [{g%s{x] {D(donates){x\r\n",
-           web_bitvector_menu(true, r->hunts, "hunts", r->hunts.toString()).c_str(),
-           web_bitvector_menu(true, r->donates, "donates", r->donates.toString()).c_str());
+    ptc(ch, "Политика:      охотится %s {D(hunts){x, делится %s {D(donates){x\r\n",
+           web_bitvector_menu(true, r->hunts, "hunts", r->hunts.toString(), FRAME_HUNTS).c_str(),
+           web_bitvector_menu(true, r->donates, "donates", r->donates.toString(), FRAME_DONATES).c_str());
 
     if (pc) {
         ptc(ch, "Натура:        {G%s {D(align){x  мин {G%d{x макс {G%d{x {D(minalign, maxalign){x\r\n",
@@ -194,7 +198,7 @@ void OLCStateRace::show( PCharacter *ch )
 
     if (r->help)
         ptc(ch, "Справка:       %s {D(help или hedit %d){x\r\n",
-            web_edit_button(ch, "hedit", r->help->getID()).c_str(),
+            olc_edit_button(ch, "hedit", r->help->getID()).c_str(),
             r->help->getID());
     else
         ptc(ch, "Справка:       нет {D(help create){x\r\n");

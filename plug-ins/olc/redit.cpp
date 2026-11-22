@@ -438,7 +438,7 @@ void
 OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
 {
     // Static: no state to ask, so the key is spelled the way getMenuKey spells it.
-    OLCMenuKeyScope menuScope( "room:" + DLString( pRoom->vnum ) );
+    OLCMenuKeyScope menuScope( "room:" + DLString( pRoom->vnum ), ch );
     int door;
     const size_t descSize = 300;
 
@@ -454,10 +454,10 @@ OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
     ptc(ch, "Name EN: [{W%s{x] %s\n\r", pRoom->name.get(EN).c_str(), web_edit_button(showWeb, ch, "name", "web").c_str());   
     ptc(ch, "Name UA: [{W%s{x] %s\n\r", pRoom->name.get(UA).c_str(), web_edit_button(showWeb, ch, "uaname", "web").c_str());   
     ptc(ch, "Name RU: [{W%s{x] %s\n\r", pRoom->name.get(RU).c_str(), web_edit_button(showWeb, ch, "runame", "web").c_str());   
-    ptc(ch, "Clan:    [{W%s{x]  Guilds: [{W%s{x]\n",
+    ptc(ch, "Clan:    %s  Guilds: %s\n",
             web_registry_menu(showWeb, ClanManager::getThis(), "clan", pRoom->clan->getName( )).c_str( ),
             web_bitvector_menu(showWeb, pRoom->guilds, "guilds", pRoom->guilds.toString()).c_str());
-    ptc(ch, "Sector:  [{W%s{x] {D(? sector_table){x  Liquid: [{W%s{x] {D(? liquid){x\n\r", 
+    ptc(ch, "Sector:  %s {D(? sector_table){x  Liquid: %s {D(? liquid){x\n\r", 
             web_flag_menu(showWeb, sector_table, "sector", sector_table.name(pRoom->sector_type)).c_str(),
             web_registry_menu(showWeb, liquidManager, "liquid", pRoom->liquid->getName(), "none").c_str());
     ptc(ch, "Smell:   [{W%s{x] %s [{W%s{x] %s [{W%s{x] %s\n\r", 
@@ -468,7 +468,7 @@ OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
           String::stripEOL(pRoom->sound.get(EN)).c_str(), web_edit_button(showWeb, ch, "sound", "web").c_str(),   
           String::stripEOL(pRoom->sound.get(UA)).c_str(), web_edit_button(showWeb, ch, "uasound", "web").c_str(),   
           String::stripEOL(pRoom->sound.get(RU)).c_str(), web_edit_button(showWeb, ch, "rusound", "web").c_str());   
-    ptc(ch, "Flags:   [{W%s{x] {D(? room_flags){x\n\r",
+    ptc(ch, "Flags:   %s {D(? room_flags){x\n\r",
             web_flag_menu(showWeb, room_flags, "flags", room_flags.names(pRoom->room_flags)).c_str());
     ptc(ch, "Health:  [{W%d{x]%%  Mana: [{W%d{x]%%\r\n", pRoom->heal_rate,  pRoom->mana_rate);
     
@@ -510,7 +510,7 @@ OLCStateRoom::show(PCharacter *ch, RoomIndexData *pRoom, bool showWeb)
             if(pexit->key > 0)
                 ptc(ch, "            Key:        [{W%7u{x]\n\r", pexit->key);
             
-            ptc(ch, "            Exit flags: [{W%s{x] {D(? exit_flags){x\n\r",
+            ptc(ch, "            Exit flags: %s {D(? exit_flags){x\n\r",
                       web_flag_menu(showWeb, exit_flags, dirs[door].name, exit_flags.names(pexit->exit_info)).c_str());
 
             ptc(ch, "            Keywords:   [{W%s{x] [{W%s{x] [{W%s{x]\n\r", 

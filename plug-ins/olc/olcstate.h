@@ -112,6 +112,10 @@ public:
      *  by each editor's show, so a child editor shown from a parent's subcommand,
      *  or an editor opened by name, binds to itself. */
     static DLString currentMenuKey;
+    /** The editor drawing right now draws for a web client: web_list_menu
+     *  draws the full field widget only then. Set with currentMenuKey by a scope
+     *  that knows the viewer; false outside one, which draws the telnet form. */
+    static bool currentWeb;
 
     /** Set by journal(): the last subcommand changed the edited entity. */
     bool lastChanged;
@@ -173,13 +177,15 @@ protected:
     XML_VARIABLE XMLString lastCmd, lastArgs;
 };
 
-/** Sets OLCState::currentMenuKey for the lifetime of one subcommand. */
+/** Sets OLCState::currentMenuKey for the lifetime of one subcommand, and
+ *  OLCState::currentWeb from the viewer when one is given. */
 class OLCMenuKeyScope {
 public:
-    OLCMenuKeyScope( const DLString &key );
+    OLCMenuKeyScope( const DLString &key, Character *viewer = 0 );
     ~OLCMenuKeyScope( );
 private:
     DLString saved;
+    bool savedWeb;
 };
 
 /** A menu key part: spaces become '_', and nothing that could break the menu tag
@@ -221,7 +227,7 @@ public:
             DLString argsCopy = args;
 
             // Menus drawn by this subcommand are bound to the edited entity.
-            OLCMenuKeyScope menuScope( state->getMenuKey( ) );
+            OLCMenuKeyScope menuScope( state->getMenuKey( ), pch );
 
             try {
                 if (((*state)->*method)( pch, args )) {
@@ -286,34 +292,68 @@ public:
     }
 };    
 
+/** An OLC edit button: web_edit_button in the field widget's yellow brackets.
+ *  Empty for telnet and for players without OLC security, as web_edit_button is. */
+extern DLString olc_edit_button(Character *ch, const DLString &editor, const DLString &args);
+/** olc_edit_button, or nothing when showWeb is off ('show noweb'). */
 extern DLString web_edit_button(bool showWeb, Character *ch, const DLString &editor, const DLString &args);
 /** Every name in a flag table, space-separated. */
 extern DLString flag_table_all_names(const FlagTable &table);
+
+/** What a menu field looks like around its value on telnet: whatever the caller
+ *  printed before the field widget, so telnet output stays as it was. */
+struct OLCMenuFrame {
+    const char *open;
+    const char *close;
+};
+/** '[{W' value '{x]', the usual OLC field. */
+extern const OLCMenuFrame OLC_FRAME_BRACKETS;
+/** The bare value: the caller prints its own colour around it. */
+extern const OLCMenuFrame OLC_FRAME_NONE;
+/** '[' value ']' with no colour of its own (oedit). */
+extern const OLCMenuFrame OLC_FRAME_PLAIN;
+
+/** The OLC field widget, every menu below ends here. A web viewer gets
+ *  '{y[{W' value ' {Y<triangle>{y]{x' with the value and the triangle inside the
+ *  drop-down toggle. Anyone else gets frame.open + the menu + frame.close: the
+ *  field exactly as telnet printed it before the widget, the menu tags invisible
+ *  there. An empty label shows as 'none' on the web only. */
+extern DLString olc_menu_widget(bool web, const StringList &commands, const DLString &id, const DLString &label,
+                                const OLCMenuFrame &frame);
+
 /** A field value as a web drop-down of every flag in the table: picking one sends
- *  '<cmd> <flag>'. Telnet and showWeb=false see only the label. */
-extern DLString web_flag_menu(bool showWeb, const FlagTable &table, const DLString &cmd, const DLString &label);
+ *  '<cmd> <flag>'. showWeb=false ('show noweb') prints the framed label, no menu. */
+extern DLString web_flag_menu(bool showWeb, const FlagTable &table, const DLString &cmd, const DLString &label,
+                              const OLCMenuFrame &frame = OLC_FRAME_BRACKETS);
 /** web_flag_menu for a flagBitsEdit field: an enumerated table's zero row ('null')
  *  is left out, since toggling it sets bit 0 and restricts to nothing. */
-extern DLString web_flag_bits_menu(bool showWeb, const FlagTable &table, const DLString &cmd, const DLString &label);
+extern DLString web_flag_bits_menu(bool showWeb, const FlagTable &table, const DLString &cmd, const DLString &label,
+                                   const OLCMenuFrame &frame = OLC_FRAME_BRACKETS);
 /** A field value as a web drop-down of fixed values: picking one sends '<cmd> <value>'. */
-extern DLString web_list_menu(bool showWeb, const StringList &values, const DLString &cmd, const DLString &label);
+extern DLString web_list_menu(bool showWeb, const StringList &values, const DLString &cmd, const DLString &label,
+                              const OLCMenuFrame &frame = OLC_FRAME_BRACKETS);
 /** A field value as a web drop-down of every valid registry element (races, liquids,
  *  clans...): picking one sends '<cmd> <name>'. A non-empty clearWord is offered last
  *  (liquids: 'none'). */
 extern DLString web_registry_menu(bool showWeb, GlobalRegistryBase *registry, const DLString &cmd, const DLString &label,
-                                  const DLString &clearWord = DLString::emptyString);
+                                  const DLString &clearWord = DLString::emptyString,
+                                  const OLCMenuFrame &frame = OLC_FRAME_BRACKETS);
 /** A set edited by globalBitvectorEdit as a web drop-down: a member sends '<cmd> -name',
  *  any other element '<cmd> +name'. */
-extern DLString web_bitvector_menu(bool showWeb, const GlobalBitvector &field, const DLString &cmd, const DLString &label);
+extern DLString web_bitvector_menu(bool showWeb, const GlobalBitvector &field, const DLString &cmd, const DLString &label,
+                                   const OLCMenuFrame &frame = OLC_FRAME_BRACKETS);
 /** Full names of every mob special function (spec_...), then clearWord if given. */
 extern StringList spec_function_names(const DLString &clearWord = DLString::emptyString);
 /** A material field (fight/material.json names) as a web drop-down: '<cmd> <name>'. */
 extern DLString web_material_menu(bool showWeb, const DLString &cmd, const DLString &label,
-                                  const DLString &clearWord = DLString::emptyString);
+                                  const DLString &clearWord = DLString::emptyString,
+                                  const OLCMenuFrame &frame = OLC_FRAME_BRACKETS);
 /** A genderEdit field as an m/f/n/p web drop-down. */
-extern DLString web_gender_menu(bool showWeb, const DLString &cmd, const DLString &label);
+extern DLString web_gender_menu(bool showWeb, const DLString &cmd, const DLString &label,
+                                const OLCMenuFrame &frame = OLC_FRAME_BRACKETS);
 /** A boolEdit field as a y/n web drop-down. */
-extern DLString web_bool_menu(bool showWeb, const DLString &cmd, const DLString &label);
+extern DLString web_bool_menu(bool showWeb, const DLString &cmd, const DLString &label,
+                              const OLCMenuFrame &frame = OLC_FRAME_BRACKETS);
 
 #define OLC_STATE(State) \
 template <> \

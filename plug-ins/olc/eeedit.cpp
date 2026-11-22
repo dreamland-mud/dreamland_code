@@ -134,16 +134,16 @@ OLCStateExtraExit::statePrompt( Descriptor *d )
 
 void OLCStateExtraExit::show(PCharacter *ch)
 {
-    OLCMenuKeyScope menuScope( getMenuKey( ) );
+    OLCMenuKeyScope menuScope( getMenuKey( ), ch );
     OBJ_INDEX_DATA *pKey = key > 0 ? get_obj_index(key) : 0;
     RoomIndexData *target = get_room_index(to_room);
 
-    ptc(ch, "Name EN:    [{W%s{x] %s {D(name help){x\n",   keyword.get(EN).c_str(), web_edit_button(ch, "name", "web").c_str());
-    ptc(ch, "Name UA:    [{W%s{x] %s {D(uaname help){x\n", keyword.get(UA).c_str(), web_edit_button(ch, "uaname", "web").c_str());
-    ptc(ch, "Name RU:    [{W%s{x] %s {D(runame help){x\n", keyword.get(RU).c_str(), web_edit_button(ch, "runame", "web").c_str());
-    ptc(ch, "Flags:      [{W%s{x] {D(? exit_flags){x\n",
+    ptc(ch, "Name EN:    [{W%s{x] %s {D(name help){x\n",   keyword.get(EN).c_str(), olc_edit_button(ch, "name", "web").c_str());
+    ptc(ch, "Name UA:    [{W%s{x] %s {D(uaname help){x\n", keyword.get(UA).c_str(), olc_edit_button(ch, "uaname", "web").c_str());
+    ptc(ch, "Name RU:    [{W%s{x] %s {D(runame help){x\n", keyword.get(RU).c_str(), olc_edit_button(ch, "runame", "web").c_str());
+    ptc(ch, "Flags:      %s {D(? exit_flags){x\n",
         web_flag_menu(true, exit_flags, "flags", exit_flags.names(info.getValue( ))).c_str());
-    ptc(ch, "Size:       [{W%s{x] {D(? size){x\n",
+    ptc(ch, "Size:       %s {D(? size){x\n",
         web_flag_menu(true, size_table, "size", size_table.name(max_size_pass.getValue( ))).c_str());
 
     if (pKey)
@@ -156,37 +156,37 @@ void OLCStateExtraExit::show(PCharacter *ch)
     else
         ptc(ch, "Target:     none\n");
 
-    ptc(ch, "Desc EN: %s {D(desc help){x\n%s\n",   web_edit_button(ch, "desc", "web").c_str(), description[EN].c_str());
-    ptc(ch, "Desc UA: %s {D(uadesc help){x\n%s\n", web_edit_button(ch, "uadesc", "web").c_str(), description[UA].c_str());
-    ptc(ch, "Desc RU: %s {D(rudesc help){x\n%s\n", web_edit_button(ch, "rudesc", "web").c_str(), description[RU].c_str());
+    ptc(ch, "Desc EN: %s {D(desc help){x\n%s\n",   olc_edit_button(ch, "desc", "web").c_str(), description[EN].c_str());
+    ptc(ch, "Desc UA: %s {D(uadesc help){x\n%s\n", olc_edit_button(ch, "uadesc", "web").c_str(), description[UA].c_str());
+    ptc(ch, "Desc RU: %s {D(rudesc help){x\n%s\n", olc_edit_button(ch, "rudesc", "web").c_str(), description[RU].c_str());
 
-    ptc(ch, "Room EN: %s {D(room help){x\n%s\n",   web_edit_button(ch, "room", "web").c_str(), room_description[EN].c_str());
-    ptc(ch, "Room UA: %s {D(uaroom help){x\n%s\n", web_edit_button(ch, "uaroom", "web").c_str(), room_description[UA].c_str());
-    ptc(ch, "Room RU: %s {D(ruroom help){x\n%s\n", web_edit_button(ch, "ruroom", "web").c_str(), room_description[RU].c_str());
+    ptc(ch, "Room EN: %s {D(room help){x\n%s\n",   olc_edit_button(ch, "room", "web").c_str(), room_description[EN].c_str());
+    ptc(ch, "Room UA: %s {D(uaroom help){x\n%s\n", olc_edit_button(ch, "uaroom", "web").c_str(), room_description[UA].c_str());
+    ptc(ch, "Room RU: %s {D(ruroom help){x\n%s\n", olc_edit_button(ch, "ruroom", "web").c_str(), room_description[RU].c_str());
 
-    ptc(ch, "Short from EN: %s  %s{D(from help){x\n",   short_desc_from[EN].c_str(), web_edit_button(ch, "from", "web").c_str());
-    ptc(ch, "Short from UA: %s  %s{D(uafrom help){x\n", short_desc_from[UA].c_str(), web_edit_button(ch, "uafrom", "web").c_str());
-    ptc(ch, "Short from RU: %s  %s{D(rufrom help){x\n", short_desc_from[RU].c_str(), web_edit_button(ch, "rufrom", "web").c_str());
+    ptc(ch, "Short from EN: %s  %s{D(from help){x\n",   short_desc_from[EN].c_str(), olc_edit_button(ch, "from", "web").c_str());
+    ptc(ch, "Short from UA: %s  %s{D(uafrom help){x\n", short_desc_from[UA].c_str(), olc_edit_button(ch, "uafrom", "web").c_str());
+    ptc(ch, "Short from RU: %s  %s{D(rufrom help){x\n", short_desc_from[RU].c_str(), olc_edit_button(ch, "rufrom", "web").c_str());
 
-    ptc(ch, "Short to EN:   %s  %s{D(to help){x\n",   short_desc_to[EN].c_str(), web_edit_button(ch, "to", "web").c_str());
-    ptc(ch, "Short to UA:   %s  %s{D(uato help){x\n", short_desc_to[UA].c_str(), web_edit_button(ch, "uato", "web").c_str());
-    ptc(ch, "Short to RU:   %s  %s{D(ruto help){x\n", short_desc_to[RU].c_str(), web_edit_button(ch, "ruto", "web").c_str());
+    ptc(ch, "Short to EN:   %s  %s{D(to help){x\n",   short_desc_to[EN].c_str(), olc_edit_button(ch, "to", "web").c_str());
+    ptc(ch, "Short to UA:   %s  %s{D(uato help){x\n", short_desc_to[UA].c_str(), olc_edit_button(ch, "uato", "web").c_str());
+    ptc(ch, "Short to RU:   %s  %s{D(ruto help){x\n", short_desc_to[RU].c_str(), olc_edit_button(ch, "ruto", "web").c_str());
 
-    ptc(ch, "Leave room EN: %s  %s{D(leaveroom help){x\n", msgLeaveRoom[EN].c_str(), web_edit_button(ch, "leaveroom", "web").c_str());
-    ptc(ch, "Leave room UA: %s  %s{D(ualeaveroom help){x\n", msgLeaveRoom[UA].c_str(), web_edit_button(ch, "ualeaveroom", "web").c_str());
-    ptc(ch, "Leave room RU: %s  %s{D(ruleaveroom help){x\n", msgLeaveRoom[RU].c_str(), web_edit_button(ch, "ruleaveroom", "web").c_str());
+    ptc(ch, "Leave room EN: %s  %s{D(leaveroom help){x\n", msgLeaveRoom[EN].c_str(), olc_edit_button(ch, "leaveroom", "web").c_str());
+    ptc(ch, "Leave room UA: %s  %s{D(ualeaveroom help){x\n", msgLeaveRoom[UA].c_str(), olc_edit_button(ch, "ualeaveroom", "web").c_str());
+    ptc(ch, "Leave room RU: %s  %s{D(ruleaveroom help){x\n", msgLeaveRoom[RU].c_str(), olc_edit_button(ch, "ruleaveroom", "web").c_str());
 
-    ptc(ch, "Leave self EN: %s  %s{D(leaveself help){x\n", msgLeaveSelf[EN].c_str(), web_edit_button(ch, "leaveself", "web").c_str());
-    ptc(ch, "Leave self UA: %s  %s{D(ualeaveself help){x\n", msgLeaveSelf[UA].c_str(), web_edit_button(ch, "ualeaveself", "web").c_str());
-    ptc(ch, "Leave self RU: %s  %s{D(ruleaveself help){x\n", msgLeaveSelf[RU].c_str(), web_edit_button(ch, "ruleaveself", "web").c_str());
+    ptc(ch, "Leave self EN: %s  %s{D(leaveself help){x\n", msgLeaveSelf[EN].c_str(), olc_edit_button(ch, "leaveself", "web").c_str());
+    ptc(ch, "Leave self UA: %s  %s{D(ualeaveself help){x\n", msgLeaveSelf[UA].c_str(), olc_edit_button(ch, "ualeaveself", "web").c_str());
+    ptc(ch, "Leave self RU: %s  %s{D(ruleaveself help){x\n", msgLeaveSelf[RU].c_str(), olc_edit_button(ch, "ruleaveself", "web").c_str());
 
-    ptc(ch, "Entry room EN: %s  %s{D(entryroom help){x\n", msgEntryRoom[EN].c_str(), web_edit_button(ch, "entryroom", "web").c_str());
-    ptc(ch, "Entry room UA: %s  %s{D(uaentryroom help){x\n", msgEntryRoom[UA].c_str(), web_edit_button(ch, "uaentryroom", "web").c_str());
-    ptc(ch, "Entry room RU: %s  %s{D(ruentryroom help){x\n", msgEntryRoom[RU].c_str(), web_edit_button(ch, "ruentryroom", "web").c_str());
+    ptc(ch, "Entry room EN: %s  %s{D(entryroom help){x\n", msgEntryRoom[EN].c_str(), olc_edit_button(ch, "entryroom", "web").c_str());
+    ptc(ch, "Entry room UA: %s  %s{D(uaentryroom help){x\n", msgEntryRoom[UA].c_str(), olc_edit_button(ch, "uaentryroom", "web").c_str());
+    ptc(ch, "Entry room RU: %s  %s{D(ruentryroom help){x\n", msgEntryRoom[RU].c_str(), olc_edit_button(ch, "ruentryroom", "web").c_str());
 
-    ptc(ch, "Entry self EN: %s  %s{D(entryself help){x\n", msgEntrySelf[EN].c_str(), web_edit_button(ch, "entryself", "web").c_str());
-    ptc(ch, "Entry self UA: %s  %s{D(uaentryself help){x\n", msgEntrySelf[UA].c_str(), web_edit_button(ch, "uaentryself", "web").c_str());
-    ptc(ch, "Entry self RU: %s  %s{D(ruentryself help){x\n", msgEntrySelf[RU].c_str(), web_edit_button(ch, "ruentryself", "web").c_str());
+    ptc(ch, "Entry self EN: %s  %s{D(entryself help){x\n", msgEntrySelf[EN].c_str(), olc_edit_button(ch, "entryself", "web").c_str());
+    ptc(ch, "Entry self UA: %s  %s{D(uaentryself help){x\n", msgEntrySelf[UA].c_str(), olc_edit_button(ch, "uaentryself", "web").c_str());
+    ptc(ch, "Entry self RU: %s  %s{D(ruentryself help){x\n", msgEntrySelf[RU].c_str(), olc_edit_button(ch, "ruentryself", "web").c_str());
 }
 
 EEEDIT(show)

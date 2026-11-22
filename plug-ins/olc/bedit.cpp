@@ -95,34 +95,34 @@ static void show_affect_message(const char *prefix, PCharacter *ch, const DLStri
 
 void OLCStateBehavior::show( PCharacter *ch )
 {
-    OLCMenuKeyScope menuScope( getMenuKey( ) );
+    OLCMenuKeyScope menuScope( getMenuKey( ), ch );
     DefaultBehavior *bhv = getOriginal();
 
     ptc(ch, "Поведение {C%s{x\r\n", bhv->getName().c_str());
 
     ptc(ch, "Название:        {C%s{x %s {D(nameRus help){x\r\n",
             bhv->getRussianName().c_str(),
-            web_edit_button(ch, "nameRus", "web").c_str());
+            olc_edit_button(ch, "nameRus", "web").c_str());
     ptc(ch, "Укр.название:    {C%s{x %s {D(nameUa help){x\r\n",
             bhv->nameUa.c_str(),
-            web_edit_button(ch, "nameUa", "web").c_str());
+            olc_edit_button(ch, "nameUa", "web").c_str());
     ptc(ch, "Описание:        %s {D(desc help){x\r\n{c%s{x\r\n",
-            web_edit_button(ch, "desc", "web").c_str(),
+            olc_edit_button(ch, "desc", "web").c_str(),
             bhv->getDescription().c_str());
     ptc(ch, "Цель:            {c%s {D(target){x\r\n",
-            web_flag_menu(true, *bhv->target.getTable(), "target", bhv->target.name()).c_str());
+            web_flag_menu(true, *bhv->target.getTable(), "target", bhv->target.name(), OLC_FRAME_NONE).c_str());
     ptc(ch, "Подкоманды:      {c%s {D(subcommand){x\r\n", bhv->cmd.c_str());
 
     if (bhv->help) {
         ptc(ch, "Справка:         %s {D(help или hedit %d){x\r\n",
-            web_edit_button(ch, "hedit", bhv->help->getID()).c_str(),
+            olc_edit_button(ch, "hedit", bhv->help->getID()).c_str(),
             bhv->help->getID());
     } else {
         ptc(ch, "Справка:         нет {D({hchelp create{x)\r\n");
     }
 
     ptc(ch, "Свойства:        %s {D(props help){x\r\n",
-            web_edit_button(ch, "props", "web").c_str());
+            olc_edit_button(ch, "props", "web").c_str());
     DLString propsString = JsonUtils::toString(bhv->props);
     ch->desc->send(propsString.c_str());
 
@@ -139,7 +139,7 @@ void OLCStateBehavior::show( PCharacter *ch )
         ptc(ch, ".............{GАффект{x.................\r\n");
         ptc(ch, "Умение:      {G%s{x %s {D(affect или skedit %s){x\r\n",
                 affectBasic->getName().c_str(),
-                web_edit_button(ch, "skedit", affectBasic->getName()).c_str(),
+                olc_edit_button(ch, "skedit", affectBasic->getName()).c_str(),
                 affectBasic->getName().c_str());
         ptc(ch, "Отменяется:  {G%s{x\r\n", a->cancelled ? "yes" : "no");
         ptc(ch, "Снимается:   {G%s{x\r\n", a->dispelled ? "yes" : "no");

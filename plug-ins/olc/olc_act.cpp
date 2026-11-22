@@ -37,6 +37,7 @@
 #include "websocketrpc.h"
 
 #include "olc.h"
+#include "olcstate.h"
 #include "loadsave.h"
 #include "material-table.h"
 #include "damageflags.h"
@@ -512,7 +513,7 @@ void show_behaviors(PCharacter *ch, const GlobalBitvector &behaviors, const Json
                 bhvName.c_str(),
                 bp.key().asString().c_str(),
                 propVal.c_str(),
-                web_edit_button(ch, editCmd, "web").c_str());
+                olc_edit_button(ch, editCmd, "web").c_str());
         }
     }
 }
