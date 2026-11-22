@@ -93,7 +93,8 @@ OLCStateRoom::detach(PCharacter *ch)
 void 
 OLCStateRoom::commit( )
 {
-    RoomIndexData *pRoom = get_room_index(room);
+    // The room under the builder, not the one redit was opened on.
+    RoomIndexData *pRoom = get_room_index(getJournalVnum());
     // FIXME: update all instances.
     if (pRoom && pRoom->room) {
         pRoom->room->room_flags = pRoom->room_flags;
@@ -1751,7 +1752,7 @@ REDIT(commands, "команды", "показать список встроен�
 REDIT(done, "готово", "выйти из редактора (не забывайте про asave changed)")
 {
     commit();
-    olc_validate_print(ch, "room", room.getValue());
+    olc_validate_print(ch, "room", getJournalVnum());
     detach(ch);
     return true;
 }
