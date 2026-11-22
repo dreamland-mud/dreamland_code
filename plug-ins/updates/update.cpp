@@ -2100,6 +2100,7 @@ void player_update( )
                    ch, 0, 0, TO_ROOM,POS_RESTING);
             oldact_p(_("Ты слышишь далекий колокольный звон.\n\rНа тебя накатывается волна ужасной боли...\n\rТы рождаешься заново, обретая плоть.\n\rНо ты пока еще между живыми и мертвыми."),
                    ch, 0, 0, TO_CHAR,POS_RESTING);
+            msp_sound( ch, "alert/resurrect", 100, 1, 70 );
             REMOVE_GHOST( ch );
         }
 
