@@ -49,7 +49,9 @@ DLString regfmt(Character *to, const RegisterList &argv);
 /** Resolve door argument that can be either door number or direction name. */
 static int get_door_argument( const RegisterList &args )
 {
-    return args2door(args);
+    // Callers index dirs[] with the result: anything out of range is "no door".
+    int door = args2door(args);
+    return (door >= 0 && door < DIR_SOMEWHERE) ? door : -1;
 }
 
 /** Populate either exit or extra exit data based on exit number or keyword. Return false if not found. */
@@ -426,7 +428,7 @@ static Register exit_list(Room *room, bool regular, bool extra)
     return Register(listObj);
 }
 
-NMI_INVOKE( RoomWrapper, exit, "(направление, номер или имя экстра-выхода): объект выхода (.api() у него) или null" )
+NMI_INVOKE( RoomWrapper, exit, "(направление, номер или имя экстра-выхода): объект выхода (.api() у него) или null; слово направления (up, вверх) всегда означает обычный выход; два объекта одного выхода не равны по ==, сравнивайте door/keyword" )
 {
     checkTarget( );
     if (args.empty())

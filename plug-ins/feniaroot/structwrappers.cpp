@@ -1985,8 +1985,10 @@ int & ExitWrapper::exitInfo() const
     return peexit ? peexit->exit_info : pexit->exit_info;
 }
 
-// Same as the open/close/lock commands: a regular door also changes on the
-// other side when the reverse exit leads straight back here.
+// Like the door commands, a regular door also changes on the far side when
+// that exit leads straight back here. The bits themselves are the old
+// room.open/lock ones, not the commands' (open also unlocks, unlock leaves
+// the door closed).
 void ExitWrapper::setDoorFlags(int flags, bool fSet) const
 {
     Room *r; exit_data *pexit; extra_exit_data *peexit;
@@ -1998,11 +2000,11 @@ void ExitWrapper::setDoorFlags(int flags, bool fSet) const
     else
         REMOVE_BIT(info, flags);
 
-    if (!pexit || !pexit->u1.to_room)
+    if (!pexit)
         return;
 
-    exit_data *rev = pexit->u1.to_room->exit[dirs[door.getValue()].rev];
-    if (rev && rev->u1.to_room == r) {
+    exit_data *rev = direction_reverse(r, door.getValue());
+    if (rev) {
         if (fSet)
             SET_BIT(rev->exit_info, flags);
         else
@@ -2038,15 +2040,23 @@ NMI_GET( ExitWrapper, keyword, "ключевые слова двери или э
     return Register(String::toString(peexit ? peexit->keyword : pexit->keyword));
 }
 
-NMI_INVOKE( ExitWrapper, name, "([lang]): название выхода с падежами (у экстра-выхода -- откуда), 0=en, 1=ru, 2=ua; пустое заменяется дверью" )
+NMI_INVOKE( ExitWrapper, name, "([lang]): название выхода с падежами (у экстра-выхода -- откуда), 0=en, 1=ru, 2=ua; у безымянного -- door/дверь/двері на этом языке" )
 {
     Room *r; exit_data *pexit; extra_exit_data *peexit;
     resolve(r, pexit, peexit);
     lang_t lang = argnum2lang(args, 1);
-    DLString desc = peexit ? peexit->short_desc_from.getForLang(lang) : pexit->short_descr.getForLang(lang);
-    if (desc.empty())
-        desc = "двер|ь|и|и|ь|ью|и";
-    return Register(desc);
+    const XMLMultiString &sd = peexit ? peexit->short_desc_from : pexit->short_descr;
+
+    // Same gate as direction_doorname: an empty RU slot means a nameless exit,
+    // and the generic word goes out in the reader's language, not in Russian.
+    if (sd.get(LANG_RU).empty()) {
+        switch (lang) {
+        case LANG_EN: return Register("door");
+        case LANG_UA: return Register("двер|і|ей|ям|і|ями|ях");
+        default:      return Register("двер|ь|и|и|ь|ью|и");
+        }
+    }
+    return Register(sd.getForLang(lang));
 }
 
 NMI_INVOKE( ExitWrapper, nameTo, "([lang]): название экстра-выхода с падежами, куда; null для обычного выхода" )
@@ -2134,15 +2144,10 @@ NMI_GET( ExitWrapper, reverse, "выход с той стороны, ведущ�
 {
     Room *r; exit_data *pexit; extra_exit_data *peexit;
     resolve(r, pexit, peexit);
-    if (!pexit || !pexit->u1.to_room)
+    if (!pexit || !direction_reverse(r, door.getValue()))
         return Register();
 
-    int rd = dirs[door.getValue()].rev;
-    exit_data *rev = pexit->u1.to_room->exit[rd];
-    if (!rev || rev->u1.to_room != r)
-        return Register();
-
-    return ExitWrapper::wrap(pexit->u1.to_room, rd);
+    return ExitWrapper::wrap(pexit->u1.to_room, dirs[door.getValue()].rev);
 }
 
 NMI_INVOKE( ExitWrapper, canSee, "(ch): видит ли ch этот выход" )
