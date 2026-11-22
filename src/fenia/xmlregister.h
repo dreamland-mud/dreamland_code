@@ -38,7 +38,18 @@ public:
     void fromXML(const XMLNode::Pointer& parent) ;
     bool toXML(XMLNode::Pointer& parent) const;
 
+    /*
+     * Field names of a Map or a wrapper are written as XML node names. A name
+     * the XML parser cannot read back (Cyrillic, digit-led, spaces) goes into
+     * a 'key' attribute of a <_key> node instead, or the whole record fails
+     * to load at boot. Valid names keep the old form.
+     */
+    static void keyToXML(XMLNode::Pointer &node, const DLString &key);
+    static DLString keyFromXML(const XMLNode::Pointer &node);
+
 private:
+    static const DLString KEY_NODE;
+    static const DLString ATTRIBUTE_KEY;
     static const DLString ATTRIBUTE_REGTYPE;
     static const DLString REGTYPE_NONE;
     static const DLString REGTYPE_STRING;

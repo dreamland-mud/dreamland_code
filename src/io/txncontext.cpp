@@ -167,8 +167,13 @@ DbContext::load( )
             try {
                 key_t id = *(key_t *)key.get_data( );
                 Data dat(val.get_data( ), val.get_size( ));
-                seq(id, dat);
-                cnt++;
+                try {
+                    seq(id, dat);
+                    cnt++;
+                } catch(const ::Exception &e) {
+                    LogStream::sendError() << e.what() << ": record " << id << endl;
+                    seqFailed(id);
+                }
             } catch(const ::Exception &e) {
                 LogStream::sendError() << e.what() << ":" << endl;
             }

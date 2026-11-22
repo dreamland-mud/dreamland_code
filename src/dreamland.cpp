@@ -230,9 +230,11 @@ void DreamLand::load( bool recursive )
             LogStream::redirect(new FileLogStream(logFile.getPath( )));
         }
 
-        getFeniaDbEnv( )->open( DLFile( getBasePath( ), feniaDbDir ).getPath( ) );
+        DLFile feniaDir( getBasePath( ), feniaDbDir );
+        getFeniaDbEnv( )->open( feniaDir.getPath( ) );
         
         feniaManager->open( );
+        feniaManager->readPurgeList( DLFile( feniaDir, "purge-unreadable.ids" ).getPath( ) );
         feniaManager->load( );
 
         if (apiPort != 0)
