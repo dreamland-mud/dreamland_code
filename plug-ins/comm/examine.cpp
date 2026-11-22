@@ -55,13 +55,13 @@ bool fountain_has_liquid( Object *obj );
 void show_fountain_liquid( Character *ch, Object *obj );
 
 // How full a vessel is and what colour its liquid is. A negative max means an
-// endless source, always full to the brim.
+// endless source, always full to the brim; so is a finite one at capacity.
 static void show_liquid_fill( Character *ch, int liquid, int cur, int max )
 {
     lang_t lang = Player::lang(ch);
     const char *level;
 
-    if (max < 0)
+    if (max < 0 || (max > 0 && cur >= max))
         level = lmsg(lang, "Completely", "До краев", "По вінця");
     else
         level = lmsg(lang,

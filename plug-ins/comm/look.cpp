@@ -1831,7 +1831,7 @@ void show_fountain_liquid( Character *ch, Object *obj )
         return;
 
     Liquid *liq = liquidManager->find( obj->value2( ) );
-    ch->pecho( _("Здесь плещется %1$s."),
+    ch->pecho( _("Жидкость здесь -- %1$s."),
                liq->getShortDescr( Player::lang( ch ) ).ruscase( '1' ).c_str( ) );
 }
 
