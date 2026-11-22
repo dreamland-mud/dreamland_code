@@ -45,6 +45,9 @@
 #include "subr.h"
 #include "schedulerwrapper.h"
 #include "characterwrapper.h"
+#include "roomwrapper.h"
+#include "directions.h"
+#include "string_utils.h"
 #include "wrap_utils.h"
 
 #include "calendar_utils.h"
@@ -1919,3 +1922,262 @@ NMI_INVOKE( LanguageWrapper, effective, "(ch): узнать процент ра�
 }
 
 
+
+/*----------------------------------------------------------------------
+ * Exit
+ *----------------------------------------------------------------------*/
+NMI_INIT(ExitWrapper, "exit, выход или экстра-выход комнаты");
+
+Scripting::Register ExitWrapper::wrap(Room *r, int d)
+{
+    ExitWrapper::Pointer ew(NEW);
+    ew->room = WrapperManager::getThis()->getWrapper(r);
+    ew->door = d;
+
+    Scripting::Object *sobj = &Scripting::Object::manager->allocate();
+    sobj->setHandler(ew);
+    return Scripting::Register(sobj);
+}
+
+Scripting::Register ExitWrapper::wrap(Room *r, extra_exit_data *eexit)
+{
+    ExitWrapper::Pointer ew(NEW);
+    ew->room = WrapperManager::getThis()->getWrapper(r);
+    ew->door = -1;
+    ew->keyword = String::toString(eexit->keyword);
+
+    Scripting::Object *sobj = &Scripting::Object::manager->allocate();
+    sobj->setHandler(ew);
+    return Scripting::Register(sobj);
+}
+
+Room * ExitWrapper::getRoom() const
+{
+    return wrapper_cast<RoomWrapper>(room)->getTarget();
+}
+
+// The exit is found again on every call: OLC can delete or replace it at any
+// time, and a stale handle must throw instead of touching freed memory.
+void ExitWrapper::resolve(Room *&r, exit_data *&pexit, extra_exit_data *&peexit) const
+{
+    r = getRoom();
+    pexit = 0;
+    peexit = 0;
+
+    if (door.getValue() >= 0 && door.getValue() < DIR_SOMEWHERE) {
+        pexit = r->exit[door.getValue()];
+    } else if (door.getValue() == -1) {
+        for (auto &e: r->extra_exits)
+            if (String::toString(e->keyword) == keyword.getValue()) {
+                peexit = e;
+                break;
+            }
+    }
+
+    if (!pexit && !peexit)
+        throw Scripting::Exception("Exit not found in room " + DLString(r->vnum));
+}
+
+int & ExitWrapper::exitInfo() const
+{
+    Room *r; exit_data *pexit; extra_exit_data *peexit;
+    resolve(r, pexit, peexit);
+    return peexit ? peexit->exit_info : pexit->exit_info;
+}
+
+// Like the door commands, a regular door also changes on the far side when
+// that exit leads straight back here. The bits themselves are the old
+// room.open/lock ones, not the commands' (open also unlocks, unlock leaves
+// the door closed).
+void ExitWrapper::setDoorFlags(int flags, bool fSet) const
+{
+    Room *r; exit_data *pexit; extra_exit_data *peexit;
+    resolve(r, pexit, peexit);
+
+    int &info = peexit ? peexit->exit_info : pexit->exit_info;
+    if (fSet)
+        SET_BIT(info, flags);
+    else
+        REMOVE_BIT(info, flags);
+
+    if (!pexit)
+        return;
+
+    exit_data *rev = direction_reverse(r, door.getValue());
+    if (rev) {
+        if (fSet)
+            SET_BIT(rev->exit_info, flags);
+        else
+            REMOVE_BIT(rev->exit_info, flags);
+    }
+}
+
+NMI_INVOKE( ExitWrapper, api, "(): печатает этот api" )
+{
+    ostringstream buf;
+    Scripting::traitsAPI<ExitWrapper>( buf );
+    return Scripting::Register( buf.str( ) );
+}
+
+NMI_GET( ExitWrapper, door, "номер направления (0..5) или -1 для экстра-выхода" )
+{
+    Room *r; exit_data *pexit; extra_exit_data *peexit;
+    resolve(r, pexit, peexit);
+    return Register(door.getValue());
+}
+
+NMI_GET( ExitWrapper, isExtra, "true для экстра-выхода" )
+{
+    Room *r; exit_data *pexit; extra_exit_data *peexit;
+    resolve(r, pexit, peexit);
+    return Register(peexit != 0);
+}
+
+NMI_GET( ExitWrapper, keyword, "ключевые слова двери или экстра-выхода, все языки через пробел" )
+{
+    Room *r; exit_data *pexit; extra_exit_data *peexit;
+    resolve(r, pexit, peexit);
+    return Register(String::toString(peexit ? peexit->keyword : pexit->keyword));
+}
+
+NMI_INVOKE( ExitWrapper, name, "([lang]): название выхода с падежами (у экстра-выхода -- откуда), 0=en, 1=ru, 2=ua; у безымянного -- door/дверь/двері на этом языке" )
+{
+    Room *r; exit_data *pexit; extra_exit_data *peexit;
+    resolve(r, pexit, peexit);
+    lang_t lang = argnum2lang(args, 1);
+    const XMLMultiString &sd = peexit ? peexit->short_desc_from : pexit->short_descr;
+
+    // Same gate as direction_doorname: an empty RU slot means a nameless exit,
+    // and the generic word goes out in the reader's language, not in Russian.
+    if (sd.get(LANG_RU).empty()) {
+        switch (lang) {
+        case LANG_EN: return Register("door");
+        case LANG_UA: return Register("двер|і|ей|ям|і|ями|ях");
+        default:      return Register("двер|ь|и|и|ь|ью|и");
+        }
+    }
+    return Register(sd.getForLang(lang));
+}
+
+NMI_INVOKE( ExitWrapper, nameTo, "([lang]): название экстра-выхода с падежами, куда; null для обычного выхода" )
+{
+    Room *r; exit_data *pexit; extra_exit_data *peexit;
+    resolve(r, pexit, peexit);
+    if (!peexit)
+        return Register();
+    return Register(peexit->short_desc_to.getForLang(argnum2lang(args, 1)));
+}
+
+NMI_INVOKE( ExitWrapper, description, "([lang]): описание выхода (что видно при взгляде туда)" )
+{
+    Room *r; exit_data *pexit; extra_exit_data *peexit;
+    resolve(r, pexit, peexit);
+    lang_t lang = argnum2lang(args, 1);
+    return Register(peexit ? peexit->description.getForLang(lang) : pexit->description.getForLang(lang));
+}
+
+NMI_INVOKE( ExitWrapper, roomDescription, "([lang]): строка экстра-выхода в описании комнаты; null для обычного выхода" )
+{
+    Room *r; exit_data *pexit; extra_exit_data *peexit;
+    resolve(r, pexit, peexit);
+    if (!peexit)
+        return Register();
+    return Register(peexit->room_description.getForLang(argnum2lang(args, 1)));
+}
+
+NMI_GET( ExitWrapper, flags, "текущие флаги выхода (таблица .tables.exit_flags); запись меняет только эту сторону" )
+{
+    return Register(exitInfo());
+}
+
+NMI_SET( ExitWrapper, flags, "текущие флаги выхода (таблица .tables.exit_flags); запись меняет только эту сторону" )
+{
+    exitInfo() = arg.toNumber();
+}
+
+NMI_GET( ExitWrapper, defaultFlags, "флаги выхода из арии, к которым он возвращается при ресете" )
+{
+    Room *r; exit_data *pexit; extra_exit_data *peexit;
+    resolve(r, pexit, peexit);
+    return Register(peexit ? peexit->exit_info_default : pexit->exit_info_default);
+}
+
+NMI_GET( ExitWrapper, key, "vnum ключа или 0" )
+{
+    Room *r; exit_data *pexit; extra_exit_data *peexit;
+    resolve(r, pexit, peexit);
+    int k = peexit ? peexit->key : pexit->key;
+    return Register(k > 0 ? k : 0);
+}
+
+NMI_GET( ExitWrapper, level, "уровень двери (сложность взлома)" )
+{
+    Room *r; exit_data *pexit; extra_exit_data *peexit;
+    resolve(r, pexit, peexit);
+    return Register(peexit ? peexit->level : pexit->level);
+}
+
+NMI_GET( ExitWrapper, size, "максимальный размер, который пройдет в экстра-выход; null для обычного выхода" )
+{
+    Room *r; exit_data *pexit; extra_exit_data *peexit;
+    resolve(r, pexit, peexit);
+    if (!peexit)
+        return Register();
+    return Register(peexit->max_size_pass);
+}
+
+NMI_GET( ExitWrapper, room, "комната, в которой этот выход" )
+{
+    getRoom();
+    return room;
+}
+
+NMI_GET( ExitWrapper, target, "комната, куда ведет выход, или null" )
+{
+    Room *r; exit_data *pexit; extra_exit_data *peexit;
+    resolve(r, pexit, peexit);
+    Room *to = peexit ? peexit->u1.to_room : pexit->u1.to_room;
+    return WrapperManager::getThis()->getWrapper(to);
+}
+
+NMI_GET( ExitWrapper, reverse, "выход с той стороны, ведущий обратно сюда, или null" )
+{
+    Room *r; exit_data *pexit; extra_exit_data *peexit;
+    resolve(r, pexit, peexit);
+    if (!pexit || !direction_reverse(r, door.getValue()))
+        return Register();
+
+    return ExitWrapper::wrap(pexit->u1.to_room, dirs[door.getValue()].rev);
+}
+
+NMI_INVOKE( ExitWrapper, canSee, "(ch): видит ли ch этот выход" )
+{
+    Room *r; exit_data *pexit; extra_exit_data *peexit;
+    resolve(r, pexit, peexit);
+    Character *ch = argnum2character(args, 1);
+    return Register(peexit ? ch->can_see(peexit) : ch->can_see(pexit));
+}
+
+NMI_INVOKE( ExitWrapper, open, "(): открыть и отпереть, с обеих сторон двери" )
+{
+    setDoorFlags(EX_CLOSED|EX_LOCKED, false);
+    return Register();
+}
+
+NMI_INVOKE( ExitWrapper, close, "(): закрыть, с обеих сторон двери" )
+{
+    setDoorFlags(EX_CLOSED, true);
+    return Register();
+}
+
+NMI_INVOKE( ExitWrapper, lock, "(): закрыть и запереть, с обеих сторон двери" )
+{
+    setDoorFlags(EX_CLOSED|EX_LOCKED, true);
+    return Register();
+}
+
+NMI_INVOKE( ExitWrapper, unlock, "(): отпереть, с обеих сторон двери" )
+{
+    setDoorFlags(EX_LOCKED, false);
+    return Register();
+}

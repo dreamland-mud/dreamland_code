@@ -302,6 +302,7 @@ WrappersPlugin::initialization( )
     Class::regMoc<LanguageWrapper>( );
     Class::regMoc<RaceWrapper>( );
     Class::regMoc<LiquidWrapper>( );
+    Class::regMoc<ExitWrapper>( );
     Class::regMoc<WearlocWrapper>( );
     Class::regMoc<SkillWrapper>( );
     Class::regMoc<SkillGroupWrapper>( );
@@ -370,6 +371,7 @@ WrappersPlugin::initialization( )
     traitsAPIJson<BonusWrapper>("bonus", apiDump, false);     
     traitsAPIJson<ReligionWrapper>("religion", apiDump, false);     
     traitsAPIJson<LiquidWrapper>("liquid", apiDump, false);     
+    traitsAPIJson<ExitWrapper>("exit", apiDump, false);
     traitsAPIJson<WearlocWrapper>("wearloc", apiDump, false);     
     traitsAPIJson<MaterialWrapper>("material", apiDump, false);
     traitsAPIJson<SkillWrapper>("skill", apiDump, false);     
@@ -419,6 +421,7 @@ void WrappersPlugin::destruction( ) {
     Class::unregMoc<AreaQuestWrapper>( );
     Class::unregMoc<WearlocWrapper>( );
     Class::unregMoc<LiquidWrapper>( );
+    Class::unregMoc<ExitWrapper>( );
     Class::unregMoc<SkillGroupWrapper>( );
     Class::unregMoc<SkillWrapper>( );
     Class::unregMoc<HometownWrapper>( );
