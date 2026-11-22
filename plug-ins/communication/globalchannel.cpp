@@ -63,18 +63,42 @@ GlobalChannel::GlobalChannel( )
 // config/aging.json "grumble": odds by the speaker's true hours over all lives
 // ("tiers": [{hours, percent}], the highest reached tier wins) and one word list
 // per language. The lists are parallel: one index is the same joke for every
-// reader, whatever language each of them reads in.
+// reader, whatever language each of them reads in. A drunk speaker grumbles
+// "drunkFactor" times as often, up to "drunkCap" percent, and the noise is
+// slurred like the line it trails.
 //
 // The file is hand-edited, and jsoncpp throws std::exception on a wrong type,
 // which nothing on the command path catches. So it is validated once here into
 // plain containers and the say path never touches a Json::Value.
 static vector<pair<int, int> > grumbleTiers;
 static map<DLString, vector<DLString> > grumbleWords;
+static const int GRUMBLE_DRUNK_FACTOR = 2;
+static const int GRUMBLE_DRUNK_CAP = 25;
+static int grumbleDrunkFactor = GRUMBLE_DRUNK_FACTOR;
+static int grumbleDrunkCap = GRUMBLE_DRUNK_CAP;
+
+// An integer field of the grumble section, or the default when missing or invalid.
+static int grumble_int( const Json::Value &cfg, const char *key, int def, int lo, int hi )
+{
+    if (!cfg.isMember( key ))
+        return def;
+
+    const Json::Value &v = cfg[key];
+    if (!v.isInt( ) || v.asInt( ) < lo || v.asInt( ) > hi) {
+        LogStream::sendError( ) << "aging.json: grumble." << key << " needs an integer "
+                                << lo << ".." << hi << ", using " << def << endl;
+        return def;
+    }
+
+    return v.asInt( );
+}
 
 CONFIGURABLE_LOADED(config, aging)
 {
     grumbleTiers.clear( );
     grumbleWords.clear( );
+    grumbleDrunkFactor = GRUMBLE_DRUNK_FACTOR;
+    grumbleDrunkCap = GRUMBLE_DRUNK_CAP;
 
     if (!value.isObject( )) {
         if (!value.isNull( ))
@@ -91,9 +115,15 @@ CONFIGURABLE_LOADED(config, aging)
         return;
     }
 
+    grumbleDrunkFactor = grumble_int( cfg, "drunkFactor", GRUMBLE_DRUNK_FACTOR, 1, 10 );
+    grumbleDrunkCap = grumble_int( cfg, "drunkCap", GRUMBLE_DRUNK_CAP, 0, 100 );
+
     for (Json::Value::const_iterator k = cfg.begin( ); k != cfg.end( ); k++) {
         DLString key = k.name( );
         const Json::Value &list = *k;
+
+        if (key == "drunkFactor" || key == "drunkCap")
+            continue;
 
         if (!list.isArray( )) {
             LogStream::sendError( ) << "aging.json: grumble." << key << " is not a list, skipped" << endl;
@@ -137,7 +167,7 @@ int GlobalChannel::grumbleRoll( Character *ch ) const
         return -1;
 
     // Gibberish gets no clean tail.
-    if (garbles( ch ))
+    if (garblesMagic( ch ))
         return -1;
 
     const vector<DLString> *words = grumble_words( "ru" );
@@ -150,13 +180,17 @@ int GlobalChannel::grumbleRoll( Character *ch ) const
         if (hours >= tier.first)
             pct = max( pct, tier.second );
 
+    // Drunk old men grumble more, never less than sober.
+    if (slurLevel( ch ) > 0)
+        pct = max( pct, min( pct * grumbleDrunkFactor, grumbleDrunkCap ) );
+
     if (pct <= 0 || number_percent( ) > pct)
         return -1;
 
     return number_range( 0, (int)words->size( ) - 1 );
 }
 
-DLString GlobalChannel::grumbleText( int index, Character *reader ) const
+DLString GlobalChannel::grumbleText( int index, Character *reader, int slur ) const
 {
     if (index < 0)
         return DLString::emptyString;
@@ -167,7 +201,8 @@ DLString GlobalChannel::grumbleText( int index, Character *reader ) const
     if (!words)
         return DLString::emptyString;
 
-    return DLString( " ... " ) + (*words)[index % words->size( )];
+    const DLString &word = (*words)[index % words->size( )];
+    return DLString( " ... " ) + (slur > 0 ? slur_text( word, slur ) : word);
 }
 
 void GlobalChannel::run( Character *ch, const DLString &arg )
@@ -216,6 +251,7 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
 
     // Readers get the noise, triggers and logs get the clean line.
     int noise = arg.empty( ) ? -1 : grumbleRoll( ch );
+    int noiseSlur = slurLevel( ch );
     bool noiseRead = false;
 
     if (needOutputSelf( ch )) {
@@ -223,7 +259,7 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
         bool fEmpty = (!msgListEmpty.empty( ) && listeners.size( ) == 0);
         const DLString &fmtSelf = fEmpty ? msgListEmpty : fMild ? msgSelfMild : msgSelf;
 
-        DLString noiseSelf = grumbleText( noise, ch );
+        DLString noiseSelf = grumbleText( noise, ch, noiseSlur );
         DLString outSelf = argGarbled + noiseSelf;
         noiseRead = noiseRead || !noiseSelf.empty( );
         DLString message = outputSelf( ch, fmtSelf, outSelf );
@@ -247,7 +283,7 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
             bool fMild = (IS_SET((*i)->comm, COMM_MILDCOLOR) && !msgOtherMild.empty( ));
             const DLString &fmtVict = fNoarg ? msgOtherNoarg : fMild ? msgOtherMild : msgOther;
             
-            DLString noiseVict = grumbleText( noise, victim );
+            DLString noiseVict = grumbleText( noise, victim, noiseSlur );
             DLString outVict = argGarbled + noiseVict;
             noiseRead = noiseRead || !noiseVict.empty( );
 

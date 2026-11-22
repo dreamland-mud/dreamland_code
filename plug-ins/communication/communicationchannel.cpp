@@ -114,9 +114,17 @@ bool CommunicationChannel::canHear( Character *ch ) const
     return ch->get_trust( ) >= trustHear.getValue( );
 }
 
-bool CommunicationChannel::garbles( Character *ch ) const
+bool CommunicationChannel::garblesMagic( Character *ch ) const
 {
-    return garble && (ch->isAffected( gsn_garble ) || slur_percent( ch ) > 0);
+    return garble && ch->isAffected( gsn_garble );
+}
+
+int CommunicationChannel::slurLevel( Character *ch ) const
+{
+    if (!garble || ch->isAffected( gsn_garble ))
+        return 0;
+
+    return slur_percent( ch );
 }
 
 void CommunicationChannel::applyGarble( Character *ch, DLString &msg ) const
@@ -126,11 +134,11 @@ void CommunicationChannel::applyGarble( Character *ch, DLString &msg ) const
     const char *src;
     char *dst;
 
-    if (!garbles( ch ))
-        return;
+    bool fGarble = garblesMagic( ch );
+    int slur = slurLevel( ch );
 
-    bool fGarble = ch->isAffected( gsn_garble );
-    int slur = fGarble ? 0 : slur_percent( ch );
+    if (!fGarble && slur <= 0)
+        return;
     
     mudtags_convert( msg.c_str( ), srcStream, TAGS_CONVERT_VIS|TAGS_CONVERT_COLOR|TAGS_ENFORCE_NOCOLOR, 0 );
     DLString srcString = srcStream.str( );
