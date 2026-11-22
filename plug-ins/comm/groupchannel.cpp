@@ -12,6 +12,7 @@
 #include "room.h"
 #include "loadsave.h"
 #include "msgformatter.h"
+#include "msp.h"
 #include "follow_utils.h"
 #include "act.h"
 
@@ -133,6 +134,10 @@ void GroupChannel::postOutput( Character *outputTo, const DLString &message, Cha
 {
     if (outputTo->getPC( ))
         remember_history_near( outputTo->getPC( ), message, speaker );
+
+    // MSP for group members who hear the line, not the speaker.
+    if (outputTo != speaker)
+        msp_sound( outputTo, "chat/channel", 100, 1, 60 );
 }
 
 DLString GroupChannel::webKind( ) const

@@ -23,6 +23,7 @@
 
 #include "infonet.h"
 #include "descriptor.h"
+#include "msp.h"
 #include "loadsave.h"
 #include "merc.h"
 #include "def.h"
@@ -182,6 +183,16 @@ DLString PageChannel::webKind( ) const
  *-----------------------------------------------------------------------*/
 SpeechChannel::SpeechChannel( )
 {
+}
+
+// MSP for everyone who hears the line, not the speaker: a blind player away
+// from the text learns that someone in the room spoke.
+void SpeechChannel::postOutput( Character *outputTo, const DLString &message, Character *speaker ) const
+{
+    RoomChannel::postOutput( outputTo, message, speaker );
+
+    if (outputTo != speaker)
+        msp_sound( outputTo, "chat/say", 100, 1, 50 );
 }
 
 static void rprog_speech( Room *room, Character *ch, const char *msg )

@@ -21,6 +21,7 @@ public:
 
 protected:
     virtual void triggers( Character *, const DLString & ) const;
+    virtual void postOutput( Character *outputTo, const DLString &message, Character *speaker ) const;
 };
 
 class EmoteChannel : public RoomChannel {
