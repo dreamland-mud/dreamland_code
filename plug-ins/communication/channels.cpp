@@ -185,13 +185,14 @@ SpeechChannel::SpeechChannel( )
 {
 }
 
-// MSP for everyone who hears the line, not the speaker: a blind player away
-// from the text learns that someone in the room spoke.
+// MSP for everyone who hears a player's line, not the speaker: a blind player
+// away from the text learns that someone in the room spoke. Mob chatter
+// (shopkeepers, timer talkers) stays silent.
 void SpeechChannel::postOutput( Character *outputTo, const DLString &message, Character *speaker ) const
 {
     RoomChannel::postOutput( outputTo, message, speaker );
 
-    if (outputTo != speaker)
+    if (outputTo != speaker && !speaker->is_npc( ))
         msp_sound( outputTo, "chat/say", 100, 1, 50 );
 }
 

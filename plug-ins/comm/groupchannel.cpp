@@ -135,8 +135,8 @@ void GroupChannel::postOutput( Character *outputTo, const DLString &message, Cha
     if (outputTo->getPC( ))
         remember_history_near( outputTo->getPC( ), message, speaker );
 
-    // MSP for group members who hear the line, not the speaker.
-    if (outputTo != speaker)
+    // MSP for group members who hear a player's line, not the speaker.
+    if (outputTo != speaker && !speaker->is_npc( ))
         msp_sound( outputTo, "chat/channel", 100, 1, 60 );
 }
 
