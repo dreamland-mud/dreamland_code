@@ -21,6 +21,7 @@
 #include "behavior.h"
 #include "json_utils_ext.h"
 #include "string_utils.h"
+#include "player_utils.h"
 
 #include "structwrappers.h"
 #include "areaindexwrapper.h"
@@ -1073,6 +1074,64 @@ NMI_INVOKE( RoomWrapper, distanceTo, "(target, maxDepth[, walker]): скольк
     room_traverse( target, iter, complete, 3000 );
 
     return Register( result );
+}
+
+// Stops on the first room of the target area: breadth-first, so that is the
+// nearest way in. Records the roads, not the rooms, for make_speedwalk.
+struct PathToAreaComplete {
+    typedef NodesEntry<RoomTraverseTraits> MyNodesEntry;
+
+    PathToAreaComplete( AreaIndexData *a, bool &f, RoomTraverseResult &p )
+                : area( a ), found( f ), path( p )
+    {
+    }
+
+    inline bool operator () ( const MyNodesEntry *const head, bool last )
+    {
+        if (head->node->areaIndex( ) != area)
+            return false;
+
+        for (const MyNodesEntry *i = head; i->prev; i = i->prev)
+            path.push_front( i->hook );
+
+        found = true;
+        return true;
+    }
+
+    AreaIndexData *area;
+    bool &found;
+    RoomTraverseResult &path;
+};
+
+NMI_INVOKE( RoomWrapper, speedwalkToArea, "(area[, walker]): строка бега (как у команды путь) до ближайшей комнаты зоны area для чара walker, на его языке; пустая строка, если дороги нет или уже в зоне. Запертые двери не проходит" )
+{
+    checkTarget( );
+    AreaIndexData *area = wrapper_cast<AreaIndexWrapper>( argnum( args, 1 ) )->getTarget( );
+    Character *walker = 0;
+
+    if (args.size( ) > 1 && argnum( args, 2 ).type == Register::OBJECT)
+        walker = argnum2character( args, 2 );
+
+    if (target->areaIndex( ) == area)
+        return Register( DLString::emptyString );
+
+    FeniaDoorFunc df( walker );
+    FeniaExtraExitFunc eef;
+    FeniaPortalFunc pf;
+    FeniaHookIterator iter( df, eef, pf );
+
+    bool found = false;
+    RoomTraverseResult path;
+    PathToAreaComplete complete( area, found, path );
+
+    room_traverse( target, iter, complete, 10000 );
+
+    if (!found || path.empty( ))
+        return Register( DLString::emptyString );
+
+    ostringstream buf;
+    make_speedwalk( path, buf, walker ? Player::displayLang( walker ) : LANG_DEFAULT );
+    return Register( buf.str( ) );
 }
 
 NMI_GET( RoomWrapper, resetMobiles, "список внумов мобов, которые ресетятся в этой комнате") 

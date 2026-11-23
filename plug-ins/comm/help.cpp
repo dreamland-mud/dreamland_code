@@ -1670,6 +1670,11 @@ CMDRUNP( help )
 
         ch->pecho(_("Нет подсказки по данному слову."));
         bugTracker->reportNohelp( ch->getPC(), origArgument.c_str( ) );
+
+        // True dead end: Fenia may follow up later (utils/ai help fallback).
+        // Prints nothing itself; with no handler bound this is a no-op.
+        if (!nthMiss)
+            gprog("onHelpMiss", "Cs", ch, origArgument.c_str());
         return;
     }
 

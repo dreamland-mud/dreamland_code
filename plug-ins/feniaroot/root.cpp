@@ -61,6 +61,8 @@
 #include "tohit.h"
 #include "mudtags.h"
 #include "behavior.h"
+#include "helpmanager.h"
+#include "player_utils.h"
 
 #include "root.h"
 #include "airequest.h"
@@ -2336,6 +2338,22 @@ NMI_INVOKE(Root, help, "(id[, ch]): вернуть текст статьи сп�
     dummy.setLevel(1);
     dummy.setSex(SEX_MALE);
     return Register(article->getText(&dummy));
+}
+
+NMI_INVOKE(Root, helpTitle, "(id, ch): заголовок статьи справки id на языке ch, или null, если статьи нет, это синоним или ch ее не видит")
+{
+    int id = argnum2number(args, 1);
+    Character *ch = argnum2character(args, 2);
+    HelpArticle::Pointer article = helpManager->getArticle(id);
+
+    if (article.isEmpty() || !article->visible(ch))
+        return Register();
+
+    DLString title = article->getTitle(DLString::emptyString, Player::displayLang(ch));
+    if (title.empty())
+        return Register();
+
+    return Register(title);
 }
 
 NMI_INVOKE(Root, finger, "(ip): список (.List) имен персонажей, заходивших с этого IP адреса")
