@@ -10,6 +10,9 @@
 #include "linkingcode.h"
 #include "emailcode.h"
 #include "accountaudit.h"
+#include "kofiledger.h"
+#include "dreamland.h"
+#include "date.h"
 #include "commonattributes.h"
 #include "pcharactermanager.h"
 #include "save.h"
@@ -187,6 +190,14 @@ static void account_status(PCharacter *ch)
     }
 
     ch->pecho(_("Аккаунт {W%1$s{x."), AccountManager::titleOf(id).c_str());
+
+    // The account id, shown so a Ko-fi payer can put it in the Ko-fi message.
+    ch->pecho(_("Код для Ko-fi: {W%1$s{x"), id.c_str());
+
+    time_t supporter = AccountManager::supporterUntil(id);
+    if (supporter > dreamland->getCurrentTime())
+        ch->pecho(_("Поддержка на Ko-fi до {W%1$s{x. Спасибо!"),
+                  Date::getTimeAsString(supporter, "%Y-%m-%d").c_str());
 
     Json::Value acc = AccountManager::get(id);
     const Json::Value &identities = acc["identities"];
@@ -1100,6 +1111,170 @@ static void account_profile(PCharacter *ch, DLString &args)
     ch->pecho(_("Спрятать персонажа: {yаккаунт профиль скрыть <имя>{x. Выключить профиль целиком: {yаккаунт профиль выкл{x."));
 }
 
+// Failed `account kofi <txn>` claims per ACCOUNT, in RAM (reboot-cleared): the
+// Ko-fi transaction id on the payer's receipt is the proof of payment, so a guesser
+// gets a handful of tries an hour however many characters the account holds.
+struct KofiClaimFails {
+    int count;
+    time_t since;
+};
+static std::map<DLString, KofiClaimFails> kofiClaimFails;
+static const int KOFI_CLAIM_MAX_FAILS = 5;
+static const time_t KOFI_CLAIM_WINDOW = 60 * 60;
+
+static void account_kofi_list(PCharacter *ch)
+{
+    std::list<Json::Value> open = KofiLedger::recentOpen(20);
+    if (open.empty()) {
+        ch->pecho("No unmatched, manual or pending Ko-fi payments.");
+        return;
+    }
+
+    ch->pecho("{WKo-fi payments waiting for an immortal, newest first:{x");
+    for (const Json::Value &e : open) {
+        const Json::Value &p = e["payment"];
+        Json::Value received = e.get("received", Json::Value(0));
+        time_t when = received.isIntegral() ? (time_t)received.asInt64() : 0;
+        Json::Value note = e.get("note", Json::Value());
+        Json::Value acc = e.get("account", Json::Value());
+        // from_name is payer-typed: escape it before the mudtag renderer. The
+        // email is a match key only and is never shown.
+        ch->pecho("  %1$s {W%2$s%3$s{x %4$s %5$s %6$s from '%7$s'%8$s, txn %9$s",
+                  Date::getTimeAsString(when, "%Y-%m-%d %H:%M").c_str(),
+                  e.get("status", "").asString().c_str(),
+                  note.isString() ? ("/" + note.asString()).c_str() : "",
+                  p.get("type", "").asString().c_str(),
+                  p.get("amount", "").asString().c_str(),
+                  p.get("currency", "").asString().c_str(),
+                  AccountManager::echoSafe(p.get("from_name", "").asString()).c_str(),
+                  acc.isString() ? (", account " + acc.asString()).c_str() : "",
+                  e.get("txn", "").asString().c_str());
+    }
+    ch->pecho("Pending = a credit was in flight: check the account before you credit or resolve it.");
+    ch->pecho("account kofi credit <txn> <account id> [months] | account kofi resolve <txn>");
+}
+
+static const char *kofi_result_text(KofiLedger::ClaimResult r)
+{
+    switch (r) {
+    case KofiLedger::CLAIM_NOT_FOUND:   return "no such transaction";
+    case KofiLedger::CLAIM_TAKEN:       return "the entry is not in a state this command handles";
+    case KofiLedger::CLAIM_FAILED:      return "the write failed, see the log";
+    case KofiLedger::CLAIM_BAD_AMOUNT:  return "amount is malformed or not USD -- give the months";
+    default:                            return "done";
+    }
+}
+
+// Admin-level Ko-fi ledger tools: an unmatched txn id is enough to claim the
+// payment, so these sit above plain immortal trust.
+static bool account_kofi_admin(PCharacter *ch, const DLString &sub, DLString &args)
+{
+    if (ch->get_trust() < KofiLedger::adminLevel())
+        return false;
+
+    if (arg_oneof(sub, "list")) {
+        account_kofi_list(ch);
+        return true;
+    }
+
+    if (arg_oneof(sub, "resolve")) {
+        DLString txn = KofiLedger::sanitizeTxn(args.getOneArgument());
+        Json::Value entry;
+        KofiLedger::ClaimResult r = txn.empty() ? KofiLedger::CLAIM_NOT_FOUND
+                                                : KofiLedger::resolve(txn, ch->getName(), entry);
+        ch->pecho("Ko-fi resolve %1$s: %2$s.", txn.c_str(), kofi_result_text(r));
+        return true;
+    }
+
+    if (arg_oneof(sub, "credit")) {
+        DLString txn = KofiLedger::sanitizeTxn(args.getOneArgument());
+        DLString id = args.getOneArgument().toUpper();
+        DLString monthsArg = args.getOneArgument();
+        if (txn.empty() || !AccountManager::exists(id)) {
+            ch->pecho("Usage: account kofi credit <txn> <account id> [months]. The account must exist.");
+            return true;
+        }
+        int months = -1;
+        if (!monthsArg.empty()) {
+            if (monthsArg.size() > 4 || !monthsArg.isNumber() || monthsArg.toInt() < 0 || monthsArg.toInt() > 1200) {
+                ch->pecho("Months must be a number from 0 to 1200.");
+                return true;
+            }
+            months = monthsArg.toInt();
+        }
+        Json::Value entry;
+        KofiLedger::ClaimResult r = KofiLedger::credit(txn, id, months, ch->getName(), entry);
+        ch->pecho("Ko-fi credit %1$s to %2$s: %3$s.", txn.c_str(), id.c_str(), kofi_result_text(r));
+        return true;
+    }
+
+    return false;
+}
+
+static void account_kofi(PCharacter *ch, DLString &args)
+{
+    DLString arg = args.getOneArgument();
+
+    if (!arg.empty() && account_kofi_admin(ch, arg, args))
+        return;
+
+    if (arg.empty()) {
+        ch->pecho(_("Укажи номер транзакции из квитанции Ko-fi: {yаккаунт кофи{x <номер>. Подробнее: {hh5106аккаунт{x."));
+        return;
+    }
+
+    DLString id = AccountManager::accountOf(ch->getName());
+    if (id.empty()) {
+        ch->pecho(_("Сначала привяжи персонажа к аккаунту: {yаккаунт связать{x."));
+        return;
+    }
+
+    time_t now = dreamland->getCurrentTime();
+    KofiClaimFails &fails = kofiClaimFails[id];
+    if (now - fails.since > KOFI_CLAIM_WINDOW) {
+        fails.count = 0;
+        fails.since = now;
+    }
+    if (!ch->is_immortal() && fails.count >= KOFI_CLAIM_MAX_FAILS) {
+        ch->pecho(_("Слишком много неверных номеров. Попробуй через час."));
+        return;
+    }
+
+    DLString txn = KofiLedger::sanitizeTxn(arg);
+    Json::Value entry;
+    KofiLedger::ClaimResult r = KofiLedger::CLAIM_NOT_FOUND;
+    if (!txn.empty())
+        r = KofiLedger::claim(txn, id, ch->getName(), entry);
+
+    if (r == KofiLedger::CLAIM_FAILED) {
+        ch->pecho(_("Не удалось зачесть платеж. Попробуй позже."));
+        return;
+    }
+
+    // Unknown and already-credited ids get one answer, so a guesser cannot
+    // learn which transaction ids exist.
+    if (r != KofiLedger::CLAIM_OK) {
+        fails.count++;
+        Json::Value a;
+        a["char"] = ch->getName();
+        a["account"] = id.c_str();
+        a["result"] = "not_found";
+        AccountAudit::record("kofi_claim_fail", a);
+        if (!ch->is_immortal())
+            ch->setWait(12);
+        ch->pecho(_("Платеж с таким номером не найден или уже зачтен. Номер транзакции есть в квитанции Ko-fi."));
+        return;
+    }
+
+    DLString title = AccountManager::titleOf(id);
+    time_t supporter = AccountManager::supporterUntil(id);
+    if (supporter > now)
+        ch->pecho(_("Платеж зачтен аккаунту {W%1$s{x. Поддержка на Ko-fi до {W%2$s{x. Спасибо!"),
+                  title.c_str(), Date::getTimeAsString(supporter, "%Y-%m-%d").c_str());
+    else
+        ch->pecho(_("Платеж зачтен аккаунту {W%1$s{x. Спасибо за поддержку!"), title.c_str());
+}
+
 CMDRUN( account )
 {
     if (ch->is_npc())
@@ -1164,7 +1339,13 @@ CMDRUN( account )
         return;
     }
 
-    ch->pecho(_("Использование: {yаккаунт{x -- статус, {yаккаунт связать{x -- код в любой бот, {yаккаунт дискорд{x / {yаккаунт телеграм{x -- по каналу, {yаккаунт почта{x <адрес> -- по почте. Подробнее: {hh5106аккаунт{x."));
+    // Ko-fi receipt claim: credit a payment the webhook could not match.
+    if (arg_oneof(cmd, "kofi", "кофи", "кофі")) {
+        account_kofi(ch->getPC(), args);
+        return;
+    }
+
+    ch->pecho(_("Использование: {yаккаунт{x -- статус, {yаккаунт связать{x -- код в любой бот, {yаккаунт дискорд{x / {yаккаунт телеграм{x -- по каналу, {yаккаунт почта{x <адрес> -- по почте, {yаккаунт кофи{x <номер> -- платеж Ko-fi. Подробнее: {hh5106аккаунт{x."));
 }
 
 /*-----------------------------------------------------------------------------

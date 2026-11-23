@@ -3,6 +3,9 @@
  * See ACCOUNTS_NANNY_ROADMAP.md / Trello 2zFpQBoW.
  */
 #include <climits>
+#include <cstdio>
+#include <fstream>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <jsoncpp/json/json.h>
@@ -182,6 +185,11 @@ DLString AccountManager::mintId()
     DLString id;
     for (;;) {
         id = create_secure_nonce(6);
+        // The id doubles as the player's Ko-fi code, matched anywhere in a Ko-fi
+        // message: an all-letter id could be an ordinary word (THANKS), so every
+        // new id carries a digit.
+        if (id.find_first_of("23456789") == string::npos)
+            continue;
         if (accounts.find(id) == accounts.end())
             break;
     }
@@ -189,7 +197,8 @@ DLString AccountManager::mintId()
 }
 
 // Player-facing account titles. The id stays the internal key (filename, pfile
-// attr, `account admin` reference); a player only ever sees this fantasy title.
+// attr, `account admin` reference); players know the account by this fantasy
+// title, and see the id only as the Ko-fi code in `account` status.
 // Titles do NOT need to be unique -- the id is the key -- so a collision is
 // harmless and we never track used combinations. In-world Thera register.
 // ~84 x ~84 x ~56 = ~395k combinations from three static lists, composed at
@@ -289,6 +298,31 @@ DLString AccountManager::echoSafe(const DLString &raw)
     return out;
 }
 
+bool AccountManager::writeAtomic(const DLString &path, const DLString &text)
+{
+    // Write a sibling temp file, check the stream after flush and close (a full
+    // disk only shows up there), then rename() over the target: a reader sees the
+    // old file or the new one, never a truncated one. The ".tmp" extension keeps
+    // a leftover out of nextTypedEntry(".json") scans.
+    DLString tmp = path + ".tmp";
+    std::ofstream out(tmp.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
+    if (!out) {
+        LogStream::sendError() << "Atomic write: cannot open " << tmp << endl;
+        return false;
+    }
+    out << text;
+    out.flush();
+    bool ok = out.good();
+    out.close();
+    ok = ok && !out.fail();
+    if (!ok || ::rename(tmp.c_str(), path.c_str()) != 0) {
+        LogStream::sendError() << "Atomic write: writing " << path << " failed" << endl;
+        ::unlink(tmp.c_str());
+        return false;
+    }
+    return true;
+}
+
 bool AccountManager::saveAccount(const DLString &id)
 {
     map<DLString, Json::Value>::iterator a = accounts.find(id);
@@ -302,9 +336,8 @@ bool AccountManager::saveAccount(const DLString &id)
         // would evaporate on the next reboot. Create the table dir first.
         if (!dir.exist())
             ::mkdir(dir.getCPath(), 0775);
-        DLFileStream(dir, id, ACCOUNT_EXT).fromString(JsonUtils::toString(a->second));
-        return true;
-    } catch (const ExceptionDBIO &e) {
+        return writeAtomic(DLFile(dir, id, ACCOUNT_EXT).getPath(), JsonUtils::toString(a->second));
+    } catch (const std::exception &e) {
         LogStream::sendError() << "Accounts: saving " << id << " failed: " << e.what() << endl;
         return false;
     }
@@ -647,6 +680,52 @@ bool AccountManager::setVaultUnlocked(const DLString &id)
         i->second.removeMember("vault");
         return false;
     }
+    return true;
+}
+
+time_t AccountManager::supporterUntil(const DLString &id)
+{
+    map<DLString, Json::Value>::iterator i = accounts.find(id);
+    if (i == accounts.end())
+        return 0;
+    // .get (not operator[]) so a lookup never writes a null "supporter" key.
+    Json::Value sup = i->second.get("supporter", Json::Value());
+    if (!sup.isObject())
+        return 0;
+    Json::Value until = sup.get("until", Json::Value());
+    return until.isIntegral() ? (time_t)until.asInt64() : 0;
+}
+
+bool AccountManager::extendSupporter(const DLString &id, long long seconds)
+{
+    map<DLString, Json::Value>::iterator i = accounts.find(id);
+    if (i == accounts.end() || seconds < 0)
+        return false;
+    if (seconds == 0)
+        return true;
+
+    long long now = (long long)dreamland->getCurrentTime();
+    long long until = (long long)supporterUntil(id);
+    long long base = until > now ? until : now;
+
+    Json::Value old = i->second.get("supporter", Json::Value());
+    Json::Value sup(Json::objectValue);
+    sup["until"] = (Json::Int64)(base + seconds);
+    i->second["supporter"] = sup;
+
+    if (!saveAccount(id)) {
+        if (old.isNull())
+            i->second.removeMember("supporter");
+        else
+            i->second["supporter"] = old;
+        return false;
+    }
+
+    Json::Value fields;
+    fields["id"] = id.c_str();
+    fields["seconds"] = (Json::Int64)seconds;
+    fields["until"] = (Json::Int64)(base + seconds);
+    AccountAudit::record("supporter", fields);
     return true;
 }
 

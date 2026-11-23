@@ -7,8 +7,10 @@
  *     dreamland_bot.token for these. Code-running endpoints (/api/exec, /api/eval)
  *     take the separate dreamland_ops.token, so a bot token leak never reaches them.
  *   servlet_auth_account_web -- bot token OR the scoped web token (emailcode,
- *     emailverify, info, enter). The web token reaches only these four, none of
- *     which mint a password or attach a character, so a leak stays far below god.
+ *     emailverify, info, enter, kofi). None of these mint a password or attach a
+ *     character, so a leak stays far below god. kofi is the one that writes state:
+ *     a leaked web token could forge Ko-fi payments and grant supporter time.
+ *     Harmless while supporter is only a date -- revisit before it buys anything.
  *
  * 5.1 HARD BLOCKER: dreamland_bot.token must NEVER be placed in the dreamland_web
  * config -- see the roadmap. The broker holds its own account_web.token, matched at
@@ -21,6 +23,7 @@
  *   /account/enter       {identityType, value, char}           -> one-use entry token
  *   /account/emailcode   {email}                               -> mail a login code
  *   /account/emailverify {email, code}                         -> verify + resolve
+ *   /account/kofi        {txn, type, amount, currency, ...}    -> Ko-fi payment ledger
  *
  * Ships dark: with minting gated off (LinkingCode::mintingEnabled) no live codes
  * exist, so /account/redeem always misses and no account is ever created here
@@ -38,6 +41,7 @@
 #include "linkingcode.h"
 #include "emailcode.h"
 #include "accountaudit.h"
+#include "kofiledger.h"
 #include "entrytoken.h"
 #include "messengers.h"
 #include "pcharacter.h"
@@ -122,10 +126,11 @@ static bool servlet_auth_account(Json::Value &params, HttpResponse &response)
     return servlet_auth_bot(params, response);
 }
 
-// Web-capable seam: the four endpoints the browser broker drives (emailcode,
-// emailverify, info, enter). Accepts the scoped web token as well as the god token.
-// None of these mint a password or attach a character, so the web token stays far
-// below god scope even if it leaks.
+// Web-capable seam: the endpoints the dreamland_web broker drives (emailcode,
+// emailverify, info, enter, kofi). Accepts the scoped web token as well as the god
+// token. None of these mint a password or attach a character, so the web token
+// stays far below god scope even if it leaks; kofi can grant supporter time (see
+// the file header).
 static bool servlet_auth_account_web(Json::Value &params, HttpResponse &response)
 {
     if (!params["bottype"].isString()) {
@@ -774,6 +779,99 @@ static void account_emailverify(HttpRequest &request, HttpResponse &response)
     servlet_response_200_json(response, out);
 }
 
+// ---- /account/kofi ---------------------------------------------------------
+//
+// One Ko-fi webhook payment, already verified (verification token) and
+// whitelisted by the dreamland_web broker. Web token auth: the endpoint only
+// records a payment and extends a supporter date, it never mints access.
+// 200 {status, months, duplicate:false} when stored, 200 {duplicate:true} for a
+// transaction already in the ledger, 500 when the ledger write fails so the
+// broker answers Ko-fi with a 5xx and Ko-fi retries.
+
+static const char *KOFI_STRING_FIELDS[] = {
+    "message_id", "timestamp", "type", "amount", "currency", "from_name",
+    "message", "email", "tier_name", "discord_username", "discord_userid", 0
+};
+static const char *KOFI_BOOL_FIELDS[] = {
+    "is_public", "is_subscription_payment", "is_first_subscription_payment", 0
+};
+
+static void account_kofi(HttpRequest &request, HttpResponse &response)
+{
+    Json::Value params;
+    if (!servlet_parse_params(request, response, params))
+        return;
+    if (!servlet_auth_account_web(params, response))
+        return;
+
+    DLString rawTxn;
+    if (!servlet_get_arg(params, response, "txn", rawTxn))
+        return;
+    DLString txn = KofiLedger::sanitizeTxn(rawTxn);
+    if (txn.empty()) {
+        servlet_response_400(response, "Invalid txn");
+        return;
+    }
+
+    DLString type, amount;
+    if (!servlet_get_arg(params, response, "type", type))
+        return;
+    if (!servlet_get_arg(params, response, "amount", amount))
+        return;
+
+    Json::Value payment(Json::objectValue);
+    payment["txn"] = txn.c_str();
+    for (int i = 0; KOFI_STRING_FIELDS[i]; i++) {
+        DLString v;
+        if (servlet_get_arg(params, KOFI_STRING_FIELDS[i], v))
+            payment[KOFI_STRING_FIELDS[i]] = v.substr(0, 1000).c_str();
+    }
+    const Json::Value &args = params["args"];
+    for (int i = 0; KOFI_BOOL_FIELDS[i]; i++)
+        if (args.isObject() && args.get(KOFI_BOOL_FIELDS[i], Json::Value()).isBool())
+            payment[KOFI_BOOL_FIELDS[i]] = args[KOFI_BOOL_FIELDS[i]].asBool();
+    if (args.isObject() && args.get("shop_items", Json::Value()).isArray()) {
+        // Shop items are only stored for the immortal who fulfils the order, never
+        // echoed in-game; the broker passes them as printable ASCII.
+        Json::Value items(Json::arrayValue);
+        const Json::Value &raw = args["shop_items"];
+        for (Json::Value::ArrayIndex i = 0; i < raw.size() && i < 20; i++) {
+            if (!raw[i].isObject())
+                continue;
+            Json::Value item(Json::objectValue);
+            if (raw[i].get("direct_link_code", Json::Value()).isString())
+                item["direct_link_code"] = raw[i]["direct_link_code"].asString().substr(0, 100);
+            if (raw[i].get("variation_name", Json::Value()).isString())
+                item["variation_name"] = raw[i]["variation_name"].asString().substr(0, 100);
+            if (raw[i].get("quantity", Json::Value()).isIntegral())
+                item["quantity"] = raw[i]["quantity"].asInt();
+            items.append(item);
+        }
+        payment["shop_items"] = items;
+    }
+
+    Json::Value entry;
+    KofiLedger::RecordResult r = KofiLedger::record(payment, entry);
+    Json::Value out;
+    if (r == KofiLedger::RECORD_DUPLICATE) {
+        out["duplicate"] = true;
+        servlet_response_200_json(response, out);
+        return;
+    }
+    if (r == KofiLedger::RECORD_FAILED) {
+        response.status = 500;
+        response.message = "Ledger write failed";
+        response.body = "Ledger write failed";
+        return;
+    }
+
+    out["duplicate"] = false;
+    out["status"] = entry["status"];
+    out["match"] = entry["match"];
+    out["months"] = entry["months"];
+    servlet_response_200_json(response, out);
+}
+
 // ---- registration ----------------------------------------------------------
 
 SERVLET_HANDLE(api_account_redeem, "/account/redeem")
@@ -804,4 +902,9 @@ SERVLET_HANDLE(api_account_emailcode, "/account/emailcode")
 SERVLET_HANDLE(api_account_emailverify, "/account/emailverify")
 {
     account_emailverify(request, response);
+}
+
+SERVLET_HANDLE(api_account_kofi, "/account/kofi")
+{
+    account_kofi(request, response);
 }
