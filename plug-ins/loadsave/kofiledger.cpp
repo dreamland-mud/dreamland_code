@@ -370,7 +370,8 @@ KofiLedger::RecordResult KofiLedger::record(const Json::Value &payment, Json::Va
     int months = monthsFor(kofi_str(payment, "amount"));
 
     DLString note;
-    if (type != "Donation" && type != "Subscription")
+    // Ko-fi sends "Tip" for one-off payments; "Donation" is the older name.
+    if (type != "Tip" && type != "Donation" && type != "Subscription")
         note = "type";
     else if (currency != "USD")
         note = "currency";
