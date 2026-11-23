@@ -850,6 +850,13 @@ NMI_INVOKE(Root, aiRequest, "(kind, payload): записать запрос ИИ
 
         DLFile tmp = dir.tempEntry();
         DLFileStream(tmp).fromString(text);
+        // fromString does not check the write: a full disk leaves a short
+        // file, which must not be published as a request.
+        if (tmp.getSize() != (int)text.size()) {
+            LogStream::sendError() << "aiRequest: short write to " << tmp.getPath() << endl;
+            tmp.remove();
+            return Register(false);
+        }
         if (!tmp.rename(tmp.getPath() + ".json")) {
             tmp.remove();
             return Register(false);
