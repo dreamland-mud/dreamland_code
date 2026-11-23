@@ -233,8 +233,10 @@ void CachedNoun::update( PCharacter *ch )
         }
     }
 
-    /* names with pretitles */
-    bool colored = ch->getRemorts( ).pretitle;
+    /* names with pretitles: colour for the old remort purchase (kept forever)
+       or a pretitle saved while the account supported the game on Ko-fi */
+    bool colored = ch->getRemorts( ).pretitle
+                   || ch->getAttributes( ).isAvailable( "pretitle_color" );
     map<lang_t, DLString> pretitles;
 
     pretitles[LANG_EN] = colored ? ch->getPretitle() : ch->getPretitle().colourStrip();
