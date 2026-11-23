@@ -385,13 +385,16 @@ void olc_ai_done(OLCState *state, PCharacter *ch, const DLString &entity, int vn
     else if (asked) {
         // The answer 'gen' started is held while this editor is open: land it
         // now. No line: 'gen' said what comes, the worker says when it lands.
-        // A lost request costs time only, the worker retries a held answer.
+        // Without this request a mob or object job reads as abandoned (the
+        // editor is gone, no 'done' heard) and is dropped after 2 minutes.
         Json::Value payload;
         payload["entity"] = entity;
         payload["vnum"] = askedVnum;
         payload["builder"] = ch->getName();
         DLString error;
-        olc_ai_send("olc_land", payload, error);
+        if (olc_ai_send("olc_land", payload, error) != AI_REQUEST_OK)
+            ptc(ch, "{CAI:{x could not tell the AI that you are done (%s): the 'gen' text may not land. "
+                    "Type {Wgen{x again in the editor to retry.\r\n", error.c_str());
     }
 
     // redit follows the builder: 'gen' may have been typed in another room.

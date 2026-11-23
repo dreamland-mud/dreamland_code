@@ -485,6 +485,11 @@ static bool run_on_state(::Pointer<State> state, OlcOpContext &ctx, OlcOpLine &l
             if (refusal.empty())
                 state->commit();
         }
+        // A 'gen' op queued a job from this state's copy: the state ends
+        // here, as 'done' would end an editor, so tell the worker to land it
+        // (it drops a mob or object job whose editor went without one).
+        if (state->aiAsked)
+            olc_ai_done(state.getPointer(), ctx.ch, state->getJournalKind(), state->getJournalVnum());
     } catch (...) {
         state->OLCState::detach(ctx.ch);
         throw;
