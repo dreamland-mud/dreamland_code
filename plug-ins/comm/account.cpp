@@ -192,7 +192,7 @@ static void account_status(PCharacter *ch)
     ch->pecho(_("Аккаунт {W%1$s{x."), AccountManager::titleOf(id).c_str());
 
     // The account id, shown so a Ko-fi payer can put it in the Ko-fi message.
-    ch->pecho(_("Код для Ko-fi: {W%1$s{x"), id.c_str());
+    ch->pecho(_("Код для Ko-fi: {W%1$s{x -- впиши его в сообщение к платежу на Ko-fi."), id.c_str());
 
     time_t supporter = AccountManager::supporterUntil(id);
     if (supporter > dreamland->getCurrentTime())
@@ -215,6 +215,15 @@ static void account_status(PCharacter *ch)
             ch->pecho("  {W%1$s{x: %2$s", type.c_str(), AccountManager::echoSafe(display).c_str());
         }
     }
+
+    // Ko-fi matches a payment by email, so an account without one (Telegram-only is
+    // common) only gets credited through the code in the message or an immortal.
+    bool hasEmail = false;
+    for (Json::Value::const_iterator i = identities.begin(); i != identities.end(); ++i)
+        if ((*i).isObject() && (*i)["type"].asString() == "email")
+            hasEmail = true;
+    if (!hasEmail)
+        ch->pecho(_("Добавь почту ({yаккаунт почта{x <адрес>): по ней платежи с Ko-fi сами найдут аккаунт, и с ней можно войти на сайте."));
 
     ch->pecho(_("Персонажи аккаунта (кликни, чтобы войти):"));
     for (const DLString &name : AccountManager::charsOf(id)) {
