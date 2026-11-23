@@ -1552,6 +1552,16 @@ NMI_INVOKE( Root, accountChars, "(id): список (List) имен персон
     return wrap(list);
 }
 
+NMI_INVOKE( Root, supporterUntil, "(name): до какого времени (секунды) аккаунт персонажа name поддерживает игру на Ko-fi, 0 если нет аккаунта или поддержки")
+{
+    DLString id = AccountManager::accountOf(args2string(args));
+
+    if (id.empty( ))
+        return Register(0);
+
+    return Register((int)AccountManager::supporterUntil(id));
+}
+
 NMI_GET( Root, clanNames, "список (List) имен всех кланов, в порядке реестра")
 {
     RegList::Pointer list(NEW);
