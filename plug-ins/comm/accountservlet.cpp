@@ -7,8 +7,10 @@
  *     dreamland_bot.token for these. Code-running endpoints (/api/exec, /api/eval)
  *     take the separate dreamland_ops.token, so a bot token leak never reaches them.
  *   servlet_auth_account_web -- bot token OR the scoped web token (emailcode,
- *     emailverify, info, enter). The web token reaches only these four, none of
- *     which mint a password or attach a character, so a leak stays far below god.
+ *     emailverify, info, enter, kofi). None of these mint a password or attach a
+ *     character, so a leak stays far below god. kofi is the one that writes state:
+ *     a leaked web token could forge Ko-fi payments and grant supporter time.
+ *     Harmless while supporter is only a date -- revisit before it buys anything.
  *
  * 5.1 HARD BLOCKER: dreamland_bot.token must NEVER be placed in the dreamland_web
  * config -- see the roadmap. The broker holds its own account_web.token, matched at
@@ -124,10 +126,11 @@ static bool servlet_auth_account(Json::Value &params, HttpResponse &response)
     return servlet_auth_bot(params, response);
 }
 
-// Web-capable seam: the four endpoints the browser broker drives (emailcode,
-// emailverify, info, enter). Accepts the scoped web token as well as the god token.
-// None of these mint a password or attach a character, so the web token stays far
-// below god scope even if it leaks.
+// Web-capable seam: the endpoints the dreamland_web broker drives (emailcode,
+// emailverify, info, enter, kofi). Accepts the scoped web token as well as the god
+// token. None of these mint a password or attach a character, so the web token
+// stays far below god scope even if it leaks; kofi can grant supporter time (see
+// the file header).
 static bool servlet_auth_account_web(Json::Value &params, HttpResponse &response)
 {
     if (!params["bottype"].isString()) {

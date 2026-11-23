@@ -127,6 +127,10 @@ public:
     static time_t supporterUntil(const DLString &id);
     static bool extendSupporter(const DLString &id, long long seconds);
 
+    // Write text to path via a temp file + rename(). False (target untouched) on
+    // any open, write, flush, close or rename failure. Shared with KofiLedger.
+    static bool writeAtomic(const DLString &path, const DLString &text);
+
     // The shared money bank (top-level "bank": {"gold","silver","qp"}). Every
     // member character deposits into and withdraws from the same balances, so
     // the money belongs to the account, not a char. bankBalance answers 0 for an

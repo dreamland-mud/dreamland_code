@@ -1111,9 +1111,9 @@ static void account_profile(PCharacter *ch, DLString &args)
     ch->pecho(_("Спрятать персонажа: {yаккаунт профиль скрыть <имя>{x. Выключить профиль целиком: {yаккаунт профиль выкл{x."));
 }
 
-// Failed `account kofi <txn>` claims per character, in RAM (reboot-cleared). The
+// Failed `account kofi <txn>` claims per ACCOUNT, in RAM (reboot-cleared): the
 // Ko-fi transaction id on the payer's receipt is the proof of payment, so a guesser
-// gets a handful of tries an hour.
+// gets a handful of tries an hour however many characters the account holds.
 struct KofiClaimFails {
     int count;
     time_t since;
@@ -1126,7 +1126,7 @@ static void account_kofi_list(PCharacter *ch)
 {
     std::list<Json::Value> open = KofiLedger::recentOpen(20);
     if (open.empty()) {
-        ch->pecho("No unmatched or manual Ko-fi payments.");
+        ch->pecho("No unmatched, manual or pending Ko-fi payments.");
         return;
     }
 
@@ -1135,27 +1135,88 @@ static void account_kofi_list(PCharacter *ch)
         const Json::Value &p = e["payment"];
         Json::Value received = e.get("received", Json::Value(0));
         time_t when = received.isIntegral() ? (time_t)received.asInt64() : 0;
+        Json::Value note = e.get("note", Json::Value());
+        Json::Value acc = e.get("account", Json::Value());
         // from_name is payer-typed: escape it before the mudtag renderer. The
         // email is a match key only and is never shown.
-        ch->pecho("  %1$s {W%2$s{x %3$s %4$s %5$s from '%6$s', txn %7$s",
+        ch->pecho("  %1$s {W%2$s%3$s{x %4$s %5$s %6$s from '%7$s'%8$s, txn %9$s",
                   Date::getTimeAsString(when, "%Y-%m-%d %H:%M").c_str(),
                   e.get("status", "").asString().c_str(),
+                  note.isString() ? ("/" + note.asString()).c_str() : "",
                   p.get("type", "").asString().c_str(),
                   p.get("amount", "").asString().c_str(),
                   p.get("currency", "").asString().c_str(),
                   AccountManager::echoSafe(p.get("from_name", "").asString()).c_str(),
+                  acc.isString() ? (", account " + acc.asString()).c_str() : "",
                   e.get("txn", "").asString().c_str());
     }
+    ch->pecho("Pending = a credit was in flight: check the account before you credit or resolve it.");
+    ch->pecho("account kofi credit <txn> <account id> [months] | account kofi resolve <txn>");
+}
+
+static const char *kofi_result_text(KofiLedger::ClaimResult r)
+{
+    switch (r) {
+    case KofiLedger::CLAIM_NOT_FOUND:   return "no such transaction";
+    case KofiLedger::CLAIM_TAKEN:       return "the entry is not in a state this command handles";
+    case KofiLedger::CLAIM_FAILED:      return "the write failed, see the log";
+    case KofiLedger::CLAIM_BAD_AMOUNT:  return "amount is malformed or not USD -- give the months";
+    default:                            return "done";
+    }
+}
+
+// Admin-level Ko-fi ledger tools: an unmatched txn id is enough to claim the
+// payment, so these sit above plain immortal trust.
+static bool account_kofi_admin(PCharacter *ch, const DLString &sub, DLString &args)
+{
+    if (ch->get_trust() < KofiLedger::adminLevel())
+        return false;
+
+    if (arg_oneof(sub, "list")) {
+        account_kofi_list(ch);
+        return true;
+    }
+
+    if (arg_oneof(sub, "resolve")) {
+        DLString txn = KofiLedger::sanitizeTxn(args.getOneArgument());
+        Json::Value entry;
+        KofiLedger::ClaimResult r = txn.empty() ? KofiLedger::CLAIM_NOT_FOUND
+                                                : KofiLedger::resolve(txn, ch->getName(), entry);
+        ch->pecho("Ko-fi resolve %1$s: %2$s.", txn.c_str(), kofi_result_text(r));
+        return true;
+    }
+
+    if (arg_oneof(sub, "credit")) {
+        DLString txn = KofiLedger::sanitizeTxn(args.getOneArgument());
+        DLString id = args.getOneArgument().toUpper();
+        DLString monthsArg = args.getOneArgument();
+        if (txn.empty() || !AccountManager::exists(id)) {
+            ch->pecho("Usage: account kofi credit <txn> <account id> [months]. The account must exist.");
+            return true;
+        }
+        int months = -1;
+        if (!monthsArg.empty()) {
+            if (monthsArg.size() > 4 || !monthsArg.isNumber() || monthsArg.toInt() < 0 || monthsArg.toInt() > 1200) {
+                ch->pecho("Months must be a number from 0 to 1200.");
+                return true;
+            }
+            months = monthsArg.toInt();
+        }
+        Json::Value entry;
+        KofiLedger::ClaimResult r = KofiLedger::credit(txn, id, months, ch->getName(), entry);
+        ch->pecho("Ko-fi credit %1$s to %2$s: %3$s.", txn.c_str(), id.c_str(), kofi_result_text(r));
+        return true;
+    }
+
+    return false;
 }
 
 static void account_kofi(PCharacter *ch, DLString &args)
 {
     DLString arg = args.getOneArgument();
 
-    if (ch->is_immortal() && arg_oneof(arg, "list", "список")) {
-        account_kofi_list(ch);
+    if (!arg.empty() && account_kofi_admin(ch, arg, args))
         return;
-    }
 
     if (arg.empty()) {
         ch->pecho(_("Укажи номер транзакции из квитанции Ko-fi: {yаккаунт кофи{x <номер>. Подробнее: {hh5106аккаунт{x."));
@@ -1169,7 +1230,7 @@ static void account_kofi(PCharacter *ch, DLString &args)
     }
 
     time_t now = dreamland->getCurrentTime();
-    KofiClaimFails &fails = kofiClaimFails[ch->getName()];
+    KofiClaimFails &fails = kofiClaimFails[id];
     if (now - fails.since > KOFI_CLAIM_WINDOW) {
         fails.count = 0;
         fails.since = now;
@@ -1196,6 +1257,7 @@ static void account_kofi(PCharacter *ch, DLString &args)
         fails.count++;
         Json::Value a;
         a["char"] = ch->getName();
+        a["account"] = id.c_str();
         a["result"] = "not_found";
         AccountAudit::record("kofi_claim_fail", a);
         if (!ch->is_immortal())
@@ -1283,7 +1345,7 @@ CMDRUN( account )
         return;
     }
 
-    ch->pecho(_("Использование: {yаккаунт{x -- статус, {yаккаунт связать{x -- код в любой бот, {yаккаунт дискорд{x / {yаккаунт телеграм{x -- по каналу, {yаккаунт почта{x <адрес> -- по почте. Подробнее: {hh5106аккаунт{x."));
+    ch->pecho(_("Использование: {yаккаунт{x -- статус, {yаккаунт связать{x -- код в любой бот, {yаккаунт дискорд{x / {yаккаунт телеграм{x -- по каналу, {yаккаунт почта{x <адрес> -- по почте, {yаккаунт кофи{x <номер> -- платеж Ko-fi. Подробнее: {hh5106аккаунт{x."));
 }
 
 /*-----------------------------------------------------------------------------
