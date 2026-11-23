@@ -191,6 +191,9 @@ static void account_status(PCharacter *ch)
 
     ch->pecho(_("Аккаунт {W%1$s{x."), AccountManager::titleOf(id).c_str());
 
+    // The account id, shown so a Ko-fi payer can put it in the Ko-fi message.
+    ch->pecho(_("Код для Ko-fi: {W%1$s{x"), id.c_str());
+
     time_t supporter = AccountManager::supporterUntil(id);
     if (supporter > dreamland->getCurrentTime())
         ch->pecho(_("Поддержка на Ko-fi до {W%1$s{x. Спасибо!"),

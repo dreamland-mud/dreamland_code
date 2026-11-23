@@ -114,16 +114,23 @@ bool KofiLedger::load(const DLString &txn, Json::Value &entry)
     }
 }
 
-// Account id named in the payer's Ko-fi message: first an exact 6-char account id
-// (any case), then a Latin word that is a character on an account. Latin only, so
-// PCharacterManager's Cyrillic declension matching never runs on free text.
+// Account named in the payer's Ko-fi message. The account id (the "Ko-fi code" from
+// `account` status) matches anywhere in the text, any case. A character name matches
+// only when the whole message, punctuation dropped and trimmed, is that one Latin
+// word: a stranger's credit is worse than an unmatched payment, which the receipt
+// claim recovers. Latin only, so PCharacterManager's Cyrillic declension matching
+// never runs on free text.
 static DLString kofi_match_message(const DLString &msg, DLString &how)
 {
     vector<DLString> words;
-    DLString cur;
+    DLString cur, bare;
     for (string::size_type i = 0; i <= msg.size(); i++) {
         char c = i < msg.size() ? msg[i] : ' ';
         bool alnum = (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9');
+        bool space = (c == ' ' || c == '\t' || c == '\r' || c == '\n');
+        // bare: the message without punctuation; non-ASCII bytes are letters here.
+        if (alnum || space || (unsigned char)c >= 0x80)
+            bare += c;
         if (alnum) {
             cur += c;
         } else if (!cur.empty()) {
@@ -142,20 +149,20 @@ static DLString kofi_match_message(const DLString &msg, DLString &how)
         }
     }
 
-    for (const DLString &w: words) {
-        if (w.size() < 2 || w.size() > 12)
-            continue;
-        bool alpha = true;
-        for (string::size_type i = 0; i < w.size(); i++)
-            if (w[i] >= '0' && w[i] <= '9')
-                alpha = false;
-        if (!alpha)
-            continue;
-        DLString id = AccountManager::accountOf(w.toLower());
-        if (!id.empty() && AccountManager::exists(id)) {
-            how = "message_char";
-            return id;
-        }
+    string::size_type first = bare.find_first_not_of(" \t\r\n");
+    if (first == string::npos)
+        return DLString::emptyString;
+    DLString name = bare.substr(first, bare.find_last_not_of(" \t\r\n") - first + 1);
+    if (name.size() < 2 || name.size() > 12)
+        return DLString::emptyString;
+    for (string::size_type i = 0; i < name.size(); i++)
+        if (!((name[i] >= 'A' && name[i] <= 'Z') || (name[i] >= 'a' && name[i] <= 'z')))
+            return DLString::emptyString;
+
+    DLString id = AccountManager::accountOf(name.toLower());
+    if (!id.empty() && AccountManager::exists(id)) {
+        how = "message_char";
+        return id;
     }
     return DLString::emptyString;
 }
