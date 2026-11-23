@@ -71,6 +71,7 @@
 #include "wiznet.h"
 #include "infonet.h"
 #include "messengers.h"
+#include "accountmanager.h"
 #include "descriptorstatemanager.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
@@ -123,6 +124,34 @@ static bool oprog_quit( Object *obj, Character *ch, bool count )
     }
 
     return false;
+}
+
+
+// Ko-fi supporter quit echo (account echo): one finished sentence per language,
+// written by Fenia into pfile attributes echo_quit_en/ru/ua. Empty when the
+// char has none, any language is missing, or support has lapsed (the text is
+// kept and shows again on renewal).
+static DLString quit_echo( PCharacter *pch, lang_t lang )
+{
+    static const char *attrNames[] = { "echo_quit_en", "echo_quit_ru", "echo_quit_ua" };
+    DLString texts[3];
+
+    for (int i = 0; i < 3; i++) {
+        XMLStringAttribute::Pointer a = pch->getAttributes( ).findAttr<XMLStringAttribute>( attrNames[i] );
+        if (!a || a->getValue( ).empty( ))
+            return DLString::emptyString;
+        texts[i] = a->getValue( );
+    }
+
+    DLString id = AccountManager::accountOf( pch->getName( ) );
+    if (id.empty( ) || AccountManager::supporterUntil( id ) <= dreamland->getCurrentTime( ))
+        return DLString::emptyString;
+
+    switch (lang) {
+    case LANG_EN: return texts[0];
+    case LANG_UA: return texts[2];
+    default:      return texts[1];
+    }
 }
 
 CMDRUNP( quit )
@@ -306,15 +335,36 @@ CMDRUNP( quit )
     if (pch->desc && !fQuiet)
         DescriptorStateManager::getThis( )->handle( CON_PLAYING, CON_QUIT, pch->desc );
 
-    oldact_p(_("$c1 покину$gло|л|ла этот мир."), pch, 0, 0, TO_ROOM ,POS_DEAD);
+    // The echo names the char, so a watcher who can't see them gets the stock
+    // line ("someone"). Echo text is an argument, never a format string.
+    bool hasEcho = !quit_echo( pch, LANG_RU ).empty( );
+    if (!hasEcho)
+        oldact_p(_("$c1 покину$gло|л|ла этот мир."), pch, 0, 0, TO_ROOM ,POS_DEAD);
+    else if (pch->in_room)
+        for (Character *rch = pch->in_room->people; rch; rch = rch->next_in_room) {
+            if (rch == pch)
+                continue;
+            if (rch->can_see( pch ))
+                rch->pecho( "%s", quit_echo( pch, viewerLang( rch ) ).c_str( ) );
+            else
+                oldact_p(_("$c1 покину$gло|л|ла этот мир."), pch, 0, rch, TO_VICT, POS_DEAD);
+        }
 
     if (!pch->getPC( )->getAttributes( ).isAvailable("quietLogin")) {
         wiznet( WIZ_LOGINS, 0, pch->get_trust( ), "%1$#C1 покину%1$#Gло|л|ла этот мир.", pch );
 
         // Immortals come and go all the time; only wiznet hears about it.
         if (!pch->is_immortal( )) {
-            infonet(pch, 0, _("{CВести: {W%1$#C1 покину%1$#Gло|л|ла Мир Мечты.{x"), pch);
-            send_discord_orb(fmtLang(LANG_EN, _("%1$#C1 покинул%1$#Gо||а Мир Мечты."), pch));
+            if (hasEcho) {
+                for (Descriptor *d = descriptor_list; d != 0; d = d->next)
+                    if (infonet_listener( d, pch, 0 ))
+                        d->character->pecho( "{W%s{x", quit_echo( pch, viewerLang( d->character ) ).c_str( ) );
+                send_discord_orb( quit_echo( pch, LANG_EN ) );
+            }
+            else {
+                infonet(pch, 0, _("{CВести: {W%1$#C1 покину%1$#Gло|л|ла Мир Мечты.{x"), pch);
+                send_discord_orb(fmtLang(LANG_EN, _("%1$#C1 покинул%1$#Gо||а Мир Мечты."), pch));
+            }
         }
     }
 
