@@ -121,6 +121,11 @@ public:
     bool lastChanged;
     /** Set by journal(), cleared when 'done' journals: edits not yet committed. */
     bool pendingDone;
+    /** AI phase 1 (olcaigen.cpp): 'gen [hint]' was typed in this editor. The
+     *  request goes out at 'done', after the commit, so the worker reads what
+     *  the builder wrote and never a copy still in the editor. */
+    bool aiAsked;
+    DLString aiHint;
     /** Journal profile and source: "immortal"/"editor" in game, OlcOps sets its own. */
     DLString journalProfile, journalSource;
 
@@ -281,8 +286,11 @@ public:
                                          cmd->getKey( ), 
                                          cmd->getVal( ).method );
 
+        // 'gen' spends money on the AI: only the full word reaches it, an
+        // abbreviation like 'ge' keeps meaning what it meant before.
         for (cmd = Chain::begin( ); cmd; cmd = cmd->getNext( ))
-            if (name.strPrefix( cmd->getKey( ) ) || name.strPrefix(cmd->getVal().rname))
+            if (cmd->getKey( ) != "gen"
+                && (name.strPrefix( cmd->getKey( ) ) || name.strPrefix(cmd->getVal().rname)))
                 return typename Command::Pointer( NEW, 
                                          (T *)this, 
                                          cmd->getKey( ), 

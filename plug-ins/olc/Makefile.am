@@ -33,6 +33,7 @@ bedit.cpp \
 olcservlet.cpp \
 olcops.cpp \
 olcvalidate.cpp \
+olcaigen.cpp \
 capturebufferhandler.cpp
 
 libolc_la_MOC = \
