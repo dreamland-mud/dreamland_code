@@ -14,6 +14,7 @@
 #include "room.h"
 #include "commonattributes.h"
 #include "hometown.h"
+#include "accountmanager.h"
 #include "wiznet.h"
 #include "infonet.h"
 #include "messengers.h"
@@ -117,6 +118,19 @@ bool Player::checkSoulJar(PCharacter *pch)
     return false;
 }
 
+bool Player::needsAccount(PCharacter *pch)
+{
+    int level = pch->getLevel();
+
+    if (level <= 19 || level >= LEVEL_HERO - 1)
+        return false;
+
+    if (pch->getAttributes().isAvailable( "noexp" ))
+        return false;
+
+    return AccountManager::accountOf( pch->getName( ) ).empty( );
+}
+
 /*
  *  Gain experience
  */
@@ -151,6 +165,12 @@ void Player::gainExp(PCharacter *pch, int gain)
     
     if (pch->getAttributes().isAvailable( "noexp" ))
         return;
+
+    if (needsAccount(pch)) {
+        pch->pecho(_("Ты больше не можешь получать опыт, пока не привяжешь персонажа к аккаунту.\n\r"
+                "Набери 'аккаунт связать' для ботов или 'аккаунт почта' со своим адресом, подробнее в 'справка аккаунт'."));
+        return;
+    }
 
     pch->exp = max( pch->getExpPerLevel( level ), pch->exp + gain ); 
 

@@ -23,6 +23,10 @@ namespace Player {
      *  soul any more, clear the bit and tell the player. Returns true if
      *  PLR_NO_EXP is still set afterwards. */
     bool checkSoulJar(PCharacter *pch);
+
+    /** Level 20-99 mortal with no account and no 'noexp' opt-out: such a
+     *  character gains no experience until it is linked to an account. */
+    bool needsAccount(PCharacter *pch);
 };
 
 #endif

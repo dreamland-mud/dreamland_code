@@ -117,6 +117,13 @@ void Questor::doComplete( PCharacter *client, DLString &args )
 
         // Handle 'quest complete exp' syntax.
         bool fExpReward = arg_is(arg, "exp");
+
+        // Experience would be thrown away by the account gate: pay points.
+        if (fExpReward && Player::needsAccount(client)) {
+            tell_raw( client, ch, _("Опыт тебе сейчас не впрок: персонаж не привязан к аккаунту. Держи квестовые единицы.") );
+            fExpReward = false;
+        }
+
         if (fExpReward)
             reward->points = 0;
         else
