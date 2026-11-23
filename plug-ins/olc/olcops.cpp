@@ -485,6 +485,11 @@ static bool run_on_state(::Pointer<State> state, OlcOpContext &ctx, OlcOpLine &l
             if (refusal.empty())
                 state->commit();
         }
+        // A 'gen' op queued a job from this state's copy: the state ends
+        // here, as 'done' would end an editor, so tell the worker to land it
+        // (it drops a mob or object job whose editor went without one).
+        if (state->aiAsked)
+            olc_ai_done(state.getPointer(), ctx.ch, state->getJournalKind(), state->getJournalVnum());
     } catch (...) {
         state->OLCState::detach(ctx.ch);
         throw;
@@ -829,6 +834,29 @@ static XMLNode::Pointer to_node(const Serializer &x, const char *name)
     return node;
 }
 
+/** A prototype as the area save serializer writes it. Any copy works: the
+ *  index entry or an editor's copy of it. */
+static XMLNode::Pointer room_node(RoomIndexData *pRoom)
+{
+    XMLRoom xr;
+    xr.init(pRoom);
+    return to_node(xr, "room");
+}
+
+static XMLNode::Pointer mob_node(const mob_index_data *pMob)
+{
+    XMLMobileFactory f;
+    f.init(pMob);
+    return to_node(f, "mobile");
+}
+
+static XMLNode::Pointer obj_node(const obj_index_data *pObj)
+{
+    XMLObjectFactory f;
+    f.init(pObj);
+    return to_node(f, "object");
+}
+
 /** The node as an XML document, in KOI8 like every other result string:
  *  XMLDocument::save writes UTF-8 and the response converts the whole JSON. */
 static DLString node_xml(XMLNode::Pointer node)
@@ -887,6 +915,21 @@ static bool get_result(OlcOpContext &ctx, const Json::Value &op, XMLNode::Pointe
 
     res["data"] = data;
     return true;
+}
+
+Json::Value olc_room_json(RoomIndexData *pRoom)
+{
+    return xml_node_json(room_node(pRoom));
+}
+
+Json::Value olc_mob_json(const mob_index_data *pMob)
+{
+    return xml_node_json(mob_node(pMob));
+}
+
+Json::Value olc_obj_json(const obj_index_data *pObj)
+{
+    return xml_node_json(obj_node(pObj));
 }
 
 /*--------------------------------------------------------------------------
@@ -1595,30 +1638,24 @@ static bool prototype_op(OlcOpContext &ctx, const DLString &kind, const DLString
 
         if (kind == "room") {
             RoomIndexData *pRoom = get_room_index(vnum);
-            XMLRoom xr;
-            xr.init(pRoom);
             extra["area"] = pRoom->areaIndex->vnum;
             // Phase 0 answered a room get with xml, and older dl_redit
             // clients read only that: json is opt-in via fields or format.
             const char *defaultFormat = op.isMember("fields") ? "json" : "xml";
-            return get_result(ctx, op, to_node(xr, "room"), extra, res, error, defaultFormat);
+            return get_result(ctx, op, room_node(pRoom), extra, res, error, defaultFormat);
         }
 
         if (kind == "mob") {
             MOB_INDEX_DATA *pMob = get_mob_index(vnum);
-            XMLMobileFactory f;
-            f.init(pMob);
             if (pMob->area)
                 extra["area"] = pMob->area->vnum;
-            return get_result(ctx, op, to_node(f, "mobile"), extra, res, error);
+            return get_result(ctx, op, mob_node(pMob), extra, res, error);
         }
 
         OBJ_INDEX_DATA *pObj = get_obj_index(vnum);
-        XMLObjectFactory f;
-        f.init(pObj);
         if (pObj->area)
             extra["area"] = pObj->area->vnum;
-        return get_result(ctx, op, to_node(f, "object"), extra, res, error);
+        return get_result(ctx, op, obj_node(pObj), extra, res, error);
     }
 
     if (action == "delete" && !part)

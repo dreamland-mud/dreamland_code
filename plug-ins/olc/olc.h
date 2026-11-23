@@ -92,16 +92,20 @@ bool olc_cases_command( PCharacter *ch, const char *argument, XMLMultiString &sh
                         const DLString &gender, bool anim );
 
 class OLCState;
-/** AI phase 1 (olcaigen.cpp): queue a request for the AI worker to write the
- *  empty text fields of a room, mob or obj prototype ("room"/"mob"/"obj").
- *  manual = 'gen' was typed: also extra descriptions and material, and never
- *  skipped by 'gen auto off'. Otherwise only an empty core text field queues
- *  one, and only while AI is on (.tmp.ai.enabled("olc_gen")). */
-void olc_ai_gen( PCharacter *ch, const DLString &entity, int vnum, bool manual, const DLString &hint );
-/** Called by every editor's 'done' after its commit: the request of a 'gen'
- *  typed in this editor, or the automatic one. */
+struct mob_index_data;
+struct obj_index_data;
+/** AI phase 1 (olcaigen.cpp). Called by every editor's 'done' after its
+ *  commit: tells the worker to land the answer of a 'gen' typed in this
+ *  editor, else queues the automatic request for the empty core text of the
+ *  committed prototype ("room"/"mob"/"obj"; only while AI is on and the
+ *  builder has not typed 'gen auto off'). */
 void olc_ai_done( OLCState *state, PCharacter *ch, const DLString &entity, int vnum );
-/** The editors' 'gen' subcommand: gen [hint] | gen auto on|off | gen revert [vnum]. */
-bool olc_ai_gen_command( OLCState *state, PCharacter *ch, const DLString &entity, int vnum, const char *argument );
+/** The editors' 'gen' subcommand on the prototype the editor holds (redit:
+ *  the room itself, medit/oedit: their copy): gen [hint] | gen auto on|off |
+ *  gen revert [vnum]. 'gen [hint]' sends that copy, so the model starts
+ *  before 'done'. */
+bool olc_ai_gen_command( OLCState *state, PCharacter *ch, RoomIndexData *pRoom, const char *argument );
+bool olc_ai_gen_command( OLCState *state, PCharacter *ch, const mob_index_data *mob, const char *argument );
+bool olc_ai_gen_command( OLCState *state, PCharacter *ch, const obj_index_data *obj, const char *argument );
 
 #endif /* __OLC_H__ */

@@ -468,7 +468,7 @@ void OLCStateMobile::statePrompt(Descriptor *d)
 // abbreviation keeps reaching the commands it reached before 'gen' existed.
 MEDIT(gen)
 {
-    return olc_ai_gen_command(this, ch, "mob", mob.vnum, argument);
+    return olc_ai_gen_command(this, ch, &mob, argument);
 }
 
 // Defined before every other subcommand: the chain matches the last defined
@@ -1415,6 +1415,7 @@ MEDIT(done)
 
 MEDIT(cancel)
 {
+    aiCancel(ch);
     detach(ch);
     return false;
 }

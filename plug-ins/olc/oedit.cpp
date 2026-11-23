@@ -284,7 +284,7 @@ OEDIT(gen)
     if (gender)
         return genderEdit(obj.gram_gender);
 
-    return olc_ai_gen_command(this, ch, "obj", obj.vnum, argument);
+    return olc_ai_gen_command(this, ch, &obj, argument);
 }
 
 // Defined before every other subcommand: the chain matches the last defined
@@ -1344,6 +1344,7 @@ OEDIT(done)
 
 OEDIT(cancel)
 {
+    aiCancel(ch);
     detach(ch);
     return false;
 }
