@@ -121,11 +121,12 @@ public:
     bool lastChanged;
     /** Set by journal(), cleared when 'done' journals: edits not yet committed. */
     bool pendingDone;
-    /** AI phase 1 (olcaigen.cpp): 'gen [hint]' was typed in this editor. The
-     *  request goes out at 'done', after the commit, so the worker reads what
-     *  the builder wrote and never a copy still in the editor. */
+    /** AI phase 1 (olcaigen.cpp): 'gen [hint]' was typed in this editor and
+     *  sent the editor's copy of aiVnum to the worker, which writes the
+     *  answer once the editor lets go of it. 'done' tells the worker to land
+     *  it now instead of at its next retry. */
     bool aiAsked;
-    DLString aiHint;
+    int aiVnum;
     /** Journal profile and source: "immortal"/"editor" in game, OlcOps sets its own. */
     DLString journalProfile, journalSource;
 

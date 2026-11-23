@@ -103,6 +103,17 @@ public:
     static bool toKoi(const std::string &utf, DLString &koi, DLString &error);
 };
 
+struct mob_index_data;
+struct obj_index_data;
+struct RoomIndexData;
+
+/** The JSON a 'get' op answers in "data" (no vnum, no area), built from any
+ *  copy of a prototype: the index entry or an editor's copy (olcaigen.cpp
+ *  sends the copy to the AI worker at 'gen'). Strings KOI8. */
+Json::Value olc_room_json(RoomIndexData *pRoom);
+Json::Value olc_mob_json(const mob_index_data *pMob);
+Json::Value olc_obj_json(const obj_index_data *pObj);
+
 /** Appends one line to the op journal and echoes it to wiznet. All strings KOI8. */
 void olc_journal(const DLString &actor, const DLString &profile, const DLString &source,
                  const DLString &kind, int vnum, const DLString &cmd, const DLString &args);
