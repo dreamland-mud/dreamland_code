@@ -1415,6 +1415,7 @@ MEDIT(done)
 
 MEDIT(cancel)
 {
+    aiCancel(ch);
     detach(ch);
     return false;
 }

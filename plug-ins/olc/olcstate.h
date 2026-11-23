@@ -127,6 +127,10 @@ public:
      *  it now instead of at its next retry. */
     bool aiAsked;
     int aiVnum;
+    /** An exit that throws the editor's copy away ('cancel', a subcommand
+     *  that threw): the worker drops that 'gen' so no AI text lands later.
+     *  redit edits in place, nothing is thrown away there. olcaigen.cpp. */
+    void aiCancel( PCharacter *ch );
     /** Journal profile and source: "immortal"/"editor" in game, OlcOps sets its own. */
     DLString journalProfile, journalSource;
 
@@ -251,6 +255,7 @@ public:
             } catch (const Exception &e) {
                 LogStream::sendError() << "OLC " << e.what() << endl;
                 pch->pecho(e.what());
+                state->aiCancel(pch);
                 state->detach(pch);
             }
         }

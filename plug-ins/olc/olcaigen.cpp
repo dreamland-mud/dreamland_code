@@ -11,6 +11,7 @@
  *                 only after 'done')
  *   'done'        olc_land for that 'gen': land the held answer now; or, with
  *                 no 'gen' typed, olc_gen for the empty core text as committed
+ *   'cancel'      olc_land with drop: the copy is thrown away, so is the 'gen'
  * The worker writes only the fields still empty when it lands ('ifEmpty',
  * checked by the game in the same call as the write), as journaled OLC ops.
  * Nothing here waits on it.
@@ -293,6 +294,29 @@ void olc_ai_done(OLCState *state, PCharacter *ch, const DLString &entity, int vn
     }
 
     olc_ai_auto(ch, entity, vnum);
+}
+
+void OLCState::aiCancel(PCharacter *ch)
+{
+    if (!aiAsked)
+        return;
+
+    aiAsked = false;
+    if (getJournalKind() == "room")
+        return;
+
+    Json::Value payload;
+    payload["entity"] = getJournalKind();
+    payload["vnum"] = aiVnum;
+    payload["builder"] = ch->getName();
+    payload["drop"] = true;
+    aiVnum = 0;
+
+    DLString error;
+    if (ai_request("olc_land", payload, error) == AI_REQUEST_OK)
+        ch->send_to("{CAI:{x the 'gen' request goes with the editor, nothing will be written.\r\n");
+    else
+        ptc(ch, "{CAI:{x could not drop the 'gen' request (%s): its text may still land.\r\n", error.c_str());
 }
 
 /** Where the 'gen' subcommand reads the prototype from: exactly one is set. */

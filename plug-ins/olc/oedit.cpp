@@ -1344,6 +1344,7 @@ OEDIT(done)
 
 OEDIT(cancel)
 {
+    aiCancel(ch);
     detach(ch);
     return false;
 }
