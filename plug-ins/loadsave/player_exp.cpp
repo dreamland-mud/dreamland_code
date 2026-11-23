@@ -14,6 +14,7 @@
 #include "room.h"
 #include "commonattributes.h"
 #include "hometown.h"
+#include "accountmanager.h"
 #include "wiznet.h"
 #include "infonet.h"
 #include "messengers.h"
@@ -136,6 +137,12 @@ void Player::gainExp(PCharacter *pch, int gain)
     if (level > 19  && pch->getHometown( ) == home_frigate ) {
         pch->pecho(_("Ты больше не можешь получать опыт, пока не выберешь дом.\n\r"
                 "Прочитай 'справка родной город'."));
+        return;
+    }
+
+    if (level > 19 && AccountManager::accountOf( pch->getName( ) ).empty( )) {
+        pch->pecho(_("Ты больше не можешь получать опыт, пока не привяжешь героя к аккаунту.\n\r"
+                "Набери 'аккаунт связать' или прочитай 'справка аккаунт'."));
         return;
     }
 
