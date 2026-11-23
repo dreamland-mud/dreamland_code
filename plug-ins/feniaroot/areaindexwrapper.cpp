@@ -85,6 +85,15 @@ NMI_INVOKE( AreaIndexWrapper, getName, "(lang): название зоны на �
     return Register( target->name.getForLang( argnum2lang( args, 1 ) ) );
 }
 
+NMI_INVOKE( AreaIndexWrapper, getSpeedwalk, "(lang): путь в зону из заголовка (от Рыночной Площади Мидгаарда) на языке lang (0=en,1=ru,2=ua), пустая строка, если не задан" )
+{
+    checkTarget( );
+    if (target->speedwalk.emptyValues( ))
+        return Register( DLString::emptyString );
+
+    return Register( target->speedwalk.getForLang( argnum2lang( args, 1 ) ) );
+}
+
 NMI_GET( AreaIndexWrapper, filename, "название файла зоны") 
 { 
     checkTarget( ); 
