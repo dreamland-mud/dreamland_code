@@ -15,6 +15,7 @@ objectwrapper.cpp \
 objindexwrapper.cpp \
 roomwrapper.cpp \
 root.cpp \
+airequest.cpp \
 schedulerwrapperext.cpp \
 validatetask.cpp \
 wrappermanager.cpp \

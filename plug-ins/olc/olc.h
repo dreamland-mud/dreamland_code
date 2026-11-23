@@ -91,4 +91,13 @@ bool olc_cases_propose( const XMLMultiString &shortDescr, const XMLMultiString *
 bool olc_cases_command( PCharacter *ch, const char *argument, XMLMultiString &shortDescr,
                         const DLString &gender, bool anim );
 
+/** AI phase 1 (olcaigen.cpp): queue a request for the AI worker to write the
+ *  empty text fields of a room, mob or obj prototype ("room"/"mob"/"obj").
+ *  manual = typed 'gen': also extra descriptions and material, and never
+ *  skipped by 'gen auto off'. At 'done' (manual false) only an empty core
+ *  text field queues one. */
+void olc_ai_gen( PCharacter *ch, const DLString &entity, int vnum, bool manual, const DLString &hint );
+/** The editors' 'gen' subcommand: gen [hint] | gen auto on|off | gen revert [vnum]. */
+bool olc_ai_gen_command( PCharacter *ch, const DLString &entity, int vnum, const char *argument );
+
 #endif /* __OLC_H__ */

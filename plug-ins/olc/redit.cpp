@@ -140,6 +140,13 @@ DLString OLCStateRoom::getMenuKey( )
 /*-------------------------------------------------------------------------
  * state level commands
  *-------------------------------------------------------------------------*/
+// Declared first: the chain is searched last-declared first, so an
+// abbreviation keeps reaching the commands it reached before 'gen' existed.
+REDIT(gen, "", "текст ИИ для пустых полей (gen help)")
+{
+    return olc_ai_gen_command(ch, "room", getJournalVnum(), argument);
+}
+
 REDIT(flags, "флаги", "установить или сбросить флаги комнаты (? room_flags)")
 {
     RoomIndexData *pRoom;
@@ -1753,6 +1760,7 @@ REDIT(done, "готово", "выйти из редактора (не забыв
 {
     commit();
     olc_validate_print(ch, "room", getJournalVnum());
+    olc_ai_gen(ch, "room", getJournalVnum(), false, "");
     detach(ch);
     return true;
 }

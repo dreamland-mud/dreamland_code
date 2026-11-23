@@ -268,6 +268,19 @@ void OLCStateObject::statePrompt(Descriptor *d)
 
 // Defined before every other subcommand: the chain matches the last defined
 // first, so 'c', 'ca' and the rest keep resolving to what they did before.
+// Declared first: the chain is searched last-declared first, so an
+// abbreviation keeps reaching the commands it reached before 'gen' existed.
+OEDIT(gen)
+{
+    // 'gen' used to be the shortest way to type 'gender': 'gen f' still is.
+    DLString args = argument;
+    args.stripWhiteSpace();
+    if (!args.empty() && args.size() <= 4 && args.find_first_not_of("mfnp") == DLString::npos)
+        return genderEdit(obj.gram_gender);
+
+    return olc_ai_gen_command(ch, "obj", obj.vnum, argument);
+}
+
 OEDIT(cases)
 {
     return olc_cases_command(ch, argument, obj.short_descr,
@@ -1316,6 +1329,7 @@ OEDIT(done)
     commit();
     ch->send_to(report);
     olc_validate_print(ch, "obj", obj.vnum);
+    olc_ai_gen(ch, "obj", obj.vnum, false, "");
     detach(ch);
     return true;
 }

@@ -1341,7 +1341,10 @@ static bool op_delete(OlcOpContext &ctx, const DLString &kind, int vnum, const J
 static bool prototype_op(OlcOpContext &ctx, const DLString &kind, const DLString &action,
                          int vnum, const Json::Value &op, Json::Value &res, DLString &error)
 {
-    if ((action == "put" || action == "delete") && !editor_refusal(kind, vnum, error))
+    // 'unlessOpen' asks the same of any op: the AI worker writes a mob or
+    // object only when no editor holds a copy its 'done' would commit over.
+    if ((action == "put" || action == "delete" || op_bool(op, "unlessOpen"))
+        && !editor_refusal(kind, vnum, error))
         return false;
 
     if (action == "put")
