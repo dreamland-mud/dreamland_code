@@ -1338,6 +1338,220 @@ static bool op_delete(OlcOpContext &ctx, const DLString &kind, int vnum, const J
     return direct_result(ctx, ok, mark, res, error);
 }
 
+/** Whitespace runs as one space, no space at the ends: the editors may add
+ *  a newline or keep the model's spacing, the comparison should not care. */
+static DLString ws_norm(const DLString &s)
+{
+    DLString out;
+    bool space = false;
+
+    for (char c: s) {
+        if (c == ' ' || c == '\t' || c == '\r' || c == '\n') {
+            space = !out.empty();
+            continue;
+        }
+        if (space)
+            out += ' ';
+        space = false;
+        out += c;
+    }
+    return out;
+}
+
+static bool material_unset(const DLString &material)
+{
+    DLString m = ws_norm(material);
+    return m.empty() || m == "none" || m == "unknown";
+}
+
+/** The language text field a set line writes ("short", "rudesc", ...), or 0. */
+static XMLMultiString *text_field_of(const DLString &kind, int vnum, const DLString &cmdName, lang_t &lang)
+{
+    DLString base = cmdName;
+    lang = EN;
+    if (base.size() > 2 && (base.substr(0, 2) == "ru" || base.substr(0, 2) == "ua")
+        && is_text_field(base.substr(2)))
+    {
+        lang = base.substr(0, 2) == "ru" ? RU : UA;
+        base = base.substr(2);
+    }
+
+    if (kind == "room") {
+        RoomIndexData *pRoom = get_room_index(vnum);
+        if (base == "name")
+            return &pRoom->name;
+        if (base == "desc")
+            return &pRoom->description;
+    }
+    else if (kind == "mob") {
+        MOB_INDEX_DATA *pMob = get_mob_index(vnum);
+        if (base == "name")
+            return &pMob->keyword;
+        if (base == "short")
+            return &pMob->short_descr;
+        if (base == "long")
+            return &pMob->long_descr;
+        if (base == "desc")
+            return &pMob->description;
+    }
+    else if (kind == "obj") {
+        OBJ_INDEX_DATA *pObj = get_obj_index(vnum);
+        if (base == "name")
+            return &pObj->keyword;
+        if (base == "short")
+            return &pObj->short_descr;
+        // oedit 'long' is the ground line, kept in the description field.
+        if (base == "long")
+            return &pObj->description;
+    }
+    return 0;
+}
+
+static ExtraDescrList *ed_list_of(const DLString &kind, int vnum)
+{
+    if (kind == "room")
+        return &get_room_index(vnum)->extraDescriptions;
+    if (kind == "obj")
+        return &get_obj_index(vnum)->extraDescriptions;
+    return 0;
+}
+
+/**
+ * 'ifEmpty' and 'ifEquals': the AI worker's guard against writing over a
+ * builder, checked on the game thread in the same call as the write.
+ *  ifEmpty  set <text field>: refused unless that field is empty in that language.
+ *           set material: refused unless the material is unset (none/unknown).
+ *           cmd [ru|ua]ed paste <kw>: refused when the prototype has another
+ *           extra description, or <kw> already has text in that language. One
+ *           AI extra description lands as three pastes of the same keyword.
+ *  ifEquals set <text field> or material: refused unless it holds this value
+ *           (whitespace aside). delete ed: an {en, ru, ua} object, refused
+ *           unless the extra description holds exactly that.
+ * The prototype exists here: prototype_op checked the index first.
+ */
+static bool guard_refusal(const DLString &kind, int vnum, const DLString &action,
+                          const Json::Value &op, const OlcOpLine &line, DLString &error)
+{
+    bool ifEmpty = op_bool(op, "ifEmpty");
+    bool ifEquals = op.isMember("ifEquals");
+
+    if (!ifEmpty && !ifEquals)
+        return true;
+
+    if (ifEmpty && ifEquals) {
+        error = "ifEmpty and ifEquals do not go together";
+        return false;
+    }
+
+    if (kind != "room" && kind != "mob" && kind != "obj") {
+        error = "ifEmpty and ifEquals are for rooms, mobs and objects";
+        return false;
+    }
+
+    if (action == "set" && line.cmdName == "material" && kind == "obj") {
+        const DLString &material = get_obj_index(vnum)->material;
+        if (ifEmpty && !material_unset(material)) {
+            error = "material is already set";
+            return false;
+        }
+        if (ifEquals) {
+            DLString want;
+            if (!op_string(op, "ifEquals", want, error))
+                return false;
+            if (ws_norm(material) != ws_norm(want)) {
+                error = "material changed since";
+                return false;
+            }
+        }
+        return true;
+    }
+
+    if (action == "set") {
+        lang_t lang;
+        XMLMultiString *field = text_field_of(kind, vnum, line.cmdName, lang);
+        if (!field) {
+            error = "ifEmpty and ifEquals are not for field " + line.cmdName;
+            return false;
+        }
+
+        DLString current = ws_norm(field->get(lang));
+        if (ifEmpty && !current.empty()) {
+            error = line.cmdName + " is not empty";
+            return false;
+        }
+        if (ifEquals) {
+            DLString want;
+            if (!op_string(op, "ifEquals", want, error))
+                return false;
+            if (current != ws_norm(want)) {
+                error = line.cmdName + " changed since";
+                return false;
+            }
+        }
+        return true;
+    }
+
+    ExtraDescrList *eds = ed_list_of(kind, vnum);
+
+    if (action == "cmd" && ifEmpty && eds
+        && (line.cmdName == "ed" || line.cmdName == "rued" || line.cmdName == "uaed"))
+    {
+        DLString args = line.arguments;
+        DLString sub = args.getOneArgument();
+        args.stripWhiteSpace();
+        if (sub != "paste" || args.empty()) {
+            error = "ifEmpty takes only '" + line.cmdName + " paste <keyword>'";
+            return false;
+        }
+
+        lang_t lang = line.cmdName == "ed" ? EN : (line.cmdName == "rued" ? RU : UA);
+        for (auto &ed: *eds) {
+            if (ed->keyword != args) {
+                error = "the prototype has an extra description already";
+                return false;
+            }
+            if (!ws_norm(ed->description.get(lang)).empty()) {
+                error = "extra description " + args + " is not empty";
+                return false;
+            }
+        }
+        return true;
+    }
+
+    if (action == "delete" && ifEquals && eds) {
+        DLString keyword;
+        if (!op_string(op, "ed", keyword, error))
+            return false;
+
+        const Json::Value &want = op["ifEquals"];
+        ExtraDescription *ed = keyword.empty() ? 0 : eds->find(keyword);
+        if (!ed || !want.isObject()) {
+            error = "ifEquals on a delete takes an ed and an {en, ru, ua} object";
+            return false;
+        }
+
+        static const lang_t edLangs[] = { EN, RU, UA };
+        static const char *edLangNames[] = { "en", "ru", "ua" };
+        for (int i = 0; i < 3; i++) {
+            DLString text;
+            if (want.isMember(edLangNames[i])) {
+                if (!want[edLangNames[i]].isString() || !OlcOps::toKoi(want[edLangNames[i]].asString(), text, error)) {
+                    error = DLString("ifEquals.") + edLangNames[i] + ": " + (error.empty() ? DLString("not a string") : error);
+                    return false;
+                }
+            }
+            if (ws_norm(ed->description.get(edLangs[i])) != ws_norm(text)) {
+                error = "extra description " + keyword + " changed since";
+                return false;
+            }
+        }
+        return true;
+    }
+
+    error = "ifEmpty and ifEquals are for a set of a text field or material, an ed paste, or an ed delete";
+    return false;
+}
+
 static bool prototype_op(OlcOpContext &ctx, const DLString &kind, const DLString &action,
                          int vnum, const Json::Value &op, Json::Value &res, DLString &error)
 {
@@ -1371,6 +1585,9 @@ static bool prototype_op(OlcOpContext &ctx, const DLString &kind, const DLString
         error = kind + " vnum " + DLString(vnum) + " not found";
         return false;
     }
+
+    if (action != "get" && !guard_refusal(kind, vnum, action, op, line, error))
+        return false;
 
     if (action == "get") {
         Json::Value extra(Json::objectValue);

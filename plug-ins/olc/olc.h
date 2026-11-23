@@ -91,13 +91,17 @@ bool olc_cases_propose( const XMLMultiString &shortDescr, const XMLMultiString *
 bool olc_cases_command( PCharacter *ch, const char *argument, XMLMultiString &shortDescr,
                         const DLString &gender, bool anim );
 
+class OLCState;
 /** AI phase 1 (olcaigen.cpp): queue a request for the AI worker to write the
  *  empty text fields of a room, mob or obj prototype ("room"/"mob"/"obj").
- *  manual = typed 'gen': also extra descriptions and material, and never
- *  skipped by 'gen auto off'. At 'done' (manual false) only an empty core
- *  text field queues one. */
+ *  manual = 'gen' was typed: also extra descriptions and material, and never
+ *  skipped by 'gen auto off'. Otherwise only an empty core text field queues
+ *  one, and only while AI is on (.tmp.ai.enabled("olc_gen")). */
 void olc_ai_gen( PCharacter *ch, const DLString &entity, int vnum, bool manual, const DLString &hint );
+/** Called by every editor's 'done' after its commit: the request of a 'gen'
+ *  typed in this editor, or the automatic one. */
+void olc_ai_done( OLCState *state, PCharacter *ch, const DLString &entity, int vnum );
 /** The editors' 'gen' subcommand: gen [hint] | gen auto on|off | gen revert [vnum]. */
-bool olc_ai_gen_command( PCharacter *ch, const DLString &entity, int vnum, const char *argument );
+bool olc_ai_gen_command( OLCState *state, PCharacter *ch, const DLString &entity, int vnum, const char *argument );
 
 #endif /* __OLC_H__ */

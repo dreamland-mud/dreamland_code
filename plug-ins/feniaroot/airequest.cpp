@@ -6,6 +6,9 @@
 #include "dldirectory.h"
 #include "dlfilestream.h"
 #include "dreamland.h"
+#include "feniamanager.h"
+#include "register-impl.h"
+#include "reglist.h"
 
 static IconvMap ai_koi2utf("koi8-u", "utf-8");
 
@@ -67,4 +70,25 @@ AiRequestResult ai_request(const DLString &kind, const Json::Value &payload, DLS
     }
 
     return AI_REQUEST_OK;
+}
+
+// The same gate every Fenia feature asks (dreamland_fenia utils/ai): the
+// worker's kill switch, 'ai on', 'ai on <feature>' and a fresh heartbeat.
+// A missing or broken helper reads as off.
+bool ai_enabled(const DLString &feature)
+{
+    static Scripting::IdRef ID_TMP("tmp"), ID_AI("ai"), ID_ENABLED("enabled");
+
+    if (!FeniaManager::wrapperManager)
+        return false;
+
+    try {
+        Scripting::Register tmpAi = *(*Scripting::Context::root[ID_TMP])[ID_AI];
+        Scripting::RegisterList args;
+        args.push_back(Scripting::Register(feature));
+        return tmpAi[ID_ENABLED](args).toBoolean();
+    }
+    catch (const ::Exception &) {
+        return false;
+    }
 }

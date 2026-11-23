@@ -266,21 +266,29 @@ void OLCStateObject::statePrompt(Descriptor *d)
     d->send( "Editing obj> " );
 }
 
-// Defined before every other subcommand: the chain matches the last defined
-// first, so 'c', 'ca' and the rest keep resolving to what they did before.
 // Declared first: the chain is searched last-declared first, so an
 // abbreviation keeps reaching the commands it reached before 'gen' existed.
 OEDIT(gen)
 {
-    // 'gen' used to be the shortest way to type 'gender': 'gen f' still is.
+    // 'gen' used to be a way to type 'gender' (the gender reads only the first
+    // letter): one word that is a gender stays one.
+    static const char *genders[] = { "male", "female", "neuter", "plural", "masculine", "feminine", 0 };
     DLString args = argument;
     args.stripWhiteSpace();
-    if (!args.empty() && args.size() <= 4 && args.find_first_not_of("mfnp") == DLString::npos)
+    DLString word = args;
+    word.toLower();
+    bool gender = !args.empty() && args.find(' ') == DLString::npos
+                  && word.find_first_not_of("mfnp") == DLString::npos;
+    for (int i = 0; !gender && !args.empty() && genders[i]; i++)
+        gender = args.find(' ') == DLString::npos && word.strPrefix(genders[i]);
+    if (gender)
         return genderEdit(obj.gram_gender);
 
-    return olc_ai_gen_command(ch, "obj", obj.vnum, argument);
+    return olc_ai_gen_command(this, ch, "obj", obj.vnum, argument);
 }
 
+// Defined before every other subcommand: the chain matches the last defined
+// first, so 'c', 'ca' and the rest keep resolving to what they did before.
 OEDIT(cases)
 {
     return olc_cases_command(ch, argument, obj.short_descr,
@@ -1329,7 +1337,7 @@ OEDIT(done)
     commit();
     ch->send_to(report);
     olc_validate_print(ch, "obj", obj.vnum);
-    olc_ai_gen(ch, "obj", obj.vnum, false, "");
+    olc_ai_done(this, ch, "obj", obj.vnum);
     detach(ch);
     return true;
 }

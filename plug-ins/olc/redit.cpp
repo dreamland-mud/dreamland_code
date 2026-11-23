@@ -144,7 +144,7 @@ DLString OLCStateRoom::getMenuKey( )
 // abbreviation keeps reaching the commands it reached before 'gen' existed.
 REDIT(gen, "", "текст ИИ для пустых полей (gen help)")
 {
-    return olc_ai_gen_command(ch, "room", getJournalVnum(), argument);
+    return olc_ai_gen_command(this, ch, "room", getJournalVnum(), argument);
 }
 
 REDIT(flags, "флаги", "установить или сбросить флаги комнаты (? room_flags)")
@@ -1760,7 +1760,7 @@ REDIT(done, "готово", "выйти из редактора (не забыв
 {
     commit();
     olc_validate_print(ch, "room", getJournalVnum());
-    olc_ai_gen(ch, "room", getJournalVnum(), false, "");
+    olc_ai_done(this, ch, "room", getJournalVnum());
     detach(ch);
     return true;
 }

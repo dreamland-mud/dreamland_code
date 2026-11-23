@@ -464,15 +464,15 @@ void OLCStateMobile::statePrompt(Descriptor *d)
 
 // Mobile Editor Functions.
 
-// Defined before every other subcommand: the chain matches the last defined
-// first, so 'c', 'ca' and the rest keep resolving to what they did before.
 // Declared first: the chain is searched last-declared first, so an
 // abbreviation keeps reaching the commands it reached before 'gen' existed.
 MEDIT(gen)
 {
-    return olc_ai_gen_command(ch, "mob", mob.vnum, argument);
+    return olc_ai_gen_command(this, ch, "mob", mob.vnum, argument);
 }
 
+// Defined before every other subcommand: the chain matches the last defined
+// first, so 'c', 'ca' and the rest keep resolving to what they did before.
 MEDIT(cases)
 {
     return olc_cases_command(ch, argument, mob.short_descr,
@@ -1408,7 +1408,7 @@ MEDIT(done)
     commit();
     ch->send_to(report);
     olc_validate_print(ch, "mob", mob.vnum);
-    olc_ai_gen(ch, "mob", mob.vnum, false, "");
+    olc_ai_done(this, ch, "mob", mob.vnum);
     detach(ch);
     return true;
 }

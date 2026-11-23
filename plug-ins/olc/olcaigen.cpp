@@ -3,12 +3,14 @@
  * room, mob or object, written by the AI worker (dreamland_tools ai-worker)
  * through /api/olc after the builder leaves the editor.
  *
- * The editors only queue a spool request (airequest.h). The worker decides
- * whether AI is on (kill switch, 'ai on olc_gen', heartbeat, budget), builds
- * the context, calls the model and writes only the fields still empty when it
- * lands, as journaled OLC ops. Nothing here waits on it.
+ * The editors only queue a spool request (airequest.h), at 'done' after the
+ * commit and only while AI is on (ai_enabled). The worker builds the context,
+ * calls the model and writes only the fields still empty when it lands
+ * (/api/olc 'ifEmpty', checked in the same call as the write), as journaled
+ * OLC ops. Nothing here waits on it.
  */
 #include "olc.h"
+#include "olcstate.h"
 #include "airequest.h"
 #include "commonattributes.h"
 #include "pcharacter.h"
@@ -95,14 +97,6 @@ static bool olc_ai_empty_fields(const DLString &entity, int vnum, Json::Value &e
     return false;
 }
 
-static void olc_ai_queue(PCharacter *ch, const DLString &kind, const Json::Value &payload)
-{
-    DLString error;
-
-    if (ai_request(kind, payload, error) != AI_REQUEST_OK)
-        ptc(ch, "{CAI:{x the request could not be queued: %s\r\n", error.c_str());
-}
-
 static DLString olc_ai_list(const Json::Value &fields)
 {
     DLString list;
@@ -123,6 +117,13 @@ void olc_ai_gen(PCharacter *ch, const DLString &entity, int vnum, bool manual, c
 
     if (!manual && get_string_attribute(ch, AIGEN_ATTR) == "off")
         return;
+
+    // Failure is silence at 'done': with AI off nothing is queued or said.
+    if (!ai_enabled("olc_gen")) {
+        if (manual)
+            ch->send_to("{CAI:{x the AI is off now ({Wai status{x), nothing was asked.\r\n");
+        return;
+    }
 
     if (!olc_ai_empty_fields(entity, vnum, empty, extras, area))
         return;
@@ -147,15 +148,31 @@ void olc_ai_gen(PCharacter *ch, const DLString &entity, int vnum, bool manual, c
     payload["manual"] = manual;
     payload["empty"] = empty;
 
-    olc_ai_queue(ch, "olc_gen", payload);
+    DLString error;
+    if (ai_request("olc_gen", payload, error) != AI_REQUEST_OK) {
+        if (manual)
+            ptc(ch, "{CAI:{x the request could not be queued: %s\r\n", error.c_str());
+        return;
+    }
 
-    ptc(ch, "{CAI:{x asked for %s %d: %s. It lands in a minute or two, when no editor has it open; "
-            "a field you fill first is kept.%s\r\n",
-        entity.c_str(), vnum, olc_ai_list(empty).c_str(),
-        manual ? "" : " {Wgen auto off{x stops this.");
+    if (manual)
+        ptc(ch, "{CAI:{x asked for %s %d: %s.\r\n", entity.c_str(), vnum, olc_ai_list(empty).c_str());
+    else
+        ptc(ch, "{CAI:{x asked for the empty text of %s %d ({Wgen auto off{x stops this).\r\n",
+            entity.c_str(), vnum);
 }
 
-bool olc_ai_gen_command(PCharacter *ch, const DLString &entity, int vnum, const char *argument)
+void olc_ai_done(OLCState *state, PCharacter *ch, const DLString &entity, int vnum)
+{
+    bool manual = state->aiAsked;
+    DLString hint = state->aiHint;
+
+    state->aiAsked = false;
+    state->aiHint.clear();
+    olc_ai_gen(ch, entity, vnum, manual, hint);
+}
+
+bool olc_ai_gen_command(OLCState *state, PCharacter *ch, const DLString &entity, int vnum, const char *argument)
 {
     DLString args = argument;
     args.stripWhiteSpace();
@@ -192,20 +209,33 @@ bool olc_ai_gen_command(PCharacter *ch, const DLString &entity, int vnum, const 
             target = which.toInt();
         }
 
+        if (!OLCState::can_edit(ch, target)) {
+            ptc(ch, "{CAI:{x you cannot build in %s %d.\r\n", entity.c_str(), target);
+            return false;
+        }
+
         Json::Value payload;
         payload["entity"] = entity;
         payload["vnum"] = target;
         payload["builder"] = ch->getName();
-        olc_ai_queue(ch, "olc_revert", payload);
-        ptc(ch, "{CAI:{x asked to revert the AI text on %s %d that nobody changed since.\r\n",
-            entity.c_str(), target);
+        DLString error;
+        if (ai_request("olc_revert", payload, error) != AI_REQUEST_OK)
+            ptc(ch, "{CAI:{x the request could not be queued: %s\r\n", error.c_str());
+        else
+            ptc(ch, "{CAI:{x asked to revert the AI text on %s %d that nobody changed since.\r\n",
+                entity.c_str(), target);
         return false;
     }
 
     if (word == "help" || word == "?") {
-        ch->send_to("{Wgen{x [hint] - ask the AI for the empty text fields of this entry, the hint steers it\r\n"
+        ch->send_to("{Wgen{x [hint] - at 'done', ask the AI for the empty text fields of this entry, the hint steers it\r\n"
                     "{Wgen auto on{x|{Woff{x - ask for them by itself at 'done' (on by default)\r\n"
                     "{Wgen revert{x [vnum] - remove the AI text nobody changed since\r\n");
+        return false;
+    }
+
+    if (!OLCState::can_edit(ch, vnum)) {
+        ptc(ch, "{CAI:{x you cannot build in %s %d.\r\n", entity.c_str(), vnum);
         return false;
     }
 
@@ -213,6 +243,10 @@ bool olc_ai_gen_command(PCharacter *ch, const DLString &entity, int vnum, const 
     if (args.size() > 300)
         args = args.substr(0, 300);
 
-    olc_ai_gen(ch, entity, vnum, true, args);
+    // Sent at 'done', after the commit: the editor may hold a copy the index
+    // does not have yet (a new mob or object exists only after 'done').
+    state->aiAsked = true;
+    state->aiHint = args;
+    ch->send_to("{CAI:{x noted. The request goes out at {Wdone{x, for the fields still empty then.\r\n");
     return false;
 }

@@ -22,4 +22,9 @@ enum AiRequestResult {
  */
 AiRequestResult ai_request(const DLString &kind, const Json::Value &payload, DLString &error);
 
+/** True when the AI feature may run now: .tmp.ai.enabled(feature) in Fenia
+ *  (kill switch, 'ai on', the feature's flag, a fresh worker heartbeat). False
+ *  when Fenia is not up or the helper throws. */
+bool ai_enabled(const DLString &feature);
+
 #endif
