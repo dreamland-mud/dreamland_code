@@ -11,11 +11,17 @@
  *                 only after 'done')
  *   'done'        olc_land for that 'gen': land the held answer now; or, with
  *                 no 'gen' typed, olc_gen for the empty core text as committed
- *   'cancel'      olc_land with drop: the copy is thrown away, so is the 'gen'
+ *   'cancel'      olc_land with drop: the copy is thrown away, so is the 'gen';
+ *                 the same when the descriptor goes (link death, quit)
+ * Every request carries seq, increasing in game order: the worker handles
+ * the OLC requests of one spool scan in that order. A copy too big for the
+ * spool falls back to the old way: the request goes out at 'done'.
  * The worker writes only the fields still empty when it lands ('ifEmpty',
  * checked by the game in the same call as the write), as journaled OLC ops.
  * Nothing here waits on it.
  */
+#include <sys/time.h>
+
 #include "olc.h"
 #include "olcstate.h"
 #include "olcops.h"
@@ -77,6 +83,67 @@ static Json::Value pick(const Json::Value &data, const char **keys)
     return out;
 }
 
+/** Each node of a 'get' JSON list ({"node": {...}} or {"node": [...]}). */
+static void each_node(Json::Value &copy, const char *key, void (*keep)(Json::Value &))
+{
+    if (!copy[key].isObject() || !copy[key].isMember("node"))
+        return;
+
+    Json::Value &n = copy[key]["node"];
+    if (n.isArray()) {
+        for (auto &node: n)
+            keep(node);
+    }
+    else if (n.isObject())
+        keep(n);
+}
+
+static DLString clip(const Json::Value &v, size_t cap)
+{
+    DLString text = v.isString() ? DLString(v.asString()) : DLString::emptyString;
+    return text.size() > cap ? DLString(text.substr(0, cap)) : text;
+}
+
+/** An extra description as the prompt reads it: keywords, and the RU or EN
+ *  text cut where the prompt cuts it (ai_olc_gen.py describe_target). The
+ *  full texts of a library would not fit the spool's 64 KB. */
+static void keep_ed(Json::Value &node)
+{
+    Json::Value out(Json::objectValue);
+    const Json::Value &desc = node["description"];
+
+    out["keyword"] = node["keyword"];
+    if (desc.isObject()) {
+        out["description"]["ru"] = clip(desc["ru"], 300);
+        out["description"]["en"] = clip(desc["en"], 300);
+    }
+    else
+        out["description"] = clip(desc, 300);
+    node = out;
+}
+
+/** An exit as the prompt reads it: direction, target room, door or not. */
+static void keep_exit(Json::Value &node)
+{
+    static const char *keys[] = { "name", "target", "flags", "key", 0 };
+    Json::Value out(Json::objectValue);
+
+    for (int i = 0; keys[i]; i++)
+        if (node.isMember(keys[i]))
+            out[keys[i]] = node[keys[i]];
+    node = out;
+}
+
+/** The copy as the worker's prompt reads it, nothing more. */
+static Json::Value copy_json(const Json::Value &data, const char **keys)
+{
+    Json::Value copy = pick(data, keys);
+
+    each_node(copy, "extraDescriptions", keep_ed);
+    each_node(copy, "exits", keep_exit);
+    return copy;
+}
+
 /**
  * Fill t with the empty fields of a room, mob or object: the index entry or
  * an editor's copy. The core fields are the text a player reads first; extra
@@ -96,7 +163,7 @@ static void target_room(RoomIndexData *pRoom, bool withCopy, OlcAiTarget &t)
     if (pRoom->extraDescriptions.empty())
         t.extras.append("ed");
     if (withCopy)
-        t.copy = pick(olc_room_json(pRoom), keys);
+        t.copy = copy_json(olc_room_json(pRoom), keys);
 }
 
 static void target_mob(const MOB_INDEX_DATA *pMob, bool withCopy, OlcAiTarget &t)
@@ -112,7 +179,7 @@ static void target_mob(const MOB_INDEX_DATA *pMob, bool withCopy, OlcAiTarget &t
     empty_langs("long", pMob->long_descr, t.empty);
     empty_langs("desc", pMob->description, t.empty);
     if (withCopy)
-        t.copy = pick(olc_mob_json(pMob), keys);
+        t.copy = copy_json(olc_mob_json(pMob), keys);
 }
 
 static void target_obj(const OBJ_INDEX_DATA *pObj, bool withCopy, OlcAiTarget &t)
@@ -132,30 +199,31 @@ static void target_obj(const OBJ_INDEX_DATA *pObj, bool withCopy, OlcAiTarget &t
     if (material_unset(pObj->material))
         t.extras.append("material");
     if (withCopy)
-        t.copy = pick(olc_obj_json(pObj), keys);
+        t.copy = copy_json(olc_obj_json(pObj), keys);
 }
 
-/** The committed prototype; false when it does not exist. */
-static bool target_index(const DLString &entity, int vnum, OlcAiTarget &t)
+/** The committed prototype; false when it does not exist. withCopy: its
+ *  facts too (for the plan line; the request itself may leave them out). */
+static bool target_index(const DLString &entity, int vnum, OlcAiTarget &t, bool withCopy = false)
 {
     if (entity == "room") {
         RoomIndexData *pRoom = get_room_index(vnum);
         if (pRoom)
-            target_room(pRoom, false, t);
+            target_room(pRoom, withCopy, t);
         return pRoom != 0;
     }
 
     if (entity == "mob") {
         MOB_INDEX_DATA *pMob = get_mob_index(vnum);
         if (pMob)
-            target_mob(pMob, false, t);
+            target_mob(pMob, withCopy, t);
         return pMob != 0;
     }
 
     if (entity == "obj") {
         OBJ_INDEX_DATA *pObj = get_obj_index(vnum);
         if (pObj)
-            target_obj(pObj, false, t);
+            target_obj(pObj, withCopy, t);
         return pObj != 0;
     }
 
@@ -221,14 +289,32 @@ static DLString plan_fields(const OlcAiTarget &t)
     return list;
 }
 
-static AiRequestResult olc_ai_queue(PCharacter *ch, const OlcAiTarget &t, bool manual,
-                                    const DLString &hint, DLString &error)
+/** ai_request with seq: microseconds, strictly increasing in game order, so
+ *  the worker can order the requests one spool scan picks up together (a
+ *  'gen' and the 'cancel' right after it). */
+static AiRequestResult olc_ai_send(const DLString &kind, Json::Value &payload, DLString &error)
+{
+    static long long last = 0;
+    struct timeval tv;
+
+    gettimeofday(&tv, 0);
+    long long seq = (long long)tv.tv_sec * 1000000 + tv.tv_usec;
+    if (seq <= last)
+        seq = last + 1;
+    last = seq;
+
+    payload["seq"] = (Json::Int64)seq;
+    return ai_request(kind, payload, error);
+}
+
+static AiRequestResult olc_ai_queue(const DLString &builder, const OlcAiTarget &t, bool manual,
+                                    const DLString &hint, bool withCopy, DLString &error)
 {
     Json::Value payload;
     payload["entity"] = t.entity;
     payload["vnum"] = t.vnum;
     payload["area"] = t.area;
-    payload["builder"] = ch->getName();
+    payload["builder"] = builder;
     payload["hint"] = hint;
     payload["manual"] = manual;
 
@@ -237,47 +323,66 @@ static AiRequestResult olc_ai_queue(PCharacter *ch, const OlcAiTarget &t, bool m
         empty.append(e);
     payload["empty"] = empty;
 
-    if (!t.copy.isNull()) {
+    if (withCopy && !t.copy.isNull()) {
         payload["copy"] = t.copy;
         payload["create"] = t.create;
     }
 
-    return ai_request("olc_gen", payload, error);
+    return olc_ai_send("olc_gen", payload, error);
 }
 
-/** The automatic request at 'done': the empty core text of the committed
- *  prototype. Silent with AI off or 'gen auto off'. */
-static void olc_ai_auto(PCharacter *ch, const DLString &entity, int vnum)
+/** A request for the committed prototype, at 'done'. The automatic one
+ *  (manual false) asks for the empty core text and is silent with AI off or
+ *  'gen auto off'. manual: a 'gen' whose copy was too big to send, with its
+ *  hint, extra descriptions and material included. */
+static void olc_ai_committed(PCharacter *ch, const DLString &entity, int vnum, bool manual, const DLString &hint)
 {
     OlcAiTarget t;
 
-    if (get_string_attribute(ch, AIGEN_ATTR) == "off")
+    if (!manual && get_string_attribute(ch, AIGEN_ATTR) == "off")
         return;
 
-    if (!ai_enabled("olc_gen"))
+    if (!ai_enabled("olc_gen")) {
+        if (manual)
+            ch->send_to("{CAI:{x the AI is off now ({Wai status{x), nothing was asked.\r\n");
         return;
+    }
 
     // The core text decides; extra descriptions and material only ride along.
-    if (!target_index(entity, vnum, t) || t.empty.empty())
+    if (!target_index(entity, vnum, t, manual) || (t.empty.empty() && (!manual || t.extras.empty()))) {
+        if (manual)
+            ptc(ch, "{CAI:{x nothing is empty on %s %d any more.\r\n", entity.c_str(), vnum);
         return;
+    }
 
     DLString error;
-    if (olc_ai_queue(ch, t, false, "", error) != AI_REQUEST_OK)
+    if (olc_ai_queue(ch->getName(), t, manual, hint, false, error) != AI_REQUEST_OK) {
+        if (manual)
+            ptc(ch, "{CAI:{x the request could not be queued: %s\r\n", error.c_str());
         return;
+    }
 
-    ptc(ch, "{CAI:{x asked for the empty text of %s %d ({Wgen auto off{x stops this).\r\n",
-        entity.c_str(), vnum);
+    if (manual)
+        ptc(ch, "{CAI:{x asked for %s %d: %s.\r\n", entity.c_str(), vnum, plan_fields(t).c_str());
+    else
+        ptc(ch, "{CAI:{x asked for the empty text of %s %d ({Wgen auto off{x stops this).\r\n",
+            entity.c_str(), vnum);
 }
 
 void olc_ai_done(OLCState *state, PCharacter *ch, const DLString &entity, int vnum)
 {
-    bool asked = state->aiAsked;
+    bool asked = state->aiAsked, deferred = state->aiDeferred;
     int askedVnum = state->aiVnum;
+    DLString hint = state->aiHint;
 
     state->aiAsked = false;
+    state->aiDeferred = false;
     state->aiVnum = 0;
+    state->aiHint.clear();
 
-    if (asked) {
+    if (asked && deferred)
+        olc_ai_committed(ch, entity, askedVnum, true, hint);
+    else if (asked) {
         // The answer 'gen' started is held while this editor is open: land it
         // now. No line: 'gen' said what comes, the worker says when it lands.
         // A lost request costs time only, the worker retries a held answer.
@@ -286,37 +391,65 @@ void olc_ai_done(OLCState *state, PCharacter *ch, const DLString &entity, int vn
         payload["vnum"] = askedVnum;
         payload["builder"] = ch->getName();
         DLString error;
-        ai_request("olc_land", payload, error);
-
-        // redit follows the builder: 'gen' may have been typed in another room.
-        if (askedVnum == vnum)
-            return;
+        olc_ai_send("olc_land", payload, error);
     }
 
-    olc_ai_auto(ch, entity, vnum);
+    // redit follows the builder: 'gen' may have been typed in another room.
+    if (asked && askedVnum == vnum)
+        return;
+
+    olc_ai_committed(ch, entity, vnum, false, "");
+}
+
+/** The editor's copy is thrown away: so is its 'gen'. 1 when the worker was
+ *  told to drop it (or a deferred one was never sent), -1 when the drop
+ *  could not be queued, 0 when there was nothing to drop. Reads no
+ *  character: it runs from the descriptor's close too. */
+static int olc_ai_drop(OLCState *state, DLString &error)
+{
+    bool asked = state->aiAsked, deferred = state->aiDeferred;
+
+    state->aiAsked = false;
+    state->aiDeferred = false;
+    state->aiHint.clear();
+
+    // redit edits in place: nothing is thrown away, the answer still lands.
+    if (!asked || state->getJournalKind() == "room")
+        return 0;
+
+    if (deferred)
+        return 1;
+
+    Json::Value payload;
+    payload["entity"] = state->getJournalKind();
+    payload["vnum"] = state->aiVnum;
+    payload["builder"] = state->aiBuilder;
+    payload["drop"] = true;
+    state->aiVnum = 0;
+
+    return olc_ai_send("olc_land", payload, error) == AI_REQUEST_OK ? 1 : -1;
 }
 
 void OLCState::aiCancel(PCharacter *ch)
 {
-    if (!aiAsked)
-        return;
-
-    aiAsked = false;
-    if (getJournalKind() == "room")
-        return;
-
-    Json::Value payload;
-    payload["entity"] = getJournalKind();
-    payload["vnum"] = aiVnum;
-    payload["builder"] = ch->getName();
-    payload["drop"] = true;
-    aiVnum = 0;
-
     DLString error;
-    if (ai_request("olc_land", payload, error) == AI_REQUEST_OK)
+    int rc = olc_ai_drop(this, error);
+
+    if (rc > 0)
         ch->send_to("{CAI:{x the 'gen' request goes with the editor, nothing will be written.\r\n");
-    else
+    else if (rc < 0)
         ptc(ch, "{CAI:{x could not drop the 'gen' request (%s): its text may still land.\r\n", error.c_str());
+}
+
+void OLCState::close(Descriptor *d)
+{
+    DLString error;
+
+    // Link death or quit inside the editor: nobody is left to tell.
+    if (olc_ai_drop(this, error) < 0)
+        LogStream::sendError() << "olc gen: could not drop on close: " << error << endl;
+
+    InterpretHandler::close(d);
 }
 
 /** Where the 'gen' subcommand reads the prototype from: exactly one is set. */
@@ -377,7 +510,7 @@ static bool olc_ai_gen_command(OLCState *state, PCharacter *ch, const OlcAiSourc
         payload["vnum"] = target;
         payload["builder"] = ch->getName();
         DLString error;
-        if (ai_request("olc_revert", payload, error) != AI_REQUEST_OK)
+        if (olc_ai_send("olc_revert", payload, error) != AI_REQUEST_OK)
             ptc(ch, "{CAI:{x the request could not be queued: %s\r\n", error.c_str());
         else
             ptc(ch, "{CAI:{x asked to revert the AI text on %s %d that nobody changed since.\r\n",
@@ -433,15 +566,31 @@ static bool olc_ai_gen_command(OLCState *state, PCharacter *ch, const OlcAiSourc
         args = args.substr(0, 300);
 
     DLString error;
-    if (olc_ai_queue(ch, t, true, args, error) != AI_REQUEST_OK) {
+    AiRequestResult rc = olc_ai_queue(ch->getName(), t, true, args, true, error);
+    bool deferred = rc == AI_REQUEST_INVALID;
+    if (rc != AI_REQUEST_OK && !deferred) {
         ptc(ch, "{CAI:{x the request could not be queued: %s\r\n", error.c_str());
         return false;
     }
 
-    state->aiAsked = true;
-    state->aiVnum = vnum;
+    // A queued 'gen' replaces the worker's earlier job by itself; a deferred
+    // one does not, so an earlier 'gen' from a smaller copy is dropped.
+    if (deferred) {
+        DLString dropError;
+        olc_ai_drop(state, dropError);
+    }
 
-    ptc(ch, "{CAI:{x %s %d, written from what this editor holds now.\r\n", entity.c_str(), vnum);
+    state->aiAsked = true;
+    state->aiDeferred = deferred;
+    state->aiVnum = vnum;
+    state->aiHint = deferred ? args : DLString::emptyString;
+    state->aiBuilder = ch->getName();
+
+    if (deferred)
+        ptc(ch, "{CAI:{x %s %d is too large to send from the editor: the request goes out at {Wdone{x, "
+                "written from what you commit.\r\n", entity.c_str(), vnum);
+    else
+        ptc(ch, "{CAI:{x %s %d, written from what this editor holds now.\r\n", entity.c_str(), vnum);
     ptc(ch, "{CAI:{x it writes: %s.\r\n", plan_fields(t).c_str());
     if (args.empty())
         ch->send_to("{CAI:{x no hint: written from the area and its neighbours.\r\n");
@@ -454,8 +603,12 @@ static bool olc_ai_gen_command(OLCState *state, PCharacter *ch, const OlcAiSourc
     }
     if (cut)
         ch->send_to("{CAI:{x the hint was cut to its first 300 characters.\r\n");
-    ch->send_to("{CAI:{x started. It lands after {Wdone{x, only into fields still empty then, "
-                "and a line tells you when.\r\n");
+    if (deferred)
+        ch->send_to("{CAI:{x it lands a while after {Wdone{x, only into fields still empty then, "
+                    "and a line tells you when.\r\n");
+    else
+        ch->send_to("{CAI:{x started. It lands after {Wdone{x, only into fields still empty then, "
+                    "and a line tells you when.\r\n");
     return false;
 }
 

@@ -124,13 +124,20 @@ public:
     /** AI phase 1 (olcaigen.cpp): 'gen [hint]' was typed in this editor and
      *  sent the editor's copy of aiVnum to the worker, which writes the
      *  answer once the editor lets go of it. 'done' tells the worker to land
-     *  it now instead of at its next retry. */
+     *  it now instead of at its next retry. aiDeferred: the copy was too big
+     *  for the spool, so 'done' sends the request (with aiHint) instead. */
     bool aiAsked;
     int aiVnum;
+    bool aiDeferred;
+    DLString aiHint, aiBuilder;
     /** An exit that throws the editor's copy away ('cancel', a subcommand
      *  that threw): the worker drops that 'gen' so no AI text lands later.
      *  redit edits in place, nothing is thrown away there. olcaigen.cpp. */
     void aiCancel( PCharacter *ch );
+    /** The descriptor goes (link death, quit, takeover): the same drop as
+     *  aiCancel, from aiBuilder (no character is touched), then the
+     *  interpreter's own close. */
+    virtual void close( Descriptor *d );
     /** Journal profile and source: "immortal"/"editor" in game, OlcOps sets its own. */
     DLString journalProfile, journalSource;
 

@@ -139,7 +139,7 @@ OLCInterpretLayer::process( InterpretArguments &iargs )
 /*--------------------------------------------------------------------------
  * OLCState 
  *-------------------------------------------------------------------------*/
-OLCState::OLCState() : lastChanged(false), pendingDone(false), aiAsked(false), aiVnum(0), journalProfile("immortal"), journalSource("editor"),
+OLCState::OLCState() : lastChanged(false), pendingDone(false), aiAsked(false), aiVnum(0), aiDeferred(false), journalProfile("immortal"), journalSource("editor"),
                        owner(0), inSedit(false), strEditor(*this)
 {
 }
