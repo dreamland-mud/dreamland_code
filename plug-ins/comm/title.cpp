@@ -7,6 +7,9 @@
 #include "def.h"
 #include <arg_utils.h>
 #include "l10n.h"
+#include "accountmanager.h"
+#include "commonattributes.h"
+#include "dreamland.h"
 
 static bool fix_title( PCharacter *ch, DLString &title )
 {
@@ -126,6 +129,31 @@ static bool fix_pretitle( PCharacter *ch, DLString &title )
     return true;
 }
 
+// Colour in a pretitle is a Ko-fi supporter perk. Saving a pretitle while the
+// account supports marks it coloured; saving one without support unmarks it,
+// so after a lapse the colour lasts until the next edit. The old remort
+// purchase (remorts.pretitle) keeps colour forever and skips all this.
+// Call before setPretitle: the cached name is rebuilt there.
+static void pretitle_colour_rights( PCharacter *pch, const DLString &arg )
+{
+    if (pch->getRemorts( ).pretitle)
+        return;
+
+    DLString id = AccountManager::accountOf( pch->getName( ) );
+    bool supporter = !id.empty( )
+        && AccountManager::supporterUntil( id ) > dreamland->getCurrentTime( );
+
+    if (supporter) {
+        pch->getAttributes( ).getAttr<XMLStringAttribute>( "pretitle_color" )->setValue( "1" );
+        return;
+    }
+
+    pch->getAttributes( ).eraseAttribute( "pretitle_color" );
+
+    if (arg.find( '{' ) != DLString::npos)
+        pch->pecho( _("Цвета в предтитуле видны только у тех, кто поддерживает игру. Подробнее: {hh5273поддержка{x.") );
+}
+
 CMDRUNP( pretitle )
 {
     PCharacter *pch = ch->getPC( );
@@ -151,6 +179,7 @@ CMDRUNP( pretitle )
     }
     
     if (arg == "clear" || arg == "очистить") {
+        pretitle_colour_rights( pch, DLString::emptyString );
         pch->setPretitle( DLString::emptyString );
         pch->setRussianPretitle( DLString::emptyString );
         pch->pecho(_("Русский и английский претитулы очищены."));
@@ -163,6 +192,7 @@ CMDRUNP( pretitle )
         if (!fix_pretitle( pch, arg ))
             return;
 
+        pretitle_colour_rights( pch, arg );
         pch->setRussianPretitle( arg );
         pch->pecho( _("Русский претитул: %s"), arg.c_str( ) );
     }
@@ -172,6 +202,7 @@ CMDRUNP( pretitle )
         if (!fix_pretitle( pch, arg ))
             return;
 
+        pretitle_colour_rights( pch, arg );
         pch->setPretitle( arg );
         pch->pecho( _("Твой претитул: %s"), arg.c_str( ) );
     }
