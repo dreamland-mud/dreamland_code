@@ -55,7 +55,8 @@ occupations.cpp \
 accountmanager.cpp \
 linkingcode.cpp \
 emailcode.cpp \
-accountaudit.cpp
+accountaudit.cpp \
+kofiledger.cpp
 
 libloadsave_la_MOC = \
 objectbehaviormanager.h \

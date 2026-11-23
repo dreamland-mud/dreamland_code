@@ -650,6 +650,52 @@ bool AccountManager::setVaultUnlocked(const DLString &id)
     return true;
 }
 
+time_t AccountManager::supporterUntil(const DLString &id)
+{
+    map<DLString, Json::Value>::iterator i = accounts.find(id);
+    if (i == accounts.end())
+        return 0;
+    // .get (not operator[]) so a lookup never writes a null "supporter" key.
+    Json::Value sup = i->second.get("supporter", Json::Value());
+    if (!sup.isObject())
+        return 0;
+    Json::Value until = sup.get("until", Json::Value());
+    return until.isIntegral() ? (time_t)until.asInt64() : 0;
+}
+
+bool AccountManager::extendSupporter(const DLString &id, long long seconds)
+{
+    map<DLString, Json::Value>::iterator i = accounts.find(id);
+    if (i == accounts.end() || seconds < 0)
+        return false;
+    if (seconds == 0)
+        return true;
+
+    long long now = (long long)dreamland->getCurrentTime();
+    long long until = (long long)supporterUntil(id);
+    long long base = until > now ? until : now;
+
+    Json::Value old = i->second.get("supporter", Json::Value());
+    Json::Value sup(Json::objectValue);
+    sup["until"] = (Json::Int64)(base + seconds);
+    i->second["supporter"] = sup;
+
+    if (!saveAccount(id)) {
+        if (old.isNull())
+            i->second.removeMember("supporter");
+        else
+            i->second["supporter"] = old;
+        return false;
+    }
+
+    Json::Value fields;
+    fields["id"] = id.c_str();
+    fields["seconds"] = (Json::Int64)seconds;
+    fields["until"] = (Json::Int64)(base + seconds);
+    AccountAudit::record("supporter", fields);
+    return true;
+}
+
 int AccountManager::bankBalance(const DLString &id, const DLString &currency)
 {
     map<DLString, Json::Value>::iterator i = accounts.find(id);

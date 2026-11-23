@@ -5,6 +5,7 @@
 #ifndef ACCOUNTMANAGER_H
 #define ACCOUNTMANAGER_H
 
+#include <ctime>
 #include <map>
 #include <list>
 #include <jsoncpp/json/json.h>
@@ -118,6 +119,13 @@ public:
     // bank/account/<id>/ cell, so the unlock belongs to the account, not a char.
     static bool vaultUnlocked(const DLString &id);
     static bool setVaultUnlocked(const DLString &id);
+
+    // Ko-fi supporter status (top-level "supporter": {"until": <unix>}). 0 when
+    // the account never supported or does not exist. extendSupporter pushes the
+    // date forward by `seconds` from max(now, until); a zero extension writes
+    // nothing. Refuses (RAM untouched) when the disk write fails.
+    static time_t supporterUntil(const DLString &id);
+    static bool extendSupporter(const DLString &id, long long seconds);
 
     // The shared money bank (top-level "bank": {"gold","silver","qp"}). Every
     // member character deposits into and withdraws from the same balances, so
