@@ -21,7 +21,32 @@
 #include "def.h"
 #include "l10n.h"
 
-struct SkillInfo 
+PROF(vampire);
+
+// Why a practiced, available skill rolls 0 right now (Skill::usable failed).
+enum {
+    BLOCK_NONE = 0,
+    BLOCK_VAMPIRE,  // vampire spells need vampire form, GenericSkill::usable
+    BLOCK_OTHER     // any other usable() veto, e.g. a clan without its item
+};
+
+// Exactly 4 visible chars: it replaces the 3-digit effective percent and the
+// cell's leading pad, so the table grid keeps its width.
+static const char * blocked_tag( Character *ch, int blocked )
+{
+    if (blocked == BLOCK_VAMPIRE)
+        return lmsg(viewerLang(ch), "vamp", "вамп", "вамп");
+    return lmsg(viewerLang(ch), " off", "выкл", "вимк");
+}
+
+static const char * blocked_text( Character *ch, int blocked )
+{
+    if (blocked == BLOCK_VAMPIRE)
+        return lmsg(viewerLang(ch), "only in vampire form", "только в облике вампира", "лише в подобі вампіра");
+    return lmsg(viewerLang(ch), "not working right now", "сейчас не работает", "зараз не діє");
+}
+
+struct SkillInfo
 {
     DLString name;
     DLString id;
@@ -33,6 +58,7 @@ struct SkillInfo
     int adept;
     int maximum;
     int help_id;
+    int blocked;
     bool spell;
     bool active;
     bool passive;
@@ -275,7 +301,17 @@ void AllSkillsList::make( Character *ch )
             info.learned = data.learned;
             info.adept = skill->getAdept( ch->getPC( ) );
         }
-        
+
+        // A practiced skill that can't fire right now says why instead of a bare 0.
+        info.blocked = BLOCK_NONE;
+        if (info.available && info.learned > 0 && !skill->usable( ch, false )) {
+            if (!ch->is_npc( ) && ch->getProfession( ) == prof_vampire
+                    && spell && !IS_VAMPIRE(ch))
+                info.blocked = BLOCK_VAMPIRE;
+            else
+                info.blocked = BLOCK_OTHER;
+        }
+
         info.mana = skill->getMana(ch);
         info.moves = skill->getMoves(ch);
 
@@ -295,6 +331,7 @@ void AllSkillsList::make( Character *ch )
 void AllSkillsList::display( std::ostream & buf )
 {
     int prevLevel = 0, firstColumn = true;
+    bool seenVampire = false, seenOther = false;
 
     if (empty( )) {
         buf << fmt(ch, _("Не найдено ни одного умения.")) << endl;
@@ -339,10 +376,17 @@ void AllSkillsList::display( std::ostream & buf )
     for (iterator i = begin( ); i != end( ); i++) {
         SkillInfo info = *i;
 
+        if (info.available && info.blocked == BLOCK_VAMPIRE)
+            seenVampire = true;
+        else if (info.available && info.blocked == BLOCK_OTHER)
+            seenOther = true;
+
         if (web.active( )) {
             DLString label = !info.available
                 ? fmt(0, lmsg(viewerLang(ch), "%s, not available yet", "%s, пока недоступно", "%s, поки недоступно"),
                       info.name.c_str( ))
+                : info.blocked != BLOCK_NONE
+                ? fmt(0, "%s, %d%%, %s", info.name.c_str( ), info.learned, blocked_text(ch, info.blocked))
                 : info.real != info.learned
                 ? fmt(0, "%s, %d%% (%d%%)", info.name.c_str( ), info.learned, info.real)
                 : fmt(0, "%s, %d%%", info.name.c_str( ), info.learned);
@@ -352,6 +396,8 @@ void AllSkillsList::display( std::ostream & buf )
             if (info.available) {
                 web.data(row, "learned", info.learned);
                 web.data(row, "real", info.real);
+                if (info.blocked != BLOCK_NONE)
+                    web.data(row, "blocked", DLString(blocked_text(ch, info.blocked)));
                 if (info.mana > 0)
                     web.data(row, "mana", info.mana);
                 else if (info.moves > 0)
@@ -372,6 +418,8 @@ void AllSkillsList::display( std::ostream & buf )
 
             if (!info.available)
                 buf << lmsg(viewerLang(ch), ", not available yet", ", пока недоступно", ", поки недоступно");
+            else if (info.blocked != BLOCK_NONE)
+                buf << fmt(0, ", %d%%, %s", info.learned, blocked_text(ch, info.blocked));
             else if (info.real != info.learned)
                 buf << fmt(0, ", %d%% (%d%%)", info.learned, info.real);
             else
@@ -408,8 +456,12 @@ void AllSkillsList::display( std::ostream & buf )
         else
             buf << fmt(0, "{c%-18s{x|", info.name.c_str( ) );
 
-        if (info.available)
-            buf << fmt(0, " %s%3d{x(%s%3d{x)|", 
+        if (info.available && info.blocked != BLOCK_NONE)
+            buf << fmt(0, "%s%3d{x({R%s{x)|",
+                              info.colorLearned( ), info.learned,
+                              blocked_tag(ch, info.blocked) );
+        else if (info.available)
+            buf << fmt(0, " %s%3d{x(%s%3d{x)|",
                               info.colorLearned( ), info.learned, 
                               info.colorReal( ), info.real );
         else
@@ -444,6 +496,19 @@ void AllSkillsList::display( std::ostream & buf )
 
     if (!screenreader)
         buf << fmt(ch, _("Цена -- мана, или шаги с пометкой %1$s.\r\n"), l(ch, "ш"));
+
+    // One legend line for the tags that replaced a 0 in the table above.
+    if (!screenreader && (seenVampire || seenOther)) {
+        DLString legend;
+        if (seenVampire)
+            legend << DLString(blocked_tag(ch, BLOCK_VAMPIRE)).stripWhiteSpace( )
+                   << " -- " << blocked_text(ch, BLOCK_VAMPIRE);
+        if (seenOther)
+            legend << (legend.empty( ) ? "" : ", ")
+                   << DLString(blocked_tag(ch, BLOCK_OTHER)).stripWhiteSpace( )
+                   << " -- " << blocked_text(ch, BLOCK_OTHER);
+        buf << "{R" << legend << "{x." << endl;
+    }
 
     buf << fmt(ch,
         _("Также используй фильтры "
