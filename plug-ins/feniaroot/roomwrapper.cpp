@@ -14,6 +14,7 @@
 #include "object.h"
 #include "room.h"
 #include "roomutils.h"
+#include "roomtempdescr.h"
 #include "save.h"
 #include "loadsave.h"                                                               
 #include "merc.h"
@@ -30,6 +31,7 @@
 #include "roomwrapper.h"
 #include "characterwrapper.h"
 #include "wrappermanager.h"
+#include "multimessagewrapper.h"
 #include "regcontainer.h"
 #include "idcontainer.h"
 #include "lex.h"
@@ -1348,4 +1350,59 @@ NMI_INVOKE(RoomWrapper, setProperty, "(key,subkey,value): установить �
     return Register();
 }
 
+/** A text argument for a temporary extra description: a .mm(en, ru, ua) or
+ *  ._(ru) message fills every language, a plain string goes to RU, which
+ *  getForLang shows to readers of the other languages. null is empty. */
+static XMLMultiString arg2multistring( const Register &arg )
+{
+    XMLMultiString result;
 
+    if (arg.type == Register::NONE)
+        return result;
+
+    if (arg.type == Register::OBJECT) {
+        MultiMessageWrapper *mmw = arg.toHandler( ).getDynamicPointer<MultiMessageWrapper>( );
+        if (mmw) {
+            for (int l = LANG_MIN; l < LANG_MAX; l++)
+                result[(lang_t)l] = mmw->getMulti( ).getMessage( (lang_t)l );
+            return result;
+        }
+    }
+
+    result[LANG_RU] = arg.toString( );
+    return result;
+}
+
+NMI_INVOKE( RoomWrapper, tempDescrSet, "(keyword, text, mark): add or replace a temporary extra description: memory only, never saved to the area file, gone after a reboot. Answers look/read/examine <keyword> after the room's own extra descriptions, to whole words of keyword only. text and mark: a string or .mm(en, ru, ua). mark (required, null or \"\" for none) is a line shown under the room description while it exists" )
+{
+    checkTarget( );
+
+    DLString keyword = argnum2string( args, 1 );
+    keyword.stripWhiteSpace( );
+    if (keyword.empty( ))
+        throw Scripting::IllegalArgumentException( );
+
+    XMLMultiString text = arg2multistring( argnum( args, 2 ) );
+    XMLMultiString mark = arg2multistring( argnum( args, 3 ) );
+
+    RoomTempDescr::set( target, keyword, text, mark );
+    return Register( );
+}
+
+NMI_INVOKE( RoomWrapper, tempDescrGet, "(keyword[, lang]): text of the temporary extra description with exactly this keyword string, in language lang (0=en, 1=ru, 2=ua, default ru), or null if there is none" )
+{
+    checkTarget( );
+
+    ExtraDescription *ed = RoomTempDescr::find( target, argnum2string( args, 1 ) );
+    if (!ed)
+        return Register( );
+
+    lang_t lang = args.size( ) > 1 ? argnum2lang( args, 2 ) : LANG_DEFAULT;
+    return Register( ed->description.getForLang( lang ) );
+}
+
+NMI_INVOKE( RoomWrapper, tempDescrClear, "(keyword): remove the temporary extra description with exactly this keyword string; true if there was one" )
+{
+    checkTarget( );
+    return Register( RoomTempDescr::clear( target, argnum2string( args, 1 ) ) );
+}

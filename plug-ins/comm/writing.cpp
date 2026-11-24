@@ -38,77 +38,17 @@ COMMAND(CWrite, "write")
         return;
     }
     
-    if (( target = get_obj_carry( ch, targetName.c_str( ) ) ))
+    if (( target = get_obj_carry( ch, targetName.c_str( ) ) )) {
         writeOnPaper( ch, target, arguments );
-    else if (( target = get_obj_room( ch, targetName.c_str( ) ) ))
-        writeOnWall( ch, target, arguments );
-    else
+        return;
+    }
+
+    // Walls belong to Fenia (utils/graffiti), through the onWrite global
+    // trigger: true once the player got an answer. nail is what findNail
+    // accepts in ch's hands, or null.
+    mudtags_strip_web( arguments, ch );
+    if (!gprog( "onWrite", "COss", ch, findNail( ch ), targetName.c_str( ), arguments.c_str( ) ))
         ch->pecho(_("У тебя нет этого."));
-}
-
-void CWrite::writeOnWall( Character *ch, Object *wall, DLString &arguments )
-{
-    ExtraDescription *ed;
-    DLString cmd;
-    Object *nail;
-
-    if (wall->item_type != ITEM_PARCHMENT) {
-        oldact(_("Тебе не удастся ничего нацарапать на $o6."), ch, wall, 0, TO_CHAR);
-        return;
-    }
-
-    if (wall->can_wear(ITEM_TAKE)) {
-        oldact(_("Подними $o4 с земли, а потом пиши."), ch, wall, 0, TO_CHAR);
-        return;
-    }
-    
-    if (!( nail = findNail( ch ) )) {
-        ch->pecho(_("Ты не держишь в руках ничего колющего или царапающего."));
-        return;
-    }
-
-    if (arguments.empty( )) {
-        oldact(_("Что именно ты хочешь выцарапать на $o6?"), ch, wall, 0, TO_CHAR);
-        return;
-    }
-
-    cmd = arguments.getOneArgument( );
-    cmd.stripWhiteSpace( );
-    
-    ed = wall->getProperDescription();
-
-    if (cmd == "+") {
-        if (!ed) 
-            ed = wall->addProperDescription();
-
-        mudtags_strip_web( arguments, ch );
-        const DLString &text = wall->getExtraDescr(ed->keyword, LANG_DEFAULT);
-        wall->addExtraDescr(ed->keyword, String::addLine(text, arguments), LANG_DEFAULT);
-
-        oldact(_("Ты выцарапываешь $O5 надпись на $o6."), ch, wall, nail, TO_CHAR );
-        oldact(_("$c1 выцарапывает $O5 надпись на $o6."), ch, wall, nail, TO_ROOM );
-
-        if (wall->pIndexData->vnum == 50102)
-            achievement( ch, "writing_on_the_wall" );
-    }
-    else if (cmd == "-" && ch->is_immortal( )) {
-        if (ed) {
-            const DLString &text = wall->getExtraDescr(ed->keyword, LANG_DEFAULT);
-            wall->addExtraDescr(ed->keyword, String::delLine(text), LANG_DEFAULT);
-
-            oldact(_("Ты отшкрябываешь последнюю строчку с $o2."), ch, wall, 0, TO_CHAR );
-            oldact(_("$c1 скребет $o4."), ch, wall, 0, TO_ROOM );
-        }
-        else
-            oldact(_("$o1 девственно чист(а) - удалять нечего."), ch, wall, 0, TO_CHAR );
-    }
-    else if (cmd == "clear" && ch->is_immortal( )) {
-        wall->clearProperDescription();
-        oldact(_("Ты тщательно отшкрябываешь все надписи с $o2."), ch, wall, 0, TO_CHAR );
-        oldact(_("$c1 тщательно отшкрябывает все надписи с $o2."), ch, wall, 0, TO_ROOM );
-    }                
-    else
-        usage( ch );
 }
 
 void CWrite::writeOnPaper( Character *ch, Object *paper, DLString &arguments )

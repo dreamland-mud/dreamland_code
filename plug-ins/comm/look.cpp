@@ -18,6 +18,7 @@
 #include <iomanip>
 #include <cctype>
 #include <cstring>
+#include <algorithm>
 
 #include "wrapperbase.h"
 #include "register-impl.h"
@@ -43,6 +44,7 @@
 #include "liquid.h"
 #include "room.h"
 #include "roomutils.h"
+#include "roomtempdescr.h"
 #include "itemutils.h"
 #include "desire.h"
 #include "fight.h"
@@ -1298,9 +1300,27 @@ static DLString oprog_extra_descr(Object *obj, Character *ch, const char *arg)
     return DLString::emptyString;
 }
 
+// Every word of arg is a whole word of keyword, case aside. Temporary room
+// descriptions (graffiti) answer only to whole words, never to a prefix, so
+// 'look w' or 'look с' still reaches the exit and builder text keeps its words.
+static bool temp_keyword_matches( const char *arg, const DLString &keyword )
+{
+    StringList words( DLString( arg ).colourStrip( ).toLower( ) );
+    StringList names( keyword.toLower( ) );
+
+    if (words.empty( ))
+        return false;
+
+    for (auto &w: words)
+        if (std::find( names.begin( ), names.end( ), w ) == names.end( ))
+            return false;
+
+    return true;
+}
+
 struct EDInfo {
-    EDInfo( DLString k, DLString d, Object *o, Room *r, bool def = false ) :
-        keyword( k ), description( d ), source( o ), sourceRoom( r ), isDefault( def )
+    EDInfo( DLString k, DLString d, Object *o, Room *r, bool def = false, bool tmp = false ) :
+        keyword( k ), description( d ), source( o ), sourceRoom( r ), isDefault( def ), isTemp( tmp )
     {
     }
 
@@ -1311,6 +1331,8 @@ struct EDInfo {
     // Keyword matched the object itself, no extra description answered:
     // shown as a full 'look at object', same as the web client's click.
     bool isDefault;
+    // A temporary room description (RoomTempDescr), not the prototype's.
+    bool isTemp;
 };
 
 struct ExtraDescList : public list<EDInfo> {
@@ -1370,6 +1392,14 @@ struct ExtraDescList : public list<EDInfo> {
             if (is_name( arg, ed->keyword.c_str() ))
                 push_back( EDInfo( ed->keyword, ed->description.getForLang(Player::lang(ch)), obj, room ) );
     }
+
+    // After the room's own descriptions, whole words only.
+    void putTempDescriptions( Room *room )
+    {
+        for (auto &ed: RoomTempDescr::list( room ))
+            if (temp_keyword_matches( arg, ed->keyword ))
+                push_back( EDInfo( ed->keyword, ed->description.getForLang(Player::lang(ch)), 0, room, false, true ) );
+    }
     
     bool output( )
     {
@@ -1388,9 +1418,15 @@ struct ExtraDescList : public list<EDInfo> {
                     return true;
                 }
 
-                const ExtraDescrList &sourceEdList = i->source ? i->source->pIndexData->extraDescriptions : i->sourceRoom->getExtraDescr();
+                const ExtraDescrList *sourceEdList;
+                if (i->source)
+                    sourceEdList = &i->source->pIndexData->extraDescriptions;
+                else if (i->isTemp)
+                    sourceEdList = &RoomTempDescr::list( i->sourceRoom );
+                else
+                    sourceEdList = &i->sourceRoom->getExtraDescr( );
                 buf << "{x";
-                webManipManager->decorateExtraDescr( buf, i->description.c_str( ), sourceEdList, ch );
+                webManipManager->decorateExtraDescr( buf, i->description.c_str( ), *sourceEdList, ch );
                 buf << endl;
 
                 ch->send_to( buf );
@@ -1420,6 +1456,7 @@ bool do_look_extradescr( Character *ch, const char *arg, int number )
     edlist.putObjects( ch->carrying );
     edlist.putObjects( ch->in_room->contents );
     edlist.putDescriptions( ch->in_room->getExtraDescr(), 0, ch->in_room );
+    edlist.putTempDescriptions( ch->in_room );
 
     return edlist.output( );
 }
@@ -1512,19 +1549,21 @@ static DLString pick_display_keyword( const DLString &keywords, lang_t lang )
 // browsing without colour. Driven by the room's extra-descr list rather than the
 // (parentheses) markers, so it also lists "secret" extras whose keyword is
 // deliberately absent from the visible text.
-static DLString look_targets_hint( Character *ch, const ExtraDescrList &edList, lang_t lang )
+static DLString look_targets_hint( Character *ch, Room *room, lang_t lang )
 {
     if (!ch->getPC( ))
         return DLString::emptyString;
     if (!uses_screenreader( ch ) && ch->getPC( )->getConfig( ).color)
         return DLString::emptyString;
 
+    // The room's own first, then the temporary ones (RoomTempDescr).
     StringList targets;
-    for (auto &ed: edList) {
-        DLString kw = pick_display_keyword( ed->keyword, lang );
-        if (!kw.empty( ))
-            targets.addUnique( kw );
-    }
+    for (const ExtraDescrList *edList: { &room->getExtraDescr( ), &RoomTempDescr::list( room ) })
+        for (auto &ed: *edList) {
+            DLString kw = pick_display_keyword( ed->keyword, lang );
+            if (!kw.empty( ))
+                targets.addUnique( kw );
+        }
     if (targets.empty( ))
         return DLString::emptyString;
 
@@ -1652,9 +1691,26 @@ static void do_look_auto( Character *ch, Room *room, bool fBrief, bool fShowMoun
         else
             buf << roomDescription;
 
+        // A line for each temporary extra description that asked for one
+        // ("Somebody has left (doodles) on the wall here."), its keyword made
+        // clickable against the temporary descriptions alone. Read only now:
+        // the Fenia hooks above may have changed them.
+        DLString marks = RoomTempDescr::marks( room, lang );
+        if (!marks.empty( )) {
+            if (!roomDescription.empty( ) && roomDescription.at( roomDescription.size( ) - 1 ) != '\n')
+                buf << endl;
+
+            ostringstream mbuf;
+            webManipManager->decorateExtraDescr( mbuf, marks.c_str( ), RoomTempDescr::list( room ), ch );
+            if (heat)
+                buf << heat_tint( mbuf.str( ) );
+            else
+                buf << mbuf.str( );
+        }
+
         // For screenreader / colourless clients, list the examinable extras
         // (empty for everyone else).
-        hint = look_targets_hint( ch, room->getExtraDescr(), lang );
+        hint = look_targets_hint( ch, room, lang );
         buf << hint;
     }
 

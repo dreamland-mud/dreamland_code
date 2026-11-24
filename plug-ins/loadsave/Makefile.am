@@ -38,6 +38,7 @@ roombehaviormanager.cpp \
 fread_utils.cpp \
 itemevents.cpp \
 roomutils.cpp \
+roomtempdescr.cpp \
 itemutils.cpp \
 char_weight.cpp \
 char_body.cpp \

@@ -72,6 +72,7 @@
 #include "dreamland.h"
 #include "affect.h"
 #include "room.h"
+#include "roomtempdescr.h"
 #include "pcharactermanager.h"
 #include "race.h"
 #include "pcharactermemory.h"
@@ -987,6 +988,16 @@ static void format_affect(Affect *paf, ostringstream &buf)
         {
             b << "[" << ed->keyword << "] ";
         }
+        b << endl;
+    }
+
+    // Runtime-only ones (graffiti): not in the area file, gone after a reboot
+    // until their Fenia owner puts them back.
+    if (!RoomTempDescr::list(r).empty())
+    {
+        b << "Временные экстра-описания: ";
+        for (auto &ed: RoomTempDescr::list(r))
+            b << "[" << ed->keyword << "] ";
         b << endl;
     }
 
