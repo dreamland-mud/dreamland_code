@@ -1373,7 +1373,7 @@ static XMLMultiString arg2multistring( const Register &arg )
     return result;
 }
 
-NMI_INVOKE( RoomWrapper, tempDescrSet, "(keyword, text, mark): add or replace a temporary extra description: memory only, never saved to the area file, gone after a reboot. Answers look/read <keyword> like a room extra description. text and mark: a string or .mm(en, ru, ua). mark, unless null or empty, is a line shown under the room description while it exists" )
+NMI_INVOKE( RoomWrapper, tempDescrSet, "(keyword, text, mark): add or replace a temporary extra description: memory only, never saved to the area file, gone after a reboot. Answers look/read/examine <keyword> after the room's own extra descriptions, to whole words of keyword only. text and mark: a string or .mm(en, ru, ua). mark (required, null or \"\" for none) is a line shown under the room description while it exists" )
 {
     checkTarget( );
 

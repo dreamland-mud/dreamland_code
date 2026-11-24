@@ -8,13 +8,14 @@ class Room;
 
 /*
  * Runtime-only extra descriptions on a room instance: graffiti, notes and
- * other things scripts put on a room for a while. They answer 'look' and
- * 'read' like the room's own extra descriptions, but live only in memory and
- * are never written to the area file. Their owner (Fenia) keeps its own store
+ * other things scripts put on a room for a while. They answer 'look', 'read'
+ * and 'examine' after the room's own extra descriptions, and only to whole
+ * words of their keyword. They live only in memory and are never written to
+ * the area file. Their owner (Fenia) keeps its own store
  * and puts them back after a reboot or a reload of this plugin.
  *
  * Each one may carry a mark: a line shown under the room description while
- * it exists ("Something is scratched on the wall here.").
+ * it exists ("Somebody has left (doodles) on the wall here.").
  */
 namespace RoomTempDescr {
     /** Temporary extra descriptions of the room, an empty list if none. */

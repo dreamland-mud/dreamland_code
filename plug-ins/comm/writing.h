@@ -21,7 +21,6 @@ public:
     virtual void run( Character *, const DLString & );
         
 private:
-    void writeOnWall( Character *, Object *, DLString & );
     void writeOnPaper( Character *, Object *, DLString & );
     void copyToBuffer( Character *, Object *, ExtraDescription * );
     void pasteFromBuffer( Character *, Object *, ExtraDescription *, const DLString &, bool );
