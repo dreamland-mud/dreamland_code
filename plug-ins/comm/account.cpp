@@ -1262,8 +1262,9 @@ static void account_kofi(PCharacter *ch, DLString &args)
 
     // A payment already applied to the claimant's own account says so: that
     // tells a guesser nothing, and payers do retry a receipt the webhook matched.
-    Json::Value owner = entry.get("account", Json::Value());
-    if (r == KofiLedger::CLAIM_TAKEN && owner.isString() && id == owner.asString().c_str()
+    if (r == KofiLedger::CLAIM_TAKEN && entry.isObject()
+        && entry.get("account", Json::Value()).isString()
+        && id == entry["account"].asString().c_str()
         && entry.get("status", "").asString() == "applied") {
         DLString title = AccountManager::titleOf(id);
         time_t supporter = AccountManager::supporterUntil(id);
