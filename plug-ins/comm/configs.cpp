@@ -257,7 +257,8 @@ static bool config_is_account_wide(const DLString &enName)
     return enName == "screenreader"
         || enName == "fightspam"
         || enName == "skillspam"
-        || enName == "noweaponspam";
+        || enName == "noweaponspam"
+        || enName == "nomusic";
 }
 
 // A linked character changed an account-wide option: record it on the account and

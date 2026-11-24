@@ -18,7 +18,6 @@
 #include "dl_ctype.h"
 #include "xmlattributecoder.h"
 #include "serversocketcontainer.h"
-#include "dlfileloader.h"
 
 #include <jsoncpp/json/json.h>
 #include "pcharacter.h"
@@ -871,41 +870,3 @@ NMI_INVOKE( NannyHandler, help, "" )
     do_help( target, a.c_str( ) );
     return Register( );
 }
-
-class DescriptionLoaderPlugin : public virtual Plugin {
-public:
-    typedef ::Pointer<DescriptionLoaderPlugin> Pointer;
-
-    DescriptionLoaderPlugin() : loader("descriptions", ".json") {
-
-    }
-
-    virtual void initialization() 
-    {
-        loader.loadAll();
-
-        for (auto &file: loader.getAll()) {
-            DLString cfgName = loader.getTableDirName() + "/" + file.first;
-            Configurable::Pointer cfg(NEW);
-            cfg->setPath(cfgName);
-            cfg->load();
-        }
-
-    }
-
-    virtual void destruction() 
-    {
-        for (auto &file: loader.getAll()) {
-            DLString cfgName = loader.getTableDirName() + "/" + file.first;
-            Configurable::Pointer cfg = configReg->get(cfgName);
-            if (cfg)
-                cfg->unload();
-        }
-    }
-
-    DLFileLoader loader;
-
-};
-
-PluginInitializer<DescriptionLoaderPlugin> initDescLoader;
-

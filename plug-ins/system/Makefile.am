@@ -47,6 +47,7 @@ calendar_utils.cpp \
 morphology.cpp \
 translations.cpp \
 configurable.cpp \
+configfolder.cpp \
 json_utils_ext.cpp \
 xmlkillingattribute.cpp \
 xmlpvpattribute.cpp \

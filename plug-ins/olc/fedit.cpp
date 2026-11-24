@@ -5,6 +5,9 @@
 #include "json_utils_ext.h"
 
 #include "configurable.h"
+#include "configfolder.h"
+#include "dlfile.h"
+#include "dreamland.h"
 #include "merc.h"
 #include "arg_utils.h"
 #include "act.h"
@@ -45,6 +48,13 @@ OLCStateFile::~OLCStateFile()
 void OLCStateFile::commit() 
 {
     Configurable::Pointer original = configReg->get(path);
+    // fedit reload unloads a folder file deleted from disk while it may be open here.
+    if (!original) {
+        if (owner)
+            owner->character->pecho("Файл {W%s{x больше не загружен, изменения не сохранены.", path.c_str());
+        return;
+    }
+
     original->setText(text);
     original->save();
 
@@ -134,6 +144,8 @@ FEDIT(cancel, "отменить", "отменить все изменения и
 // without a plugin reload (the same loaded() call fedit's own 'done' makes).
 // The file is parsed first: load() hands even a half-parsed value to loaded(),
 // and the handlers clear their tables before refilling them.
+// In a ConfigFolder folder the same call also registers a file that appeared
+// on disk after boot and unloads one that was deleted.
 static void fedit_reload(Character *ch, DLString name)
 {
     if (name.empty()) {
@@ -145,7 +157,24 @@ static void fedit_reload(Character *ch, DLString name)
         name = name.substr(0, name.size() - 5);
 
     Configurable::Pointer cfg = configReg->get(name);
-    if (!cfg) {
+
+    // A file of a scanned folder (ambient/, descriptions/) can appear or vanish
+    // between boots: a new one is registered here, a deleted one is unloaded.
+    ConfigFolder *folder = ConfigFolder::owner(name);
+    bool isNew = false;
+    if (folder) {
+        bool onDisk = folder->onDisk(name);
+
+        if (cfg && !onDisk) {
+            cfg->unload();
+            ch->pecho("Файл {W%s{x удален с диска и выгружен.", name.c_str());
+            return;
+        }
+
+        isNew = !cfg && onDisk;
+    }
+
+    if (!cfg && !isNew) {
         list<Configurable::Pointer> matches = configReg->getAll(name);
         if (matches.empty()) {
             ch->pecho("Не найдено ни одного файла с именем {W%s{x.", name.c_str());
@@ -160,10 +189,15 @@ static void fedit_reload(Character *ch, DLString name)
         cfg = matches.front();
     }
 
+    DLString path = name;
+    if (cfg)
+        path = cfg->getPath();
+    DLString absPath = DLFile(dreamland->getTableDir(), path, ".json").getAbsolutePath();
+
     try {
-        std::ifstream ifs(cfg->getAbsolutePath().c_str());
+        std::ifstream ifs(absPath.c_str());
         if (!ifs) {
-            ch->pecho("Не могу прочитать {W%s{x.", cfg->getAbsolutePath().c_str());
+            ch->pecho("Не могу прочитать {W%s{x.", absPath.c_str());
             return;
         }
 
@@ -172,17 +206,28 @@ static void fedit_reload(Character *ch, DLString name)
 
         ostringstream errbuf;
         if (!JsonUtils::validate(buffer.str(), errbuf)) {
-            ch->pecho("Ошибка парсинга JSON в {W%s{x, файл не перезагружен:", cfg->getPath().c_str());
+            ch->pecho("Ошибка парсинга JSON в {W%s{x, файл не перезагружен:", path.c_str());
             ch->pecho("%s", errbuf.str().c_str());
+            return;
+        }
+
+        if (isNew) {
+            cfg = folder->loadFile(path);
+            if (!cfg) {
+                ch->pecho("Файл {W%s{x не удалось зарегистрировать, подробности в логе.", path.c_str());
+                return;
+            }
+            ch->pecho("Файл {W%s{x зарегистрирован и загружен с диска: %d записей.",
+                      path.c_str(), (int)cfg->getValue().size());
             return;
         }
 
         cfg->load();
         ch->pecho("Файл {W%s{x перезагружен с диска: %d записей.",
-                  cfg->getPath().c_str(), (int)cfg->getValue().size());
+                  path.c_str(), (int)cfg->getValue().size());
 
     } catch (const std::exception &ex) {
-        ch->pecho("Ошибка при перезагрузке {W%s{x: %s", cfg->getPath().c_str(), ex.what());
+        ch->pecho("Ошибка при перезагрузке {W%s{x: %s", path.c_str(), ex.what());
     }
 }
 

@@ -926,7 +926,7 @@ void AccountManager::setMessengerIdentity(const DLString &id, const DLString &ty
 }
 
 // Map ONE account-wide config key onto a character. Keys mirror the config option
-// EN names (screenreader / fightspam / skillspam / noweaponspam), plus the special
+// EN names (screenreader / fightspam / skillspam / noweaponspam / nomusic), plus the special
 // tri-state "color" and the "lang" attribute. An unknown key is ignored, so a newer
 // build can add keys without an older one choking on them.
 void AccountManager::applyConfigKeyToChar(PCharacter *ch, const DLString &key, const Json::Value &value)
@@ -952,6 +952,11 @@ void AccountManager::applyConfigKeyToChar(PCharacter *ch, const DLString &key, c
         // under the option's own name, so the semantics stay self-consistent.
         if (value.asBool()) SET_BIT(ch->config, CONFIG_WEAPONSPAM);
         else REMOVE_BIT(ch->config, CONFIG_WEAPONSPAM);
+    }
+    else if (key == "nomusic") {
+        // Mutes the music channel, bards and gramophones (comm_flags nomusic).
+        if (value.asBool()) SET_BIT(ch->comm, COMM_NOMUSIC);
+        else REMOVE_BIT(ch->comm, COMM_NOMUSIC);
     }
     else if (key == "color") {
         // Tri-state across two bits, mirroring config_color: off / on / mild.
