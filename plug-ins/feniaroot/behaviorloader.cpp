@@ -141,6 +141,11 @@ void DefaultBehavior::unloaded()
     behaviorManager->unregistrate(Pointer(this));
 }
 
+bool DefaultBehavior::isValid() const
+{
+    return true;
+}
+
 const DLString & DefaultBehavior::getName() const
 {
     return Behavior::getName();
