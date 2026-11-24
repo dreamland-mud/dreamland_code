@@ -23,6 +23,9 @@
  * account achievements are the exception: they belong to the whole account and
  * stay on the page when the alt holding them is hidden (Kit 2026-10-24).
  *
+ * A supporter's main character may bring a portrait (field "portrait": video
+ * and poster paths, alt text, the character's login), see profile_portrait.
+ *
  * Achievements come from Fenia (.tmp.achievements.profile in the private
  * world scripts): definitions, the test gate and the secrets never pass
  * through here. No script, a throw or a closed gate leave the field out.
@@ -483,6 +486,66 @@ static PCMemoryInterface *profile_main_char(const list<PCMemoryInterface *> &sho
     return mainChar;
 }
 
+// The supporter portrait (PV-10), written by Fenia on "account portrait accept"
+// as pfile string attributes: portrait = "<remorts>:<key>", the alt text in
+// portrait_alt_en/ru/ua. The key (32 lowercase hex) names the files the site
+// serves, /portraits/<key>.mp4 and .jpg. Shown only on the main character,
+// only while the account supports the game (a lapse hides it, renewal brings
+// it back) and only in the life it was made for (a remort retires it). Read
+// fresh on every request, so a lapse or a new accept shows at once.
+static const DLString::size_type PORTRAIT_KEY_LEN = 32;
+
+static bool profile_portrait_key_valid(const DLString &key)
+{
+    if (key.size() != PORTRAIT_KEY_LEN)
+        return false;
+
+    for (char ch : key)
+        if (!(ch >= '0' && ch <= '9') && !(ch >= 'a' && ch <= 'f'))
+            return false;
+    return true;
+}
+
+static bool profile_portrait(const DLString &account, PCMemoryInterface *pci, Json::Value &out)
+{
+    if (AccountManager::supporterUntil(account) <= dreamland->getCurrentTime())
+        return false;
+
+    const DLString &raw = get_string_attribute(pci, "portrait");
+    DLString::size_type colon = raw.find(':');
+    if (colon == DLString::npos || colon == 0 || colon > 4)
+        return false;
+
+    // Same count as Fenia's ch.remort_count, which stamped the life.
+    unsigned int life = 0;
+    for (DLString::size_type i = 0; i < colon; i++) {
+        char ch = raw.at(i);
+        if (ch < '0' || ch > '9')
+            return false;
+        life = life * 10 + (ch - '0');
+    }
+    if (life != pci->getRemorts().size())
+        return false;
+
+    DLString key = raw.substr(colon + 1);
+    if (!profile_portrait_key_valid(key))
+        return false;
+
+    out["video"] = ("/portraits/" + key + ".mp4").c_str();
+    out["poster"] = ("/portraits/" + key + ".jpg").c_str();
+    out["char"] = pci->getName().c_str();
+
+    static const char *ALT_ATTRS[] = { "portrait_alt_en", "portrait_alt_ru", "portrait_alt_ua" };
+    static const char *ALT_LANGS[] = { "en", "ru", "ua" };
+    out["alt"] = Json::Value(Json::objectValue);
+    for (int i = 0; i < 3; i++) {
+        DLString alt = get_string_attribute(pci, ALT_ATTRS[i]).colourStrip();
+        if (!alt.empty())
+            out["alt"][ALT_LANGS[i]] = alt.c_str();
+    }
+    return true;
+}
+
 static void profile_servlet(HttpRequest &request, HttpResponse &response)
 {
     Json::Value params;
@@ -530,6 +593,10 @@ static void profile_servlet(HttpRequest &request, HttpResponse &response)
             entry["main"] = true;
         body["chars"].append(entry);
     }
+
+    Json::Value portrait;
+    if (mainChar != 0 && profile_portrait(id, mainChar, portrait))
+        body["portrait"] = portrait;
 
     Json::Value achievements;
     if (profile_achievements_cached(id, shown, achievements))
