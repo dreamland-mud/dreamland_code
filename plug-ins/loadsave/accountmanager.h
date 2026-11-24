@@ -10,9 +10,27 @@
 #include <list>
 #include <jsoncpp/json/json.h>
 #include "dlstring.h"
+#include "eventbus.h"
 
 class PCMemoryInterface;
 class PCharacter;
+
+/**
+ * An account-wide option changed on one character and was written to the
+ * account: published by AccountManager::writeConfigThrough after the account's
+ * other online characters got the value. The comm plugin listens and updates
+ * open settings dialogs. 'except' is the character whose dialog already knows
+ * (null: tell every character of the account).
+ */
+struct AccountConfigChangedEvent : public Event {
+    AccountConfigChangedEvent(const DLString &id, const DLString &key,
+                              const Json::Value &value, PCharacter *except);
+    virtual ~AccountConfigChangedEvent();
+    DLString id;
+    DLString key;
+    Json::Value value;
+    PCharacter *except;
+};
 
 /**
  * The account layer.
@@ -78,6 +96,17 @@ public:
     static void applyConfigToChar(PCharacter *ch);
     static void propagateConfigKey(const DLString &id, const DLString &key,
                                    const Json::Value &value, PCharacter *except);
+
+    // The config options (ConfigElement names, not bit names) the account owns.
+    static bool isAccountWideConfig(const DLString &key);
+    // A linked character changed an account-wide option: record it on the
+    // account, push it to the account's other online characters and publish
+    // AccountConfigChangedEvent. An unlinked character is a no-op. Every command
+    // that sets an account-wide value calls this, so the next login does not
+    // re-apply a stale one. notifySelf: the caller has no way to update the
+    // changer's own settings dialog, so the event covers it too.
+    static void writeConfigThrough(PCharacter *ch, const DLString &key,
+                                   const Json::Value &value, bool notifySelf = false);
 
     // --- mutations (persist immediately) ---
     // No callers until the linking-code / redeem surface lands in a later phase.

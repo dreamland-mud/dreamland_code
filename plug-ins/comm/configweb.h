@@ -3,6 +3,8 @@
 #define __CONFIGWEB_H__
 
 #include "descriptorstatelistener.h"
+#include "eventbus.h"
+#include "plugin.h"
 #include "dlstring.h"
 
 class PCharacter;
@@ -20,6 +22,18 @@ void web_config_changed( PCharacter *ch, const DLString &key, const Json::Value 
  *  option changed on one of them changes on all of them. */
 void web_config_changed_account( const DLString &id, const DLString &key,
                                  const Json::Value &value, PCharacter *except );
+
+/** An account-wide option was written to the account (AccountManager::
+ *  writeConfigThrough, from any plugin): move the switch in every open dialog
+ *  of that account. */
+class AccountConfigWebNotifier : public Plugin, public EventHandler {
+public:
+    typedef ::Pointer<AccountConfigWebNotifier> Pointer;
+
+    virtual void initialization();
+    virtual void destruction();
+    virtual void handleEvent(const type_index &eventType, const Event &event) const;
+};
 
 /** A character entering or leaving the world: the dialog has nothing to show
  *  for a descriptor sitting at the login prompt, and the settings on screen

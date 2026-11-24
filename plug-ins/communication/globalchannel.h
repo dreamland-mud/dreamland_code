@@ -19,6 +19,7 @@ public:
     virtual void run( Character *, const DLString & );
 
 protected:
+    void writeOffThrough( Character * ) const;
     virtual bool canTalkGlobally( Character * ) const;
     virtual void findListeners( Character *, Listeners & ) const = 0;
     virtual bool isGlobalListener( Character *, Character * ) const;

@@ -1011,6 +1011,42 @@ void AccountManager::applyConfigToChar(PCharacter *ch)
     }
 }
 
+AccountConfigChangedEvent::AccountConfigChangedEvent(const DLString &id, const DLString &key,
+                                                     const Json::Value &value, PCharacter *except)
+    : id(id), key(key), value(value), except(except)
+{
+}
+
+AccountConfigChangedEvent::~AccountConfigChangedEvent()
+{
+}
+
+bool AccountManager::isAccountWideConfig(const DLString &key)
+{
+    // These are the config OPTION names (ConfigElement::getName), not the bit names:
+    // the CONFIG_WEAPONSPAM bit's option is "noweaponspam" (inverted -- set = hide
+    // weapon-flag effects), so the honest account key is "noweaponspam" too.
+    return key == "screenreader"
+        || key == "fightspam"
+        || key == "skillspam"
+        || key == "noweaponspam"
+        || key == "nomusic";
+}
+
+void AccountManager::writeConfigThrough(PCharacter *ch, const DLString &key,
+                                        const Json::Value &value, bool notifySelf)
+{
+    DLString id = accountOf(ch->getName());
+    if (id.empty())
+        return;
+
+    setConfigKey(id, key, value);
+    propagateConfigKey(id, key, value, ch);
+
+    if (eventBus)
+        eventBus->publish(AccountConfigChangedEvent(id, key, value, notifySelf ? 0 : ch));
+}
+
 void AccountManager::propagateConfigKey(const DLString &id, const DLString &key,
                                         const Json::Value &value, PCharacter *except)
 {
