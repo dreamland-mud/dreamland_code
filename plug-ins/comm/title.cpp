@@ -172,9 +172,10 @@ CMDRUNP( pretitle )
         DLString eng = pch->getPretitle( );
         DLString rus = pch->getRussianPretitle( );
 
+        DLString none = _("(нет)").getMessage( pch );
         pch->pecho( _("Твой претитул: %s\r\nРусский претитул: %s"),
-                     (eng.empty( ) ? "(нет)" : eng.c_str( )),
-                     (rus.empty( ) ? "(нет)" : rus.c_str( )) );
+                     (eng.empty( ) ? none.c_str( ) : eng.c_str( )),
+                     (rus.empty( ) ? none.c_str( ) : rus.c_str( )) );
         return;
     }
     
