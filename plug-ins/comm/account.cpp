@@ -1260,8 +1260,23 @@ static void account_kofi(PCharacter *ch, DLString &args)
         return;
     }
 
-    // Unknown and already-credited ids get one answer, so a guesser cannot
-    // learn which transaction ids exist.
+    // A payment already applied to the claimant's own account says so: that
+    // tells a guesser nothing, and payers do retry a receipt the webhook matched.
+    Json::Value owner = entry.get("account", Json::Value());
+    if (r == KofiLedger::CLAIM_TAKEN && owner.isString() && id == owner.asString().c_str()
+        && entry.get("status", "").asString() == "applied") {
+        DLString title = AccountManager::titleOf(id);
+        time_t supporter = AccountManager::supporterUntil(id);
+        if (supporter > now)
+            ch->pecho(_("Этот платеж уже зачтен твоему аккаунту {W%1$s{x. Поддержка на Ko-fi до {W%2$s{x."),
+                      title.c_str(), Date::getTimeAsString(supporter, "%Y-%m-%d").c_str());
+        else
+            ch->pecho(_("Этот платеж уже зачтен твоему аккаунту {W%1$s{x."), title.c_str());
+        return;
+    }
+
+    // Unknown ids and ids credited elsewhere get one answer, so a guesser
+    // cannot learn which transaction ids exist.
     if (r != KofiLedger::CLAIM_OK) {
         fails.count++;
         Json::Value a;
