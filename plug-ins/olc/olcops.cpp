@@ -59,36 +59,18 @@ static IconvMap koi2utf("koi8-u", "utf-8");
  * Text conversion
  *-------------------------------------------------------------------------*/
 
-// Game text is ASCII punctuation only (KOI8 engine): map the usual typographic
-// characters instead of refusing them.
-static const struct { const char *from; const char *to; } koiPunctuation[] = {
-    { "\xE2\x80\xA6", "..." },  // U+2026 ellipsis
-    { "\xE2\x80\x94", "--" },   // U+2014 em dash
-    { "\xE2\x80\x93", "-" },    // U+2013 en dash
-    { "\xCA\xBC", "'" },        // U+02BC modifier letter apostrophe
-    { "\xE2\x80\x99", "'" },    // U+2019
-    { "\xE2\x80\x98", "'" },    // U+2018
-    { "\xE2\x80\x9C", "\"" },   // U+201C
-    { "\xE2\x80\x9D", "\"" },   // U+201D
-    { "\xC2\xAB", "\"" },       // U+00AB
-    { "\xC2\xBB", "\"" },       // U+00BB
-    { "\xC2\xA0", " " },        // U+00A0 no-break space
-    { 0, 0 }
-};
-
 bool OlcOps::toKoi(const std::string &utf, DLString &koi, DLString &error)
 {
-    std::string mapped = utf;
+    // Game text is ASCII punctuation only (KOI8 engine): map the usual
+    // typographic characters instead of refusing them. KOI8-U holds the
+    // no-break space, but OLC text uses a plain one.
+    std::string mapped = IconvMap::typographyToAscii(utf);
+    const std::string nbsp = "\xC2\xA0";
+    std::string::size_type pos = 0;
 
-    for (int i = 0; koiPunctuation[i].from; i++) {
-        const std::string from = koiPunctuation[i].from;
-        const std::string to = koiPunctuation[i].to;
-        std::string::size_type pos = 0;
-
-        while ((pos = mapped.find(from, pos)) != std::string::npos) {
-            mapped.replace(pos, from.size(), to);
-            pos += to.size();
-        }
+    while ((pos = mapped.find(nbsp, pos)) != std::string::npos) {
+        mapped.replace(pos, nbsp.size(), " ");
+        pos += 1;
     }
 
     koi = utf2koi(mapped);
@@ -131,7 +113,7 @@ bool OlcOps::toKoi(const std::string &utf, DLString &koi, DLString &error)
     snprintf(hex, sizeof(hex), "U+%04X", code);
 
     error = DLString("Character ") + hex + " at offset " + DLString(offset)
-            + " has no KOI8-U form, the game would cut the text there";
+            + " has no KOI8-U form";
     return false;
 }
 
