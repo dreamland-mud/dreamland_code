@@ -1439,6 +1439,16 @@ static DLString rprog_eexit_descr( Room *room, EXTRA_EXIT_DATA *peexit, Characte
     return descr;
 }
 
+// onDescrChar: an affect on the looker recolours or extends the room text the
+// looker sees. A separate trigger from the room-affect onDescr, because some
+// affect types live on both rooms and characters (heat, evil spirit, prevent)
+// and their room onDescr must not follow the character around.
+static DLString afprog_descr_char( AffectHandler *ah, Character *ch, Affect *paf, const DLString &descr )
+{
+    FENIA_STR_CALL( ah, "DescrChar", "CAs", ch, paf, descr.c_str( ) )
+    return descr;
+}
+
 // Pick a keyword to show from an extra-descr's space-separated, multi-language
 // keyword blob, favouring the reader's language: Latin for EN, words with
 // Ukrainian-specific letters for UA, Cyrillic-without-Ukrainian-marks for RU.
@@ -1627,6 +1637,13 @@ static void do_look_auto( Character *ch, Room *room, bool fBrief, bool fShowMoun
             auto ah = paf->type->getAffect();
             if (ah)
                 roomDescription = ah->onDescr(SpellTarget::Pointer(NEW, ch), paf, roomDescription);
+        }
+
+        // Then the looker's own affects get a say (a mushroom trip paints the room).
+        for (auto &paf: ch->affected.findAllWithHandler()) {
+            auto ah = paf->type->getAffect();
+            if (ah)
+                roomDescription = afprog_descr_char(*ah, ch, paf, roomDescription);
         }
 
         // Append resulting room description to the main output buffer.
