@@ -289,9 +289,9 @@ static void wear_run( Character *ch, char *argument )
 
 CMDRUNP( wear )
 {
-    // Putting a thing on can kill the wearer (a wear trigger, a burn): the
-    // death has already happened by then, so the command just stops. Uncaught,
-    // the exception reaches the scheduler and takes the server down.
+    // Backstop: nothing on the wear path is known to kill the wearer now, but
+    // a death that ever escapes from here would reach the scheduler uncaught
+    // and take the server down. The death has happened, the command stops.
     try {
         wear_run( ch, argument );
     } catch (const VictimDeathException &) {

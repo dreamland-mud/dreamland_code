@@ -25,6 +25,7 @@
 #include "dreamland.h"
 #include "def.h"
 #include "fenia_utils.h"
+#include "msp.h"
 
 CLAN(battlerager);
 PROF(cleric);
@@ -212,6 +213,19 @@ void rage_magic_refuse( Character *ch )
     ch->pecho( _("Твоя клятва ярости слишком глубока: эта магия тебе больше не дозволена.") );
 }
 
+void rage_burn( Character *ch, int dam )
+{
+    if (dam <= 0 || ch->hit <= 1)
+        return;
+
+    int before = ch->hit;
+    int low = ch->max_hit / 5;
+    ch->hit = max( 1, ch->hit - dam );
+
+    if (!ch->is_npc( ) && before >= low && ch->hit < low)
+        msp_sound( ch, "alert/lowhp", 100, 1, 80 );
+}
+
 bool rage_own_magic( Character *ch )
 {
     bool burned = number_percent( ) <= rage_deflect( ch );
@@ -226,7 +240,7 @@ bool rage_own_magic( Character *ch )
     }
 
     int before = ch->hit;
-    ch->hit = max( 1, ch->hit - dam );
+    rage_burn( ch, dam );
     if (before > 1 && ch->hit == 1)
         achievement( ch, "the_oath_remembers" );
     return burned;
