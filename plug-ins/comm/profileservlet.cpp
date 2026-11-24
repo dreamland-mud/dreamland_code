@@ -489,7 +489,8 @@ static PCMemoryInterface *profile_main_char(const list<PCMemoryInterface *> &sho
 // The supporter portrait (PV-10), written by Fenia on "account portrait accept"
 // as pfile string attributes: portrait = "<remorts>:<key>", the alt text in
 // portrait_alt_en/ru/ua. The key (32 lowercase hex) names the files the site
-// serves, /portraits/<key>.mp4 and .jpg. Shown only on the main character,
+// serves: /portraits/<key>.mp4 (540x1920, colour on top, alpha as grey below)
+// and the RGBA poster <key>.png. Shown only on the main character,
 // only while the account supports the game (a lapse hides it, renewal brings
 // it back) and only in the life it was made for (a remort retires it). Read
 // fresh on every request, so a lapse or a new accept shows at once.
@@ -532,7 +533,7 @@ static bool profile_portrait(const DLString &account, PCMemoryInterface *pci, Js
         return false;
 
     out["video"] = ("/portraits/" + key + ".mp4").c_str();
-    out["poster"] = ("/portraits/" + key + ".jpg").c_str();
+    out["poster"] = ("/portraits/" + key + ".png").c_str();
     out["char"] = pci->getName().c_str();
 
     static const char *ALT_ATTRS[] = { "portrait_alt_en", "portrait_alt_ru", "portrait_alt_ua" };
