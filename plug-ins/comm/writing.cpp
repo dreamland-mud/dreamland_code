@@ -42,8 +42,13 @@ COMMAND(CWrite, "write")
         writeOnPaper( ch, target, arguments );
     else if (( target = get_obj_room( ch, targetName.c_str( ) ) ))
         writeOnWall( ch, target, arguments );
-    else
-        ch->pecho(_("У тебя нет этого."));
+    else {
+        // The walls of the room itself (graffiti, Fenia utils/graffiti): true
+        // once the player got an answer. nail is what findNail accepts, or null.
+        mudtags_strip_web( arguments, ch );
+        if (!gprog( "onWrite", "COss", ch, findNail( ch ), targetName.c_str( ), arguments.c_str( ) ))
+            ch->pecho(_("У тебя нет этого."));
+    }
 }
 
 void CWrite::writeOnWall( Character *ch, Object *wall, DLString &arguments )

@@ -43,6 +43,7 @@
 #include "liquid.h"
 #include "room.h"
 #include "roomutils.h"
+#include "roomtempdescr.h"
 #include "itemutils.h"
 #include "desire.h"
 #include "fight.h"
@@ -1298,6 +1299,16 @@ static DLString oprog_extra_descr(Object *obj, Character *ch, const char *arg)
     return DLString::emptyString;
 }
 
+// Every extra description of a room: the temporary ones scripts put there
+// (graffiti, notes) first, then the prototype's. A view: the list owns nothing.
+static ExtraDescrList room_extra_descr( Room *room )
+{
+    ExtraDescrList all( RoomTempDescr::list( room ) );
+    const ExtraDescrList &proto = room->getExtraDescr( );
+    all.insert( all.end( ), proto.begin( ), proto.end( ) );
+    return all;
+}
+
 struct EDInfo {
     EDInfo( DLString k, DLString d, Object *o, Room *r, bool def = false ) :
         keyword( k ), description( d ), source( o ), sourceRoom( r ), isDefault( def )
@@ -1388,7 +1399,11 @@ struct ExtraDescList : public list<EDInfo> {
                     return true;
                 }
 
-                const ExtraDescrList &sourceEdList = i->source ? i->source->pIndexData->extraDescriptions : i->sourceRoom->getExtraDescr();
+                ExtraDescrList sourceEdList;
+                if (i->source)
+                    sourceEdList = i->source->pIndexData->extraDescriptions;
+                else
+                    sourceEdList = room_extra_descr( i->sourceRoom );
                 buf << "{x";
                 webManipManager->decorateExtraDescr( buf, i->description.c_str( ), sourceEdList, ch );
                 buf << endl;
@@ -1419,7 +1434,7 @@ bool do_look_extradescr( Character *ch, const char *arg, int number )
     
     edlist.putObjects( ch->carrying );
     edlist.putObjects( ch->in_room->contents );
-    edlist.putDescriptions( ch->in_room->getExtraDescr(), 0, ch->in_room );
+    edlist.putDescriptions( room_extra_descr( ch->in_room ), 0, ch->in_room );
 
     return edlist.output( );
 }
@@ -1612,7 +1627,8 @@ static void do_look_auto( Character *ch, Room *room, bool fBrief, bool fShowMoun
         
         // Decorate "(sign)" with web tags for extra descriptions, and "(door)"
         // markers that name a visible exit with clickable 'look' tags.
-        webManipManager->decorateExtraDescr( rbuf, dsc, room->getExtraDescr(), ch, /*decorateExits=*/true );
+        ExtraDescrList roomEds = room_extra_descr( room );
+        webManipManager->decorateExtraDescr( rbuf, dsc, roomEds, ch, /*decorateExits=*/true );
 
         // Append room_description fields of all extra exits or their Fenia onExtraExitDescr overrides
         for (auto &peexit: room->extra_exits)
@@ -1635,9 +1651,25 @@ static void do_look_auto( Character *ch, Room *room, bool fBrief, bool fShowMoun
         else
             buf << roomDescription;
 
+        // A line for each temporary extra description that asked for one
+        // ("Something is scratched on the (wall) here."), decorated like the
+        // description so its keyword is clickable.
+        DLString marks = RoomTempDescr::marks( room, lang );
+        if (!marks.empty( )) {
+            if (!roomDescription.empty( ) && roomDescription.at( roomDescription.size( ) - 1 ) != '\n')
+                buf << endl;
+
+            ostringstream mbuf;
+            webManipManager->decorateExtraDescr( mbuf, marks.c_str( ), roomEds, ch );
+            if (heat)
+                buf << heat_tint( mbuf.str( ) );
+            else
+                buf << mbuf.str( );
+        }
+
         // For screenreader / colourless clients, list the examinable extras
         // (empty for everyone else).
-        hint = look_targets_hint( ch, room->getExtraDescr(), lang );
+        hint = look_targets_hint( ch, roomEds, lang );
         buf << hint;
     }
 
