@@ -560,17 +560,43 @@ CMDRUNP( affects )
         output.push_back( ao );
     }
 
-    // Raw debuff bits with no owning affect (a cursed or slowing generated item,
-    // race) used to read only as a yellow word in the closing "under the effect
-    // of" line, while the web panel showed them as red maladictions. List each
-    // as its own red permanent row and drop it from that line. Same bit set as
-    // the panel's "mal" column (plug-ins/web/impl.cpp addAffFallbacks).
-    static const bitstring_t malBits[] = {
-        AFF_BLIND, AFF_POISON, AFF_PLAGUE, AFF_CORRUPTION, AFF_FAERIE_FIRE,
-        AFF_CHARM, AFF_CURSE, AFF_WEAKEN, AFF_SLOW, AFF_SCREAM, AFF_SLEEP,
-        AFF_BLOODTHIRST, AFF_STUN, AFF_WEAK_STUN,
+    // Raw affect bits with no owning affect (a generated item's haste or curse,
+    // race): list each as its own permanent row (red for debuffs) and drop it
+    // from the closing "under the effect of" line. Same bit set as the web
+    // panel's fallbacks (plug-ins/web/impl.cpp addAffFallbacks). The
+    // skill name dedups against a gear-grant row of that skill already listed
+    // (eqAffects maps bare stealth bits to their skills).
+    static const struct { bitstring_t bit; const char *skill; bool negative; } rawBits[] = {
+        { AFF_INVISIBLE,    "invisibility",    false },
+        { AFF_IMP_INVIS,    "improved invis",  false },
+        { AFF_HIDE,         "hide",            false },
+        { AFF_SNEAK,        "sneak",           false },
+        { AFF_FLYING,       "fly",             false },
+        { AFF_PASS_DOOR,    "pass door",       false },
+        { AFF_FADE,         "fade",            false },
+        { AFF_CAMOUFLAGE,   "camouflage",      false },
+        { AFF_SANCTUARY,    "sanctuary",       false },
+        { AFF_PROTECT_EVIL, "protection evil", false },
+        { AFF_PROTECT_GOOD, "protection good", false },
+        { AFF_REGENERATION, "regeneration",    false },
+        { AFF_HASTE,        "haste",           false },
+        { AFF_BLIND,        "blindness",       true },
+        { AFF_POISON,       "poison",          true },
+        { AFF_PLAGUE,       "plague",          true },
+        { AFF_CORRUPTION,   "corruption",      true },
+        { AFF_FAERIE_FIRE,  "faerie fire",     true },
+        { AFF_CHARM,        "charm person",    true },
+        { AFF_CURSE,        "curse",           true },
+        { AFF_WEAKEN,       "weaken",          true },
+        { AFF_SLOW,         "slow",            true },
+        { AFF_SCREAM,       "scream",          true },
+        { AFF_SLEEP,        "sleep",           true },
+        { AFF_BLOODTHIRST,  "bloodthirst",     true },
+        { AFF_STUN,         0,                 true },
+        { AFF_WEAK_STUN,    0,                 true },
     };
-    for (bitstring_t bit: malBits) {
+    for (const auto &rb: rawBits) {
+        bitstring_t bit = rb.bit;
         if (!IS_AFFECTED( ch, bit ))
             continue;
 
@@ -590,15 +616,19 @@ CMDRUNP( affects )
         ao.name = affect_flags.messages( bit, false, '1', ao.lang );
         ao.duration = -1;
         ao.unitMinutes = false;
-        ao.negative = true;
+        ao.negative = rb.negative;
 
         DLString effect = mal_bit_effect( bit, ao.lang );
         if (!effect.empty( ))
             ao.lines.push_back( effect );
 
+        Skill *skill = rb.skill ? skillManager->findExisting( rb.skill ) : 0;
         bool dup = false;
         for (auto &o: output)
-            if (o.name == ao.name) { dup = true; break; }
+            if (o.name == ao.name || (skill != 0 && o.type == skill->getIndex( ))) {
+                dup = true;
+                break;
+            }
         if (!dup)
             output.push_back( ao );
         permAff.dropAff( bit );
