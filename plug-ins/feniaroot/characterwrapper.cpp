@@ -150,6 +150,7 @@
 #include "math_utils.h"
 
 RELIG(none);   // god_none sentinel for the gear-advisor tattoo-slot filter
+RELIG(karmina);   // vampire form damroll bonus, ga_formDamrollMult
 // Item-granted skill pricing: Flowers never fight players, a Battlerager can't blink,
 // Shalafi cast at half the class penalty.
 CLAN(flowers);
@@ -5988,6 +5989,18 @@ static void ga_grantHitWeapon( obj_index_data *pProto, ::Object *inst, ::Object 
     pierce = attack_table[get_weapon_attack( wep )].damage == DAM_PIERCE;
 }
 
+// Vampire form adds a share of the char's damroll on top (Fenia skillcommand/vampire/run:
+// damroll/2, damroll*11/10 for Karmina's marked followers), so gear damroll is worth that
+// much more to a vampire, in form or not. item_value.json shared form_damroll_*.
+static double ga_formDamrollMult( Character *target )
+{
+    if (target == 0 || target->is_npc( ) || target->getProfession( )->getName( ) != "vampire")
+        return 1.0;
+    if (target->getReligion( ) == god_karmina && get_eq_char( target, wear_tattoo ))
+        return item_value( "shared", "form_damroll_karmina", 2.1 );
+    return item_value( "shared", "form_damroll_vampire", 1.5 );
+}
+
 static double ga_grantsValue( Character *target, const GAWeights &w, obj_index_data *pProto,
                               ::Object *inst, bool worn, double swing, int itemLevel )
 {
@@ -6008,9 +6021,14 @@ static double ga_grantsValue( Character *target, const GAWeights &w, obj_index_d
     // One melee hit of the char in points: the swing of its weapon (this item, when it
     // is a usable weapon, else the wielded one) plus its damroll. Multiplying it by a
     // share x prices "x more of all melee damage". The reference player's landed hit
-    // when there is no char.
+    // when there is no char. w.dr carries a vampire's form multiplier and so does its
+    // damroll while in form: price the form damroll at the plain weight, in form or not.
+    double formMult = ga_formDamrollMult( target );
+    double formDr = 0;
+    if (target != 0)
+        formDr = target->is_vampire( ) ? (double)target->damroll : target->damroll * formMult;
     double perHit = target != 0
-        ? std::max( 0.0, swing ) + w.dr * target->damroll
+        ? std::max( 0.0, swing ) + w.dr / formMult * formDr
         : w.dr * item_pc_dmg( lvl, caster );
     double sanct = item_flag_base( AFF_SANCTUARY, caster, lvl );
     double activeUse = ga_gk( "active_use", 0.5 );
@@ -6732,6 +6750,7 @@ static void ga_itemContext( Character *target, int mySlot, ::Object *self, bool 
     w.caster = caster;
     item_weights( w, caster, target->getRealLevel( ) );
     ga_poolScales( target, w );
+    w.dr *= ga_formDamrollMult( target );
     ga_modelHitroll( target, w );
     w.spellFactor = ga_spellFactor( target );
     w.curWeaponSwing = ga_curWeaponSwing( target, w );
@@ -6839,6 +6858,7 @@ NMI_INVOKE( CharacterWrapper, gearAdvice, "(profile, [lockedSlots], [slotFilter]
     // damroll; a caster well under it.
     item_weights( w, w.caster, target->getRealLevel( ) );
     ga_poolScales( target, w );
+    w.dr *= ga_formDamrollMult( target );
     ga_modelHitroll( target, w );
 
     w.curWeaponSwing = ga_curWeaponSwing( target, w );
