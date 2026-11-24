@@ -106,9 +106,18 @@ void OLCStateBehavior::show( PCharacter *ch )
     ptc(ch, "Укр.название:    {C%s{x %s {D(nameUa help){x\r\n",
             bhv->nameUa.c_str(),
             olc_edit_button(ch, "nameUa", "web").c_str());
+    ptc(ch, "Англ.название:   {C%s{x %s {D(nameEn help){x\r\n",
+            bhv->nameEn.c_str(),
+            olc_edit_button(ch, "nameEn", "web").c_str());
     ptc(ch, "Описание:        %s {D(desc help){x\r\n{c%s{x\r\n",
             olc_edit_button(ch, "desc", "web").c_str(),
-            bhv->getDescription().c_str());
+            bhv->description.get(LANG_RU).c_str());
+    ptc(ch, "Укр.описание:    %s {D(uadesc help){x\r\n{c%s{x\r\n",
+            olc_edit_button(ch, "uadesc", "web").c_str(),
+            bhv->description.get(LANG_UA).c_str());
+    ptc(ch, "Англ.описание:   %s {D(endesc help){x\r\n{c%s{x\r\n",
+            olc_edit_button(ch, "endesc", "web").c_str(),
+            bhv->description.get(LANG_EN).c_str());
     ptc(ch, "Цель:            {c%s {D(target){x\r\n",
             web_flag_menu(true, *bhv->target.getTable(), "target", bhv->target.name(), OLC_FRAME_NONE).c_str());
     ptc(ch, "Подкоманды:      {c%s {D(subcommand){x\r\n", bhv->cmd.c_str());
@@ -214,9 +223,24 @@ BEDIT(nameUa, "укрназвание", "установить украинско
     return editor(argument, getOriginal()->nameUa, (editor_flags)(ED_NO_NEWLINE));
 }
 
-BEDIT(description, "описание", "установить описание")
+BEDIT(nameEn, "англназвание", "установить английское название")
+{
+    return editor(argument, getOriginal()->nameEn, (editor_flags)(ED_NO_NEWLINE));
+}
+
+BEDIT(description, "описание", "установить русское описание")
 {
     return editor(argument, getOriginal()->description[LANG_RU], (editor_flags)(ED_NO_NEWLINE));
+}
+
+BEDIT(uadesc, "укописание", "установить украинское описание")
+{
+    return editor(argument, getOriginal()->description[LANG_UA], (editor_flags)(ED_NO_NEWLINE));
+}
+
+BEDIT(endesc, "англописание", "установить английское описание")
+{
+    return editor(argument, getOriginal()->description[LANG_EN], (editor_flags)(ED_NO_NEWLINE));
 }
 
 BEDIT(target, "цель", "установить цель поведения")
