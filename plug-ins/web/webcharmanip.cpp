@@ -220,6 +220,7 @@ WEBMANIP_RUN(decorateMobile)
         if (mob_has_occupation(victim, OCC_QUEST_MASTER)) {
             manips.addLocal("quest", LangText{"request", "попросить", "попросити"}.get(manips.lang));
             manips.addLocal("quest", LangText{"complete", "сдать", "завершити"}.get(manips.lang));
+            manips.addLocal("quest", LangText{"find", "найти", "знайти"}.get(manips.lang));
             manips.addLocal("quest", LangText{"cancel", "отменить", "скасувати"}.get(manips.lang));
         }
 
