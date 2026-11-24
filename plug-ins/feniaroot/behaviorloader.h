@@ -42,6 +42,9 @@ public:
     virtual void unloaded();
     virtual const DLString & getName() const;
     virtual void setName(const DLString &);
+    // A behavior loaded from its XML profile is real. Only the BehaviorManager
+    // stub for an unknown name (plain Behavior) stays invalid.
+    virtual bool isValid() const;
 
     XML_VARIABLE XMLPointerNoEmpty<BehaviorHelp> help;    
 };
