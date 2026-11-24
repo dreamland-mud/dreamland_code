@@ -24,9 +24,8 @@
 #include "affectflags.h"
 #include "core/object.h"
 
-#include "damage_impl.h"
-#include "damageflags.h"
 #include "skill_utils.h"
+#include "rageoath.h"
 #include "../loadsave/behavior_utils.h"
 #include "interp.h"
 #include "save.h"
@@ -356,10 +355,11 @@ bool DefaultWearlocation::canEquip( Character *ch, Object *obj )
     }
 
     if (IS_SET( obj->extra_flags, ITEM_MAGIC ) && ch->isAffected( gsn_spellbane )) {
-        int dam = URANGE( 0, ch->hit - 1, ch->max_hit / 5 );
+        // Never lethal (rage_burn), not through the damage pipeline: its
+        // vulnerability bonus would push a capped hit past the last point.
         oldact(_("Магия $o2 аннигилирует с твоим спеллбаном!"), ch, obj, 0, TO_CHAR);
         oldact(_("Магия $o2 аннигилирует со спеллбаном $c2!"), ch, obj, 0, TO_ROOM);
-        SkillDamage( ch, ch, gsn_spellbane, DAM_NEGATIVE, dam, DAMF_MAGIC ).hit( false );
+        rage_burn( ch, ch->max_hit / 5 );
         interpret_raw( ch, "cb", "Меня ударило магической вещью!" );
         return false;
     }

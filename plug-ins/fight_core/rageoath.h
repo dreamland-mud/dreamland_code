@@ -53,6 +53,12 @@ bool rage_magic_allowed( Character *ch, RageMagic kind );
 /** Tell the member the oath forbids this magic now. */
 void rage_magic_refuse( Character *ch );
 /**
+ * Oath pain that never kills: takes dam hit points, never below 1 and never a
+ * heal (a negative dam, from a negative max_hit, does nothing). Plays the
+ * low-HP alert when it crosses a fifth of max HP, as a combat hit would.
+ */
+void rage_burn( Character *ch, int dam );
+/**
  * The member uses magic himself and the aura rolls against it.
  * True: the magic burns out. Either way it hurts, never lethally.
  */

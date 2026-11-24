@@ -126,7 +126,7 @@ static void oprog_dress(Object *obj, Character *ch, Character *victim)
  * 'wear <obj> [to <victim>]'
  * 'wear all'
  */
-CMDRUNP( wear )
+static void wear_run( Character *ch, char *argument )
 {
     Character *victim = ch;
     Object *obj;
@@ -182,22 +182,19 @@ CMDRUNP( wear )
         // One line for 'order pet wear all', not a refusal per item.
         bool petWore = false;
 
-        try {
-            for (obj = ch->carrying; obj != 0; obj = obj_next) {
-                obj_next = obj->next_content;
-                
-                if (obj->wear_loc != wear_none || !ch->can_see( obj ))
+        for (obj = ch->carrying; obj != 0; obj = obj_next) {
+            obj_next = obj->next_content;
+            
+            if (obj->wear_loc != wear_none || !ch->can_see( obj ))
+                continue;
+
+            if (petActor) {
+                if (!wear_pet_allows( ch, obj, wear_neck_1.getElement( ) ))
                     continue;
-
-                if (petActor) {
-                    if (!wear_pet_allows( ch, obj, wear_neck_1.getElement( ) ))
-                        continue;
-                    petWore = true;
-                }
-
-                wear_obj( ch, obj, F_WEAR_VERBOSE );
+                petWore = true;
             }
-        } catch (const VictimDeathException &) {
+
+            wear_obj( ch, obj, F_WEAR_VERBOSE );
         }
 
         if (petActor && !petWore)
@@ -288,6 +285,17 @@ CMDRUNP( wear )
     oldact(_("$c1 надевает на тебя $o4."), ch, obj, victim, TO_VICT);
     oldact(_("$c1 надевает на $C4 $o4."), ch, obj, victim, TO_NOTVICT);
     oprog_dress(obj, ch, victim);	
+}
+
+CMDRUNP( wear )
+{
+    // Backstop: nothing on the wear path is known to kill the wearer now, but
+    // a death that ever escapes from here would reach the scheduler uncaught
+    // and take the server down. The death has happened, the command stops.
+    try {
+        wear_run( ch, argument );
+    } catch (const VictimDeathException &) {
+    }
 }
 
 
