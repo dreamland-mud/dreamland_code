@@ -356,10 +356,13 @@ bool DefaultWearlocation::canEquip( Character *ch, Object *obj )
     }
 
     if (IS_SET( obj->extra_flags, ITEM_MAGIC ) && ch->isAffected( gsn_spellbane )) {
+        // Never lethal, like the oath's own-magic pain (rage_own_magic): HP comes
+        // off directly, since the damage pipeline's vulnerability bonus would
+        // push the capped hit past the last point.
         int dam = URANGE( 0, ch->hit - 1, ch->max_hit / 5 );
         oldact(_("Магия $o2 аннигилирует с твоим спеллбаном!"), ch, obj, 0, TO_CHAR);
         oldact(_("Магия $o2 аннигилирует со спеллбаном $c2!"), ch, obj, 0, TO_ROOM);
-        SkillDamage( ch, ch, gsn_spellbane, DAM_NEGATIVE, dam, DAMF_MAGIC ).hit( false );
+        ch->hit -= dam;
         interpret_raw( ch, "cb", "Меня ударило магической вещью!" );
         return false;
     }
