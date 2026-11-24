@@ -540,6 +540,25 @@ RPCRUN(config_set)
 /*-------------------------------------------------------------------------
  * Entering and leaving the world
  *------------------------------------------------------------------------*/
+void AccountConfigWebNotifier::initialization()
+{
+    eventBus->subscribe(typeid(AccountConfigChangedEvent), Pointer(this));
+}
+
+void AccountConfigWebNotifier::destruction()
+{
+    eventBus->unsubscribe(typeid(AccountConfigChangedEvent), Pointer(this));
+}
+
+void AccountConfigWebNotifier::handleEvent(const type_index &eventType, const Event &event) const
+{
+    if (eventType != typeid(AccountConfigChangedEvent))
+        return;
+
+    const AccountConfigChangedEvent &e = static_cast<const AccountConfigChangedEvent &>(event);
+    web_config_changed_account(e.id, e.key, e.value, e.except);
+}
+
 void ConfigWebStateListener::run( int oldState, int newState, Descriptor *d )
 {
     if (d == 0)

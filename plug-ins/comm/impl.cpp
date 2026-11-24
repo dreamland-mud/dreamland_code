@@ -38,6 +38,7 @@ extern "C"
                 Plugin::registerPlugin<AccountConfigLoginListener>( ppl );
                 Plugin::registerPlugin<ConfigWebStateListener>( ppl );
                 Plugin::registerPlugin<ChatWebStateListener>( ppl );
+                Plugin::registerPlugin<AccountConfigWebNotifier>( ppl );
 
                 Plugin::registerPlugin<SpeedWalkUpdateTask>( ppl );
                 Plugin::registerPlugin<SandboxReaper>( ppl );

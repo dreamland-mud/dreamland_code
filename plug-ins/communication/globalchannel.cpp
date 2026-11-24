@@ -23,6 +23,7 @@
 #include "dldirectory.h"
 #include "descriptor.h"
 #include "loadsave.h"
+#include "accountmanager.h"
 #include "ban.h"
 #include "act.h"
 #include "merc.h"
@@ -205,6 +206,24 @@ DLString GlobalChannel::grumbleText( int index, Character *reader, int slur ) co
     return DLString( " ... " ) + (slur > 0 ? slur_text( word, slur ) : word);
 }
 
+/*
+ * The channel's off bit can also be a config option the account owns
+ * (comm 'nomusic' is option 'nomusic'): the account then has to hear about the
+ * change, or the next login puts the old value back.
+ */
+void GlobalChannel::writeOffThrough( Character *ch ) const
+{
+    if (ch->is_npc( ))
+        return;
+
+    DLString key = off.names( );
+    if (!AccountManager::isAccountWideConfig( key ))
+        return;
+
+    AccountManager::writeConfigThrough( ch->getPC( ), key,
+                                        Json::Value( IS_SET(ch->comm, off) != 0 ), true );
+}
+
 void GlobalChannel::run( Character *ch, const DLString &arg )
 {
     Listeners listeners;
@@ -221,6 +240,7 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
         }
 
         TOGGLE_BIT(ch->comm, off);
+        writeOffThrough( ch );
 
         if (!IS_SET(ch->comm, off)) {
             if (msgOn.empty( ))
@@ -241,7 +261,10 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
     if (!canTalkGlobally( ch ))
         return;
 
-    REMOVE_BIT(ch->comm, off);
+    if (IS_SET(ch->comm, off)) {
+        REMOVE_BIT(ch->comm, off);
+        writeOffThrough( ch );
+    }
 
     findListeners( ch, listeners );
 

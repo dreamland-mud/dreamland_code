@@ -926,7 +926,7 @@ void AccountManager::setMessengerIdentity(const DLString &id, const DLString &ty
 }
 
 // Map ONE account-wide config key onto a character. Keys mirror the config option
-// EN names (screenreader / fightspam / skillspam / noweaponspam), plus the special
+// EN names (screenreader / fightspam / skillspam / noweaponspam / nomusic), plus the special
 // tri-state "color" and the "lang" attribute. An unknown key is ignored, so a newer
 // build can add keys without an older one choking on them.
 void AccountManager::applyConfigKeyToChar(PCharacter *ch, const DLString &key, const Json::Value &value)
@@ -952,6 +952,11 @@ void AccountManager::applyConfigKeyToChar(PCharacter *ch, const DLString &key, c
         // under the option's own name, so the semantics stay self-consistent.
         if (value.asBool()) SET_BIT(ch->config, CONFIG_WEAPONSPAM);
         else REMOVE_BIT(ch->config, CONFIG_WEAPONSPAM);
+    }
+    else if (key == "nomusic") {
+        // Mutes the music channel, bards and gramophones (comm_flags nomusic).
+        if (value.asBool()) SET_BIT(ch->comm, COMM_NOMUSIC);
+        else REMOVE_BIT(ch->comm, COMM_NOMUSIC);
     }
     else if (key == "color") {
         // Tri-state across two bits, mirroring config_color: off / on / mild.
@@ -1004,6 +1009,42 @@ void AccountManager::applyConfigToChar(PCharacter *ch)
         LogStream::sendError() << "Accounts: bad config value applying to "
             << ch->getName() << ": " << e.what() << endl;
     }
+}
+
+AccountConfigChangedEvent::AccountConfigChangedEvent(const DLString &id, const DLString &key,
+                                                     const Json::Value &value, PCharacter *except)
+    : id(id), key(key), value(value), except(except)
+{
+}
+
+AccountConfigChangedEvent::~AccountConfigChangedEvent()
+{
+}
+
+bool AccountManager::isAccountWideConfig(const DLString &key)
+{
+    // These are the config OPTION names (ConfigElement::getName), not the bit names:
+    // the CONFIG_WEAPONSPAM bit's option is "noweaponspam" (inverted -- set = hide
+    // weapon-flag effects), so the honest account key is "noweaponspam" too.
+    return key == "screenreader"
+        || key == "fightspam"
+        || key == "skillspam"
+        || key == "noweaponspam"
+        || key == "nomusic";
+}
+
+void AccountManager::writeConfigThrough(PCharacter *ch, const DLString &key,
+                                        const Json::Value &value, bool notifySelf)
+{
+    DLString id = accountOf(ch->getName());
+    if (id.empty())
+        return;
+
+    setConfigKey(id, key, value);
+    propagateConfigKey(id, key, value, ch);
+
+    if (eventBus)
+        eventBus->publish(AccountConfigChangedEvent(id, key, value, notifySelf ? 0 : ch));
 }
 
 void AccountManager::propagateConfigKey(const DLString &id, const DLString &key,

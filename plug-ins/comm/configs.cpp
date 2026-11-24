@@ -246,36 +246,6 @@ void ConfigCommand::destruction( )
     thisClass = NULL;
 }
 
-// Account-wide config keys: the subset that syncs across an account's characters
-// (the accessibility / display / spam settings). Everything else stays per-char.
-// The key is the config option's EN name, matching AccountManager::applyConfigKeyToChar.
-static bool config_is_account_wide(const DLString &enName)
-{
-    // These are the config OPTION names (ConfigElement::getName), not the bit names:
-    // the CONFIG_WEAPONSPAM bit's option is "noweaponspam" (inverted -- set = hide
-    // weapon-flag effects), so the honest account key is "noweaponspam" too.
-    return enName == "screenreader"
-        || enName == "fightspam"
-        || enName == "skillspam"
-        || enName == "noweaponspam";
-}
-
-// A linked character changed an account-wide option: record it on the account and
-// push it to the account's OTHER online characters live. An unlinked character keeps
-// the plain per-char behavior -- no account store touched.
-static void account_config_writethrough(PCharacter *ch, const DLString &key, const Json::Value &value)
-{
-    DLString id = AccountManager::accountOf(ch->getName());
-    if (id.empty())
-        return;
-    AccountManager::setConfigKey(id, key, value);
-    AccountManager::propagateConfigKey(id, key, value, ch);
-
-    // The alts changed under their owners' hands: an open dialog on any of them
-    // shows the new value without waiting for anything.
-    web_config_changed_account(id, key, value, ch);
-}
-
 COMMAND(ConfigCommand, "config")
 {
     PCharacter *pch;
@@ -387,9 +357,9 @@ COMMAND(ConfigCommand, "config")
                     // even one that changes nothing here: typing the command is
                     // also how a player re-asserts the value onto an account
                     // that has drifted from it.
-                    if (config_is_account_wide((*c)->getName()))
-                        account_config_writethrough(pch, (*c)->getName(),
-                                                    Json::Value(now));
+                    if (AccountManager::isAccountWideConfig((*c)->getName()))
+                        AccountManager::writeConfigThrough(pch, (*c)->getName(),
+                                                       Json::Value(now));
 
                     if (now != was) {
                         // Typed at the keyboard with the dialog open: the switch
@@ -433,7 +403,7 @@ static void config_lang(PCharacter *ch, const DLString &constArguments)
     }
 
     ch->getAttributes().getAttr<XMLStringAttribute>("lang")->setValue(lang);
-    account_config_writethrough(ch, "lang", Json::Value(lang));
+    AccountManager::writeConfigThrough(ch, "lang", Json::Value(lang));
     ch->pecho(_("Ок."));
 }
 
@@ -509,7 +479,7 @@ static void config_color(PCharacter *ch, const DLString &constArguments)
         colorState = "mild";
     else
         colorState = "on";
-    account_config_writethrough(ch, "color", Json::Value(colorState));
+    AccountManager::writeConfigThrough(ch, "color", Json::Value(colorState));
 }
 
 /*-------------------------------------------------------------------------
@@ -1093,8 +1063,8 @@ bool ConfigCommand::webApply( PCharacter *ch, const DLString &key, const DLStrin
             stored = now ? 1 : 0;
 
             // The same write-through the command body runs, on the same keys.
-            if (config_is_account_wide(key))
-                account_config_writethrough(ch, key, Json::Value(now));
+            if (AccountManager::isAccountWideConfig(key))
+                AccountManager::writeConfigThrough(ch, key, Json::Value(now));
 
             // Clicking a switch that is already where it was asked to be is not
             // a change, and a pfile write for it is a write for nothing.
