@@ -1564,6 +1564,23 @@ NMI_INVOKE( Root, supporterUntil, "(name): до какого времени (с�
     return Register((int)AccountManager::supporterUntil(id));
 }
 
+// Same reading as account_profile_enabled (comm/profileservlet.cpp): no
+// "profile" key in the account config, or anything but false, is on.
+NMI_INVOKE( Root, accountProfileOn, "(name): true если публичная страница аккаунта персонажа name не выключена (account profile off); false без аккаунта")
+{
+    DLString id = AccountManager::accountOf(args2string(args));
+
+    if (id.empty( ) || !AccountManager::exists( id ))
+        return Register(false);
+
+    Json::Value cfg = AccountManager::getConfig(id);
+    if (!cfg.isObject( ) || !cfg.isMember("profile"))
+        return Register(true);
+
+    const Json::Value &v = cfg["profile"];
+    return Register(!v.isBool( ) || v.asBool( ));
+}
+
 NMI_GET( Root, clanNames, "список (List) имен всех кланов, в порядке реестра")
 {
     RegList::Pointer list(NEW);
