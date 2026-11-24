@@ -659,10 +659,8 @@ void reset_room(Room *pRoom, int flags)
     if (weather_info.sky == SKY_RAINING 
         && !IS_SET(pRoom->room_flags, ROOM_INDOORS) ) 
     {
-        pRoom->history.erase( );
-
-        if (number_percent( ) < 50)
-            pRoom->history.erase( );
+        // RoomHistory::erase only trims past MAX_SIZE; rain wipes every footprint.
+        pRoom->history.clear( );
     }
 
     for(iExit = 0; iExit < DIR_SOMEWHERE; iExit++) {
