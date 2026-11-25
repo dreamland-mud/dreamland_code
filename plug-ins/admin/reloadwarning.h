@@ -30,13 +30,10 @@ inline void plugin_reload_warning( )
  */
 inline std::list<DLString> plugin_reload_names( const DLString &arg )
 {
-    std::list<DLString> names;
-    DLString rest = arg, name;
+    DLString rest = arg;
 
     rest.substitute( ',', ' ' );
-    while (!(name = rest.getOneArgument( )).empty( ))
-        names.push_back( name );
-    return names;
+    return rest.split( " " );
 }
 
 /** The first of several names that is no loaded plugin, or empty when all are. */

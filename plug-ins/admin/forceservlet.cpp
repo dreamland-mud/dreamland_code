@@ -193,6 +193,9 @@ SERVLET_HANDLE(api_reload, "/reload")
     }
 
     std::list<DLString> names = plugin_reload_names(what);
+    // One name: use it trimmed (' comm', 'comm,'), as 'plug reload' does.
+    if (names.size() == 1)
+        what = names.front();
 
     // Mirror CPlugin::doReload's keyword mapping exactly.
     if (names.size() > 1) {
