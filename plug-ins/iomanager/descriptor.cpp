@@ -99,6 +99,51 @@ const char *ttype_name( int ttype )
     return TTYPE_NAMES[URANGE(TTYPE_NONE, ttype, TTYPE_MAX-1)];
 }
 
+/*
+ * A forwarded address (the telnet VIA option, the X-Forwarded-For header) is
+ * text the other end wrote. It is believed only when that other end is a proxy
+ * on this machine: nginx connects to the web socket ports from loopback. From
+ * any other peer the claim is dropped and the peer's own address stands, so a
+ * player cannot plant someone else's address in lasthost, alt links or bans.
+ */
+static bool peer_is_local_proxy( const Descriptor *d )
+{
+    in_addr addr;
+
+    if (!inet_aton( d->realip.c_str( ), &addr ))
+        return false;
+
+    return (ntohl( addr.s_addr ) >> 24) == 127;
+}
+
+/*
+ * nginx adds the address it saw to the end of whatever X-Forwarded-For the
+ * client sent ($proxy_add_x_forwarded_for), so only the last hop is the
+ * proxy's own word. False when that hop is not a plain IPv4 or IPv6 address.
+ */
+static bool forwarded_last_hop( const std::string &header, std::string &host, in_addr &v4 )
+{
+    std::string::size_type comma = header.rfind( ',' );
+    std::string hop = comma == std::string::npos ? header : header.substr( comma + 1 );
+    std::string::size_type from = hop.find_first_not_of( " \t" );
+    std::string::size_type to = hop.find_last_not_of( " \t" );
+    in6_addr v6;
+
+    memset( &v4, 0, sizeof( v4 ) );
+
+    if (from == std::string::npos)
+        return false;
+
+    hop = hop.substr( from, to - from + 1 );
+
+    if (inet_pton( AF_INET, hop.c_str( ), &v4 ) != 1
+            && inet_pton( AF_INET6, hop.c_str( ), &v6 ) != 1)
+        return false;
+
+    host = hop;
+    return true;
+}
+
 bool Descriptor::checkStopSymbol( )
 {
     if (!character)
@@ -223,11 +268,18 @@ int Descriptor::inputTelnet( unsigned char i )
                     break;
                     
                 case SE:
-                    if(telnet.sn_ptr >= 5 && 
+                    if(telnet.sn_ptr >= 5 &&
+                            telnet.subneg[0] == TELOPT_VIA &&
+                            !peer_is_local_proxy( this ))
+                    {
+                        LogStream::sendWarning( )
+                            << "telnet: VIA from " << realip << " ignored, not a local proxy" << endl;
+                    }
+                    else if(telnet.sn_ptr >= 5 &&
                             telnet.subneg[0] == TELOPT_VIA)
                     {
                         telnet.subneg[telnet.sn_ptr] = 0;
-                        
+
                         ViaRecord v;
                         
                         v.first = *(in_addr*)(telnet.subneg + 1);
@@ -830,17 +882,19 @@ Descriptor::wsHandleNeg(unsigned char *buf, int rc)
 
                     if(!proxyFor.empty()) {
                         ViaRecord v;
-                        in_addr addr;
 
-                        if(inet_aton(proxyFor.c_str(), &addr))
-                            v.first = addr;
+                        if (!peer_is_local_proxy( this )) {
+                            LogStream::sendWarning( ) << "WebSock: X-Forwarded-For from "
+                                << realip << " ignored, not a local proxy" << endl;
+                        } else if (!forwarded_last_hop( proxyFor, v.second, v.first )) {
+                            LogStream::sendWarning( ) << "WebSock: X-Forwarded-For '"
+                                << proxyFor << "' ends in no address, ignored" << endl;
+                        } else {
+                            via.push_back(v);
 
-                        v.second = proxyFor;
-                        
-                        via.push_back(v);
-
-                        if (banManager->checkVerbose( this, BAN_ALL )) 
-                            return -1;
+                            if (banManager->checkVerbose( this, BAN_ALL ))
+                                return false;
+                        }
                     }
 
                     // Generate unique client ID, to be used when creating secure clickable action links.
