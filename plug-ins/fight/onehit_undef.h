@@ -32,6 +32,7 @@ class UndefinedOneHit: public WeaponOneHit {
 public:
     UndefinedOneHit( Character *ch, Character *victim, bool secondary, string command = "", bool offEnd = false );
     
+    virtual void init( );
     virtual bool canHit( );
     bool checkHands( );
     virtual bool canDamage( );
