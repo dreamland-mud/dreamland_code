@@ -29,8 +29,12 @@ public:
         const Hosts & getHosts() const { return hosts; }
         const DLString &getMatchingHost(const DLString &hostPrefix) const;
 
-        /** Undated rows get `seed`, rows last seen before `cutoff` go. True if anything changed. */
-        bool prune(time_t seed, time_t cutoff, int &seeded, int &dropped);
+        /** Undated rows get `seed`, rows last seen before `cutoff` go. True if anything
+         *  changed; with apply false nothing is touched and it says what would change. */
+        bool prune(time_t seed, time_t cutoff, bool apply, int &seeded, int &dropped);
+
+        /** Last-seen date of a row, `fallback` when it has none. */
+        time_t seenOf(const DLString &host, time_t fallback) const;
 
         /** Check if this player has a unique ip address */
         static bool isUnique(const DLString &playerName, const DLString &host);

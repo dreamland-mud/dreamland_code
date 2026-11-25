@@ -24,9 +24,14 @@ bool XMLAttributeDevices::hasDevice(const DLString &device) const
     return devices.isAvailable(device);
 }
 
-bool XMLAttributeDevices::prune(time_t seed, time_t cutoff, int &seeded, int &dropped)
+bool XMLAttributeDevices::prune(time_t seed, time_t cutoff, bool apply, int &seeded, int &dropped)
 {
-    return XMLAttributeLastHost::pruneRows(devices, seen, seed, cutoff, seeded, dropped);
+    if (apply)
+        return XMLAttributeLastHost::pruneRows(devices, seen, seed, cutoff, seeded, dropped);
+
+    Devices counts = devices;
+    Dates dates = seen;
+    return XMLAttributeLastHost::pruneRows(counts, dates, seed, cutoff, seeded, dropped);
 }
 
 /**

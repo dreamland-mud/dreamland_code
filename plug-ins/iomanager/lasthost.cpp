@@ -1,3 +1,5 @@
+#include <jsoncpp/json/json.h>
+#include "configurable.h"
 #include "lasthost.h"
 #include "lastdevice.h"
 #include "netlists.h"
@@ -52,9 +54,20 @@ bool XMLAttributeLastHost::isUnique(const DLString &playerName, const DLString &
     return true;
 }
 
-bool XMLAttributeLastHost::prune(time_t seed, time_t cutoff, int &seeded, int &dropped)
+bool XMLAttributeLastHost::prune(time_t seed, time_t cutoff, bool apply, int &seeded, int &dropped)
 {
-    return pruneRows(hosts, seen, seed, cutoff, seeded, dropped);
+    if (apply)
+        return pruneRows(hosts, seen, seed, cutoff, seeded, dropped);
+
+    Hosts counts = hosts;
+    Dates dates = seen;
+    return pruneRows(counts, dates, seed, cutoff, seeded, dropped);
+}
+
+time_t XMLAttributeLastHost::seenOf(const DLString &host, time_t fallback) const
+{
+    auto d = seen.find(host);
+    return d == seen.end() ? fallback : d->second.getValue();
 }
 
 bool XMLAttributeLastHost::pruneRows(Hosts &counts, Dates &dates, time_t seed, time_t cutoff, int &seeded, int &dropped)
@@ -158,24 +171,26 @@ void XMLAttributeLastHostListenerPlugin::run(int oldState, int newState, Descrip
 }
 
 /*
- * Retention: addresses and web device ids are kept 12 months after last seen
- * (multing tools, decision 3). Runs at boot, right after the playerbase
- * loads, then daily. A plugin reload drops the daily run until the next boot:
- * the first pass dates and saves every pfile, and that must not happen with
- * players online.
+ * Retention: addresses and web device ids are personal data, kept
+ * keep_days (config/host_retention.json) after last seen, then deleted; the
+ * owner's last address goes with them. Runs once per boot, right after the
+ * playerbase loads, never on a plugin reload: the first pass dates and saves
+ * every pfile, and that must not happen with players online. With "apply"
+ * off it only counts and logs, so a new rule can be checked on live data first.
  */
-static const time_t HOST_KEEP = 365 * (time_t)Date::SECOND_IN_DAY;
+static const int MIN_KEEP_DAYS = 180;
+static Json::Value retentionConfig;
+
+CONFIGURABLE_LOADED(config, host_retention)
+{
+    retentionConfig = value;
+}
 
 class HostRetentionTask : public SchedulerTaskRoundPlugin {
 public:
     typedef ::Pointer<HostRetentionTask> Pointer;
 
     virtual void run( );
-
-    virtual void after( )
-    {
-        DLScheduler::getThis( )->putTaskInSecond( Date::SECOND_IN_DAY, Pointer( this ) );
-    }
 
     // After PlayerLoadTask (SCDP_BOOT + 10) has filled the player list at boot.
     virtual int getPriority( ) const
@@ -189,13 +204,36 @@ protected:
         if (DLScheduler::getThis( )->getCurrentTick( ) == 0)
             DLScheduler::getThis( )->putTaskNOW( Pointer( this ) );
     }
+
+private:
+    void sweep( bool apply, int keepDays );
 };
 
 void HostRetentionTask::run( )
 {
-    time_t now = dreamland->getCurrentTime( );
-    time_t cutoff = now - HOST_KEEP;
-    int chars = 0, seeded = 0, hostsDropped = 0, devicesDropped = 0, saved = 0;
+    const Json::Value &cfg = retentionConfig;
+    bool apply = cfg["apply"].isBool( ) && cfg["apply"].asBool( );
+    int keepDays = cfg["keep_days"].isInt( ) ? cfg["keep_days"].asInt( ) : 0;
+
+    // A missing or broken config must never delete anything.
+    if (keepDays < MIN_KEEP_DAYS) {
+        LogStream::sendError( ) << "Host retention: keep_days " << keepDays << " is below "
+                                << MIN_KEEP_DAYS << ", counting with 365 and writing nothing" << endl;
+        keepDays = 365;
+        apply = false;
+    }
+
+    try {
+        sweep( apply, keepDays );
+    } catch (const std::exception &e) {
+        LogStream::sendError( ) << "Host retention: " << e.what( ) << endl;
+    }
+}
+
+void HostRetentionTask::sweep( bool apply, int keepDays )
+{
+    time_t cutoff = dreamland->getCurrentTime( ) - keepDays * (time_t)Date::SECOND_IN_DAY;
+    int chars = 0, undated = 0, hostsDropped = 0, devicesDropped = 0, lastCleared = 0, saved = 0;
     clock_t started = clock( );
 
     for (auto &p: PCharacterManager::getPCM( )) {
@@ -204,26 +242,41 @@ void HostRetentionTask::run( )
         bool changed = false;
 
         XMLAttributeLastHost::Pointer hosts = pci->getAttributes( ).findAttr<XMLAttributeLastHost>("lasthost");
-        if (hosts) {
-            chars++;
-            changed = hosts->prune( seed, cutoff, seeded, hostsDropped ) || changed;
+        XMLAttributeDevices::Pointer devices = pci->getAttributes( ).findAttr<XMLAttributeDevices>("devices");
+
+        // The last address is as old as its own row (owner's last login when undated).
+        if (!pci->getLastAccessHost( ).empty( )) {
+            time_t lastSeen = hosts ? hosts->seenOf( pci->getLastAccessHost( ), seed ) : seed;
+            if (lastSeen < cutoff) {
+                lastCleared++;
+                changed = true;
+                if (apply)
+                    pci->setLastAccessHost( DLString::emptyString );
+            }
         }
 
-        XMLAttributeDevices::Pointer devices = pci->getAttributes( ).findAttr<XMLAttributeDevices>("devices");
+        if (hosts) {
+            chars++;
+            changed = hosts->prune( seed, cutoff, apply, undated, hostsDropped ) || changed;
+        }
+
         if (devices)
-            changed = devices->prune( seed, cutoff, seeded, devicesDropped ) || changed;
+            changed = devices->prune( seed, cutoff, apply, undated, devicesDropped ) || changed;
 
         if (changed) {
-            PCharacterManager::saveMemory( pci );
+            if (apply)
+                PCharacterManager::saveMemory( pci );
             saved++;
         }
     }
 
     LogStream::sendNotice( )
-        << "Host retention: " << chars << " players with addresses, " << seeded << " rows dated, "
-        << hostsDropped << " addresses and " << devicesDropped << " devices older than "
-        << Date::getTimeAsString( cutoff, "%Y-%m-%d" ) << " dropped, " << saved << " saved in "
-        << (clock( ) - started) * 1000 / CLOCKS_PER_SEC << " ms cpu" << endl;
+        << "Host retention (" << (apply ? "applied" : "dry run, nothing written") << ", keep "
+        << keepDays << " days, cutoff " << Date::getTimeAsString( cutoff, "%Y-%m-%d" ) << "): "
+        << chars << " players with addresses, " << undated << " undated rows, "
+        << hostsDropped << " addresses and " << devicesDropped << " devices dropped, "
+        << lastCleared << " last addresses cleared, " << saved << " pfiles " << (apply ? "saved" : "to save")
+        << ", " << (clock( ) - started) * 1000 / CLOCKS_PER_SEC << " ms cpu" << endl;
 }
 
 PluginInitializer<HostRetentionTask> initHostRetention;

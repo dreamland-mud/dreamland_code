@@ -31,7 +31,7 @@ public:
         const Devices & getDevices() const { return devices; }
 
         /** Same rule as XMLAttributeLastHost::prune. */
-        bool prune(time_t seed, time_t cutoff, int &seeded, int &dropped);
+        bool prune(time_t seed, time_t cutoff, bool apply, int &seeded, int &dropped);
 
 private:
         /** Map between device id and how many times it was used. */
