@@ -181,9 +181,11 @@ static bool kofi_older(const Json::Value &a, const Json::Value &b)
     return kofi_received(a) < kofi_received(b);
 }
 
-// Payer email -> account, learnt from applied entries. Ko-fi renewals arrive
-// without the message the first payment carried, so a subscriber matched once by
-// code or claim keeps matching by the email Ko-fi sends with every payment.
+// Payer email -> account, learnt from applied subscription entries. Ko-fi renewals
+// arrive without the message the first payment carried, so a subscriber matched
+// once by code or claim keeps matching by the email Ko-fi sends with every payment.
+// One-off payments teach nothing: a one-off gift carries the friend's code, and
+// learning from it would send the giver's own later payments to the friend.
 // Built from the ledger on first use, then kept current by kofi_remember_email.
 static map<DLString, DLString> kofiEmails;
 static bool kofiEmailsLoaded = false;
@@ -195,8 +197,16 @@ static DLString kofi_email(const Json::Value &entry)
     return email;
 }
 
+static bool kofi_is_subscription(const Json::Value &payment)
+{
+    Json::Value sub = payment.get("is_subscription_payment", Json::Value());
+    return (sub.isBool() && sub.asBool()) || kofi_str(payment, "type") == "Subscription";
+}
+
 static void kofi_remember_email(const Json::Value &entry)
 {
+    if (!kofi_is_subscription(entry["payment"]))
+        return;
     DLString email = kofi_email(entry);
     DLString id = kofi_str(entry, "account");
     if (!email.empty() && !id.empty() && kofi_str(entry, "status") == "applied")
@@ -239,8 +249,16 @@ static DLString kofi_match_message(const DLString &msg)
     return DLString::emptyString;
 }
 
+// A code in the message wins over the payer's own identities: it is the payer
+// saying which account the money is for, which is how a gift reaches a friend.
 static DLString kofi_match(const Json::Value &p, DLString &how)
 {
+    DLString coded = kofi_match_message(kofi_str(p, "message"));
+    if (!coded.empty()) {
+        how = "message_code";
+        return coded;
+    }
+
     DLString discord = kofi_str(p, "discord_userid");
     if (!discord.empty()) {
         DLString id = AccountManager::findByIdentity("discord", discord);
@@ -267,10 +285,7 @@ static DLString kofi_match(const Json::Value &p, DLString &how)
         }
     }
 
-    DLString id = kofi_match_message(kofi_str(p, "message"));
-    if (!id.empty())
-        how = "message_code";
-    return id;
+    return DLString::emptyString;
 }
 
 // One wiznet line for admins who can act on it (wiznet also logs it as a notice).
