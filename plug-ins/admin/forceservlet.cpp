@@ -163,6 +163,8 @@ SERVLET_HANDLE(api_snoop, "/snoop")
  *
  * Auth: bottype=telegram|discord, token=<secret>
  * Args: what (optional) -- most (default) | all | changed | <plugin name>
+ *       | several names ('comm loadsave' or 'comm,loadsave'): all of them are
+ *       unloaded, then the set loads back in one pass.
  *
  * Example:
  *   curl -s 'http://localhost:1235/api/reload' \
@@ -190,8 +192,20 @@ SERVLET_HANDLE(api_reload, "/reload")
         return;
     }
 
+    std::list<DLString> names = plugin_reload_names(what);
+    // One name: use it trimmed (' comm', 'comm,'), as 'plug reload' does.
+    if (names.size() == 1)
+        what = names.front();
+
     // Mirror CPlugin::doReload's keyword mapping exactly.
-    if (arg_is_all(what)) {
+    if (names.size() > 1) {
+        DLString unknown = plugin_reload_unknown(manager, names);
+        if (!unknown.empty()) {
+            servlet_response_404(response, "Unknown reload target '" + unknown + "' in '" + what + "'");
+            return;
+        }
+        manager->setReloadManyRequest(names);
+    } else if (arg_is_all(what)) {
         manager->setReloadAllRequest();
     } else if (arg_is_strict(what, "most")) {
         manager->setReloadNonCriticalRequest();
