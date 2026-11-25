@@ -1429,24 +1429,37 @@ static bool help_test_login(const DLString &login)
     return false;
 }
 
+/** A name as the player-name lookup compares it: normalized, then romanised
+ *  and lowercased, so a Cyrillic spelling of a Latin login (самуро for
+ *  Samuro) and the login itself land on the same key. Still an exact match:
+ *  no distance, or ordinary words would start turning into people. */
+static DLString help_player_key(const DLString &str)
+{
+    return String::translitToLatin(help_world_normalize(str)).toLower();
+}
+
 /** A query that is exactly a player's name, three letters or more, the login
- *  or the name in any language: point at the profile. Immortals stay out,
- *  whatever whois shows. */
+ *  or the name in any language, typed in either script: point at the profile.
+ *  Immortals stay out, whatever whois shows. */
 static bool help_player_answer(Character *ch, const DLString &query)
 {
     DLString q = help_world_normalize(query);
     if (q.size() < 3 || q.find(' ') != DLString::npos)
         return false;
 
+    DLString qkey = help_player_key(query);
     static const lang_t langs[] = { LANG_EN, LANG_RU, LANG_UA };
     PCMemoryInterface *found = 0;
 
     for (auto &p: PCharacterManager::getPCM()) {
         PCMemoryInterface *pci = p.second;
-        bool hit = help_world_normalize(pci->getName()) == q;
+        bool hit = help_world_normalize(pci->getName()) == q
+                   || help_player_key(pci->getName()) == qkey;
 
-        for (int l = 0; !hit && l < 3; l++)
-            hit = help_world_normalize(pci->getNameP('1', langs[l])) == q;
+        for (int l = 0; !hit && l < 3; l++) {
+            DLString name = pci->getNameP('1', langs[l]);
+            hit = help_world_normalize(name) == q || help_player_key(name) == qkey;
+        }
         if (!hit)
             continue;
 
@@ -1635,10 +1648,12 @@ CMDRUNP( help )
         if (origArgument.size() > 1) {
             FuzzySearch fs(ch, argument);
 
-            // A player's exact name, unless a guess matched something for real:
-            // short logins look like words, and an article beats a person.
-            if (!nthMiss && !commandShown && !fs.hasStrongResults()
-                    && help_player_answer(ch, origArgument))
+            // A player's exact name always gets the whois pointer. A guess
+            // that matched something for real still prints under it: short
+            // logins look like words, so the article stays one line away.
+            bool playerShown = !nthMiss && !commandShown
+                    && help_player_answer(ch, origArgument);
+            if (playerShown && !fs.hasStrongResults())
                 return;
 
             if (fs.hasResults()) {
@@ -1646,11 +1661,15 @@ CMDRUNP( help )
                 // A text miss stays in nohelp.txt for analysis and the replay
                 // even when a guess answered it, but no human needs to read
                 // it. Numeric guesses mostly answer someone reading the help
-                // by number, which is not a miss at all.
-                if (!fs.isNumeric())
+                // by number, which is not a miss at all. A player answer has
+                // already logged it.
+                if (!playerShown && !fs.isNumeric())
                     bugTracker->reportNohelpAnswered( ch->getPC(), origArgument.c_str( ) );
                 return;
             }
+
+            if (playerShown)
+                return;
         }
         
         if (commandShown) {
