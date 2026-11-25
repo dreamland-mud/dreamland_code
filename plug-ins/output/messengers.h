@@ -40,4 +40,8 @@ bool send_email(const DLString &to, const DLString &subject, const DLString &bod
 // past the cap the mail is dropped and logged. True if queued.
 bool send_admin_email(const DLString &subject, const DLString &body);
 
+// Something an immortal must act on: the subject to the private Discord scream
+// channel (where the gods actually look) plus the full mail to ADMIN_EMAIL.
+void send_admin_alert(const DLString &subject, const DLString &body);
+
 #endif

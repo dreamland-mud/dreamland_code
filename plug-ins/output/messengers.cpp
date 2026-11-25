@@ -184,6 +184,12 @@ bool send_admin_email(const DLString &subject, const DLString &body)
     return send_email(ADMIN_EMAIL, "[DreamLand] " + subject, body);
 }
 
+void send_admin_alert(const DLString &subject, const DLString &body)
+{
+    send_discord_wiznet(subject);
+    send_admin_email(subject, body);
+}
+
 /** Prepare string to use inside Discord JSON field. Strip tags and colors and trim to size. */
 static DLString discord_string(const DLString &source)
 {
