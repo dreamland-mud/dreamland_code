@@ -489,3 +489,24 @@ DLString NetLists::org(const DLString &ip)
     }
     return out;
 }
+
+DLString NetLists::lastHop(const DLString &chain)
+{
+    vector<string> links = chainOf(chain);
+    bool isV4;
+    uint32_t a4;
+    V6 a6;
+
+    if (links.empty() || !parseAddr(links.back().c_str(), isV4, a4, a6))
+        return DLString();
+
+    if (!isV4)
+        return links.back();
+
+    struct in_addr x;
+    char buf[INET_ADDRSTRLEN];
+    x.s_addr = htonl(a4);
+    if (!inet_ntop(AF_INET, &x, buf, sizeof(buf)))
+        return DLString();
+    return buf;
+}

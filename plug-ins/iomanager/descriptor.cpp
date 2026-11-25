@@ -29,6 +29,7 @@
 #include "outofband.h"
 #include "backdoorhandler.h"
 #include "mssp.h"
+#include "netlists.h"
 #include "msp.h"
 
 
@@ -114,34 +115,6 @@ static bool peer_is_local_proxy( const Descriptor *d )
         return false;
 
     return (ntohl( addr.s_addr ) >> 24) == 127;
-}
-
-/*
- * nginx adds the address it saw to the end of whatever X-Forwarded-For the
- * client sent ($proxy_add_x_forwarded_for), so only the last hop is the
- * proxy's own word. False when that hop is not a plain IPv4 or IPv6 address.
- */
-static bool forwarded_last_hop( const std::string &header, std::string &host, in_addr &v4 )
-{
-    std::string::size_type comma = header.rfind( ',' );
-    std::string hop = comma == std::string::npos ? header : header.substr( comma + 1 );
-    std::string::size_type from = hop.find_first_not_of( " \t" );
-    std::string::size_type to = hop.find_last_not_of( " \t" );
-    in6_addr v6;
-
-    memset( &v4, 0, sizeof( v4 ) );
-
-    if (from == std::string::npos)
-        return false;
-
-    hop = hop.substr( from, to - from + 1 );
-
-    if (inet_pton( AF_INET, hop.c_str( ), &v4 ) != 1
-            && inet_pton( AF_INET6, hop.c_str( ), &v6 ) != 1)
-        return false;
-
-    host = hop;
-    return true;
 }
 
 bool Descriptor::checkStopSymbol( )
@@ -268,32 +241,30 @@ int Descriptor::inputTelnet( unsigned char i )
                     break;
                     
                 case SE:
-                    if(telnet.sn_ptr >= 5 &&
-                            telnet.subneg[0] == TELOPT_VIA &&
-                            !peer_is_local_proxy( this ))
-                    {
-                        LogStream::sendWarning( )
-                            << "telnet: VIA from " << realip << " ignored, not a local proxy" << endl;
-                    }
-                    else if(telnet.sn_ptr >= 5 &&
+                    if(telnet.sn_ptr >= 5 && 
                             telnet.subneg[0] == TELOPT_VIA)
                     {
-                        telnet.subneg[telnet.sn_ptr] = 0;
+                        if (!peer_is_local_proxy( this )) {
+                            LogStream::sendWarning( ) << "telnet: VIA from "
+                                << realip << " ignored, not a local proxy" << endl;
+                        } else {
+                            telnet.subneg[telnet.sn_ptr] = 0;
 
-                        ViaRecord v;
-                        
-                        v.first = *(in_addr*)(telnet.subneg + 1);
-                        v.second = (char*)telnet.subneg + 1 + sizeof(in_addr);
-                        
-                        via.push_back(v);
-                        
-                        LogStream::sendError() 
-                            << "got via: " 
-                            << v.second << "(" << inet_ntoa(v.first) << ")" 
-                            << endl;
-                        
-                        if (banManager->checkVerbose( this, BAN_ALL )) 
-                            return -1;
+                            ViaRecord v;
+
+                            v.first = *(in_addr*)(telnet.subneg + 1);
+                            v.second = (char*)telnet.subneg + 1 + sizeof(in_addr);
+
+                            via.push_back(v);
+
+                            LogStream::sendError()
+                                << "got via: "
+                                << v.second << "(" << inet_ntoa(v.first) << ")"
+                                << endl;
+
+                            if (banManager->checkVerbose( this, BAN_ALL ))
+                                return -1;
+                        }
                     }
 
                     if (telnet.sn_ptr >= 3 
@@ -881,19 +852,31 @@ Descriptor::wsHandleNeg(unsigned char *buf, int rc)
                     DLString proxyFor(websock.headers["X-Forwarded-For"]);
 
                     if(!proxyFor.empty()) {
-                        ViaRecord v;
+                        DLString hop = NetLists::lastHop( proxyFor );
 
                         if (!peer_is_local_proxy( this )) {
                             LogStream::sendWarning( ) << "WebSock: X-Forwarded-For from "
                                 << realip << " ignored, not a local proxy" << endl;
-                        } else if (!forwarded_last_hop( proxyFor, v.second, v.first )) {
+                        } else if (hop.empty( )) {
                             LogStream::sendWarning( ) << "WebSock: X-Forwarded-For '"
                                 << proxyFor << "' ends in no address, ignored" << endl;
                         } else {
+                            ViaRecord v;
+
+                            if (!inet_aton( hop.c_str( ), &v.first ))
+                                v.first.s_addr = 0;
+
+                            v.second = hop;
                             via.push_back(v);
 
-                            if (banManager->checkVerbose( this, BAN_ALL ))
+                            if (banManager->checkVerbose( this, BAN_ALL )) {
+                                // Send the ban notice now: closing the socket
+                                // drops whatever is still queued.
+                                LogStream::sendWarning( ) << "WebSock: banned address "
+                                    << hop << ", closing" << endl;
+                                process_output( this, false );
                                 return false;
+                            }
                         }
                     }
 

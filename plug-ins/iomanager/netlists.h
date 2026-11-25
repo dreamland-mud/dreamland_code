@@ -24,6 +24,9 @@ namespace NetLists {
     DLString tag(const DLString &ip);
     // "AS<n> <description>" or "".
     DLString org(const DLString &ip);
+    // The last link of a chain as a plain address, or "" when it is not one.
+    // An IPv4-mapped IPv6 address comes back as dotted IPv4.
+    DLString lastHop(const DLString &chain);
 }
 
 #endif
