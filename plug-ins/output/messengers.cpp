@@ -169,6 +169,13 @@ bool send_admin_email(const DLString &subject, const DLString &body)
     static time_t windowStart = 0;
     static int sentInWindow = 0;
 
+    // A line break in a header makes the drainer (bin/iemail) die on this
+    // file at every run, and every mail queued behind it stops.
+    DLString oneLine = subject;
+    for (auto &c: oneLine)
+        if (c == '\r' || c == '\n')
+            c = ' ';
+
     time_t now = dreamland->getCurrentTime();
     if (now - windowStart >= 3600) {
         windowStart = now;
@@ -176,12 +183,12 @@ bool send_admin_email(const DLString &subject, const DLString &body)
     }
 
     if (sentInWindow >= ADMIN_EMAIL_PER_HOUR) {
-        LogStream::sendWarning() << "Admin email dropped (hourly cap): " << subject << endl;
+        LogStream::sendWarning() << "Admin email dropped (hourly cap): " << oneLine << endl;
         return false;
     }
 
     sentInWindow++;
-    return send_email(ADMIN_EMAIL, "[DreamLand] " + subject, body);
+    return send_email(ADMIN_EMAIL, "[DreamLand] " + oneLine, body);
 }
 
 void send_admin_alert(const DLString &subject, const DLString &body)

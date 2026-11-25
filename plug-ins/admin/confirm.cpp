@@ -116,15 +116,21 @@ void Confirm::doRequest( Character *ch )
         return;
     }
 
+    // A repeat while the request still waits only refreshes it: one ping per
+    // request, so nobody can spend the gods' mail cap by spamming the command.
+    attr = find_confirm_attr(ch->getPC());
+    bool waiting = attr && attr->responsible.empty();
     attr = get_confirm_attr(ch->getPC());
     
     ch->pecho( _("Твое описание отправлено Бессмертным на рассмотрение.") );
     wiznet( WIZ_CONFIRM, 0, 0,
             "%^C1 просит подтверждения своему персонажу ({y{hcconfirm show %s{x).", ch, ch->getNameC() );    
-    send_telegram("Вниманию богов: кто-то попросил подтверждения своему персонажу.");
-    send_admin_alert(DLString("Confirm request: ") + ch->getPC()->getName(),
-                     ch->getPC()->getName() + " asks the gods to confirm their character.\n"
-                     "In game: confirm show " + ch->getPC()->getName() + "\n");
+    if (!waiting) {
+        send_telegram("Вниманию богов: кто-то попросил подтверждения своему персонажу.");
+        send_admin_alert(DLString("Confirm request: ") + ch->getPC()->getName(),
+                         ch->getPC()->getName() + " asks the gods to confirm their character.\n"
+                         "In game: confirm show " + ch->getPC()->getName() + "\n");
+    }
 
     attr->update( ch->getPC() ); 
     PCharacterManager::saveMemory( ch->getPC( ) );
@@ -474,7 +480,8 @@ void XMLAttributeConfirmListenerPlugin::run( int oldState, int newState, Descrip
     if (!ch)
         return;
 
-    if (ch->is_immortal( ))
+    // A resumed web session is the same sitting: the count was shown at login.
+    if (ch->is_immortal( ) && oldState != CON_RESUME)
         Confirm::doUnread(ch);
 
     attr = find_confirm_attr(ch->getPC());
