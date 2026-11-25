@@ -108,7 +108,8 @@ CMDADM(finger)
     // who ever used the same IP.
     if (isdigit(ipAddress.at(0))) {
         // Exact or prefix match, the exact address first for each player.
-        HostIndex::Matches matches = HostIndex::hostPrefixOwners(ipAddress);
+        // Addresses are stored lowercase (IPv6 hex), so match typed input that way.
+        HostIndex::Matches matches = HostIndex::hostPrefixOwners(ipAddress.toLower());
 
         for (auto &m: matches)
             str << m.first << ": " << m.second << endl;

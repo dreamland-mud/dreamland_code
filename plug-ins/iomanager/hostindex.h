@@ -11,12 +11,13 @@
 /**
  * Who used an address or a web client device id, read from the in-RAM
  * playerbase, so one question costs a map lookup instead of a walk over
- * every profile (about 5 ms on live).
+ * every profile.
  *
  * Built on first use and fed by the connect listeners. Every read checks
  * each name against its profile, so a deleted char or a pruned row drops out
- * on its own. Renames and undeletes happen in loadsave, out of sight, so the
- * index rebuilds itself once it is older than REBUILD_SECONDS.
+ * on its own. Renames and undeletes happen in loadsave, out of sight, and a
+ * read during a remort (the char is briefly out of the player list) drops
+ * the name, so the index rebuilds itself once it is older than REBUILD_SECONDS.
  */
 class HostIndex {
 public:
