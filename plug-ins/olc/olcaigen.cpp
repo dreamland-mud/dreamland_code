@@ -335,31 +335,30 @@ static AiRequestResult olc_ai_queue(const DLString &builder, const OlcAiTarget &
  *  (manual false) asks for the empty core text and is silent with AI off or
  *  'gen auto off'. manual: a 'gen' whose copy was too big to send, with its
  *  hint, extra descriptions and material included. */
-static void olc_ai_committed(PCharacter *ch, const DLString &entity, int vnum, bool manual, const DLString &hint)
+static bool olc_ai_committed(PCharacter *ch, const DLString &entity, int vnum, bool manual, const DLString &hint,
+                             OlcAiTarget &t)
 {
-    OlcAiTarget t;
-
     if (!manual && get_string_attribute(ch, AIGEN_ATTR) == "off")
-        return;
+        return false;
 
     if (!ai_enabled("olc_gen")) {
         if (manual)
             ch->send_to("{CAI:{x the AI is off now ({Wai status{x), nothing was asked.\r\n");
-        return;
+        return false;
     }
 
     // The core text decides; extra descriptions and material only ride along.
     if (!target_index(entity, vnum, t, manual) || (t.empty.empty() && (!manual || t.extras.empty()))) {
         if (manual)
             ptc(ch, "{CAI:{x nothing is empty on %s %d any more.\r\n", entity.c_str(), vnum);
-        return;
+        return false;
     }
 
     DLString error;
     if (olc_ai_queue(ch->getName(), t, manual, hint, false, error) != AI_REQUEST_OK) {
         if (manual)
             ptc(ch, "{CAI:{x the request could not be queued: %s\r\n", error.c_str());
-        return;
+        return false;
     }
 
     if (manual)
@@ -367,21 +366,37 @@ static void olc_ai_committed(PCharacter *ch, const DLString &entity, int vnum, b
     else
         ptc(ch, "{CAI:{x asked for the empty text of %s %d ({Wgen auto off{x stops this).\r\n",
             entity.c_str(), vnum);
+    return true;
 }
 
-void olc_ai_done(OLCState *state, PCharacter *ch, const DLString &entity, int vnum)
+/** The "field.lang" names of t.empty as the validators name them: the AI's
+ *  "keyword" of a mob or object is the validators' "name". */
+static void ai_fields(const OlcAiTarget &t, OlcAiFields &fields)
+{
+    for (auto &e: t.empty) {
+        DLString f = e.asString();
+        if (t.entity != "room" && f.find("keyword.") == 0)
+            f = "name" + f.substr(7);
+        fields.insert(f);
+    }
+}
+
+void olc_ai_done(OLCState *state, PCharacter *ch, const DLString &entity, int vnum, OlcAiFields *pending)
 {
     bool asked = state->aiAsked, deferred = state->aiDeferred;
     int askedVnum = state->aiVnum;
     DLString hint = state->aiHint;
+    bool landed = false;
 
     state->aiAsked = false;
     state->aiDeferred = false;
     state->aiVnum = 0;
     state->aiHint.clear();
 
-    if (asked && deferred)
-        olc_ai_committed(ch, entity, askedVnum, true, hint);
+    if (asked && deferred) {
+        OlcAiTarget t;
+        landed = olc_ai_committed(ch, entity, askedVnum, true, hint, t);
+    }
     else if (asked) {
         // The answer 'gen' started is held while this editor is open: land it
         // now. No line: 'gen' said what comes, the worker says when it lands.
@@ -395,13 +410,22 @@ void olc_ai_done(OLCState *state, PCharacter *ch, const DLString &entity, int vn
         if (olc_ai_send("olc_land", payload, error) != AI_REQUEST_OK)
             ptc(ch, "{CAI:{x could not tell the AI that you are done (%s): the 'gen' text may not land. "
                     "Type {Wgen{x again in the editor to retry.\r\n", error.c_str());
+        else
+            landed = true;
     }
 
     // redit follows the builder: 'gen' may have been typed in another room.
-    if (asked && askedVnum == vnum)
+    if (asked && askedVnum == vnum) {
+        // The answer lands only into fields still empty: those of the commit.
+        OlcAiTarget t;
+        if (landed && pending && target_index(entity, vnum, t))
+            ai_fields(t, *pending);
         return;
+    }
 
-    olc_ai_committed(ch, entity, vnum, false, "");
+    OlcAiTarget t;
+    if (olc_ai_committed(ch, entity, vnum, false, "", t) && pending)
+        ai_fields(t, *pending);
 }
 
 /** The editor's copy is thrown away: so is its 'gen'. 1 when the worker was

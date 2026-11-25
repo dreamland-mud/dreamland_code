@@ -1407,8 +1407,10 @@ MEDIT(done)
 
     commit();
     ch->send_to(report);
-    olc_validate_print(ch, "mob", mob.vnum);
-    olc_ai_done(this, ch, "mob", mob.vnum);
+    // The AI first: warnings on text it is about to write are only counted.
+    OlcAiFields aiFields;
+    olc_ai_done(this, ch, "mob", mob.vnum, &aiFields);
+    olc_validate_print(ch, "mob", mob.vnum, &aiFields);
     detach(ch);
     return true;
 }

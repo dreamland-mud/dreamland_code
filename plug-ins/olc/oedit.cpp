@@ -1336,8 +1336,10 @@ OEDIT(done)
 
     commit();
     ch->send_to(report);
-    olc_validate_print(ch, "obj", obj.vnum);
-    olc_ai_done(this, ch, "obj", obj.vnum);
+    // The AI first: warnings on text it is about to write are only counted.
+    OlcAiFields aiFields;
+    olc_ai_done(this, ch, "obj", obj.vnum, &aiFields);
+    olc_validate_print(ch, "obj", obj.vnum, &aiFields);
     detach(ch);
     return true;
 }

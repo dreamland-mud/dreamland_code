@@ -1001,7 +1001,25 @@ void olc_validate_area_all(AreaIndexData *pArea, OlcFindings &out)
 /*--------------------------------------------------------------------------
  * Editor 'done'
  *-------------------------------------------------------------------------*/
-void olc_validate_print(Character *ch, const DLString &kind, int vnum)
+/** A warning about text the AI is writing now: on that field and language,
+ *  on any language of it when the warning names none, and a long line's
+ *  keyword check when the keywords of that language are being written. */
+static bool ai_writes(const std::set<DLString> &ai, const OlcFinding &f)
+{
+    if (!f.lang.empty()) {
+        if (ai.count(f.field + "." + f.lang))
+            return true;
+        return f.check == "text.kw_in_long" && ai.count("name." + f.lang);
+    }
+
+    for (auto &a: ai)
+        if (a.find(f.field + ".") == 0)
+            return true;
+    return false;
+}
+
+void olc_validate_print(Character *ch, const DLString &kind, int vnum,
+                        const std::set<DLString> *aiFields)
 {
     static const size_t maxLines = 20;
     OlcFindings findings;
@@ -1018,12 +1036,25 @@ void olc_validate_print(Character *ch, const DLString &kind, int vnum)
 
     // The immortal profile: warnings are told, info stays out.
     OlcFindings warnings;
-    for (auto &f: findings)
-        if (f.severity == "warning")
+    int aiCount = 0;
+    for (auto &f: findings) {
+        if (f.severity != "warning")
+            continue;
+        if (aiFields && ai_writes(*aiFields, f))
+            aiCount++;
+        else
             warnings.push_back(f);
+    }
 
-    if (warnings.empty())
+    if (warnings.empty()) {
+        if (aiCount > 0) {
+            ostringstream buf;
+            buf << "{CAI:{x " << aiCount << (aiCount == 1 ? " save note is" : " save notes are")
+                << " on text it is writing now." << endl;
+            ch->send_to(buf);
+        }
         return;
+    }
 
     ostringstream buf;
     buf << "{YПроверка [" << vnum << "]: замечаний " << warnings.size()
@@ -1041,6 +1072,10 @@ void olc_validate_print(Character *ch, const DLString &kind, int vnum)
 
     if (warnings.size() > maxLines)
         buf << "  ... и еще " << (warnings.size() - maxLines) << "." << endl;
+
+    if (aiCount > 0)
+        buf << "{CAI:{x " << aiCount << (aiCount == 1 ? " more is" : " more are")
+            << " on text it is writing now." << endl;
 
     ch->send_to(buf);
 }
