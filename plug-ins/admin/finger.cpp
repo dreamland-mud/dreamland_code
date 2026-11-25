@@ -15,6 +15,7 @@
 #include "admincommand.h"
 #include "lasthost.h"
 #include "lastdevice.h"
+#include "hostindex.h"
 #include "pcharactermanager.h"
 #include "pcharacter.h"
 #include "race.h"
@@ -106,31 +107,14 @@ CMDADM(finger)
     // If the argument starts with a digit, assume it's an IP address and find everyone 
     // who ever used the same IP.
     if (isdigit(ipAddress.at(0))) {
-        const PCharacterMemoryList &pcm = PCharacterManager::getPCM( );
-        PCharacterMemoryList::const_iterator p;
-        bool found = false;
+        // Exact or prefix match, the exact address first for each player.
+        // Addresses are stored lowercase (IPv6 hex), so match typed input that way.
+        HostIndex::Matches matches = HostIndex::hostPrefixOwners(ipAddress.toLower());
 
-        for (p = pcm.begin( ); p != pcm.end( ); p++) {
-            XMLAttributeLastHost::Pointer attr = p->second->getAttributes().findAttr<XMLAttributeLastHost>("lasthost");
-            if (!attr)
-                continue;
+        for (auto &m: matches)
+            str << m.first << ": " << m.second << endl;
 
-            // Strict match.
-            if (attr->hasHost(ipAddress)) {
-                str << p->first << ": " << ipAddress << endl;
-                found = true;
-                continue;
-            } 
-
-            // Prefix match.
-            DLString myIP = attr->getMatchingHost(ipAddress);
-            if (!myIP.empty()) {
-                str << p->first << ": " << myIP << endl;
-                found = true;
-            }
-        }
-
-        if (!found) {
+        if (matches.empty()) {
             ch->pecho(_("Не найдено никого с таким IP адресом."));
             return;
         }

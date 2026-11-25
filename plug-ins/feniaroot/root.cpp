@@ -51,6 +51,7 @@
 #include "subclass.h"
 #include "lasthost.h"
 #include "lastdevice.h"
+#include "hostindex.h"
 #include "netlists.h"
 #include "roomutils.h"
 #include "merc.h"
@@ -1673,6 +1674,16 @@ NMI_INVOKE( Root, devicesOf, "(name): список (List) id устройств 
     return wrap(list);
 }
 
+NMI_INVOKE( Root, deviceOwners, "(id): List of the names of every char that logged in from this web client device id; empty if none")
+{
+    RegList::Pointer list(NEW);
+
+    for (auto &name: HostIndex::deviceOwners(args2string(args)))
+        list->push_back(Register(name));
+
+    return wrap(list);
+}
+
 NMI_INVOKE( Root, netTag, "(ip): 'tor', 'vpn', 'dc' (датацентр) или пустая строка -- по локальным спискам сетей")
 {
     return Register(NetLists::tag(args2string(args)));
@@ -2501,15 +2512,10 @@ NMI_INVOKE(Root, helpTitle, "(id, ch): заголовок статьи спра�
 
 NMI_INVOKE(Root, finger, "(ip): список (.List) имен персонажей, заходивших с этого IP адреса")
 {
-    DLString ipAddress = args2string(args);
-    const PCharacterMemoryList &pcm = PCharacterManager::getPCM();
     RegList::Pointer players(NEW);
 
-    for (auto p = pcm.begin( ); p != pcm.end( ); p++) {
-        XMLAttributeLastHost::Pointer attr = p->second->getAttributes().findAttr<XMLAttributeLastHost>("lasthost");
-        if (attr && attr->hasHost(ipAddress))
-            players->push_back(Register(p->first));
-    }
+    for (auto &name: HostIndex::hostOwners(args2string(args)))
+        players->push_back(Register(name));
 
     return ::wrap(players);
 }

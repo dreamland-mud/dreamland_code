@@ -33,6 +33,7 @@ entrytoken.cpp \
 webmanip.cpp \
 lasthost.cpp \
 lastdevice.cpp \
+hostindex.cpp \
 netlists.cpp \
 banflags.cpp \
 ban.cpp \

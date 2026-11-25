@@ -28,6 +28,7 @@
 #include "areaquestutils.h"
 #include "xmlattributeareaquest.h"
 #include "lasthost.h"
+#include "hostindex.h"
 #include "merc.h"
 #include "def.h"
 
@@ -610,31 +611,15 @@ NMI_GET(PlayerWrapper, alts, "массив (.Array), ключ - IP, значен
     if (!myLastHostAttr)
         return altsReg;
         
-    auto myHosts = myLastHostAttr->getHosts();  
-    
     std::map<DLString, std::map<DLString, int> > loginsByHostByPlayer;
 
-    // Collect stats about matching IPs for all players
-    const PCharacterMemoryList &players = PCharacterManager::getPCM();    
-    for (const auto &p: players) {
-        PCMemoryInterface *alt = p.second;
-        const DLString &altName = p.first;
+    // For each address of the target, how many times every other char logged in from it.
+    for (const auto &h: myLastHostAttr->getHosts()) {
+        const DLString &host = h.first;
 
-        if (altName == player->getName())
-            continue;
-
-        auto altLastHostAttr = alt->getAttributes().findAttr<XMLAttributeLastHost>("lasthost");  
-        if (!altLastHostAttr)
-            continue;
-
-        // For each player, count how many times they logged in from the same IP addresses as the target player
-        for (const auto &h: altLastHostAttr->getHosts()) {
-            const DLString &altHost = h.first;
-            int altLogins = h.second.getValue();
-
-            if (myHosts.find(altHost) != myHosts.end())
-                loginsByHostByPlayer[altHost][altName] += altLogins;
-        }
+        for (const auto &alt: HostIndex::hostLogins(host))
+            if (!(alt.first ^ player->getName()))
+                loginsByHostByPlayer[host][alt.first] += alt.second;
     }
 
     // Populate Fenia array
