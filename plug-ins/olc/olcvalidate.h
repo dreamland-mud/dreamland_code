@@ -2,6 +2,7 @@
 #define __OLCVALIDATE_H__
 
 #include <vector>
+#include <set>
 #include "dlstring.h"
 
 struct RoomIndexData;
@@ -84,8 +85,10 @@ void olc_validate_area_all(AreaIndexData *pArea, OlcFindings &out);
 /** Runs the chain on one prototype after an editor's 'done' and prints its
  *  warnings as plain lines (the immortal profile: info is left out). Prints
  *  nothing for a clean prototype; never changes or blocks anything.
- *  kind: room | mob | obj. */
-void olc_validate_print(Character *ch, const DLString &kind, int vnum);
+ *  kind: room | mob | obj. aiFields: "field.lang" the AI is writing now
+ *  (olc_ai_done); warnings on them are counted in one line, not listed. */
+void olc_validate_print(Character *ch, const DLString &kind, int vnum,
+                        const std::set<DLString> *aiFields = 0);
 
 /** A resolved editor subcommand that sets a numeric or power field. Unreachable
  *  while OlcOps::apply refuses the player profile; phase 5 replaces this

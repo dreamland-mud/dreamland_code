@@ -1761,8 +1761,10 @@ REDIT(commands, "команды", "показать список встроен�
 REDIT(done, "готово", "выйти из редактора (не забывайте про asave changed)")
 {
     commit();
-    olc_validate_print(ch, "room", getJournalVnum());
-    olc_ai_done(this, ch, "room", getJournalVnum());
+    // The AI first: warnings on text it is about to write are only counted.
+    OlcAiFields aiFields;
+    olc_ai_done(this, ch, "room", getJournalVnum(), &aiFields);
+    olc_validate_print(ch, "room", getJournalVnum(), &aiFields);
     detach(ch);
     return true;
 }

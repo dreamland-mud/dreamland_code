@@ -94,12 +94,16 @@ bool olc_cases_command( PCharacter *ch, const char *argument, XMLMultiString &sh
 class OLCState;
 struct mob_index_data;
 struct obj_index_data;
+/** "field.lang" names, as the validators name fields ("name.en", "desc.ua"). */
+typedef std::set<DLString> OlcAiFields;
 /** AI phase 1 (olcaigen.cpp). Called by every editor's 'done' after its
  *  commit: tells the worker to land the answer of a 'gen' typed in this
  *  editor, else queues the automatic request for the empty core text of the
  *  committed prototype ("room"/"mob"/"obj"; only while AI is on and the
- *  builder has not typed 'gen auto off'). */
-void olc_ai_done( OLCState *state, PCharacter *ch, const DLString &entity, int vnum );
+ *  builder has not typed 'gen auto off'). pending: filled with the fields of
+ *  this vnum the AI is now writing, so 'done' does not warn about them. */
+void olc_ai_done( OLCState *state, PCharacter *ch, const DLString &entity, int vnum,
+                  OlcAiFields *pending = 0 );
 /** The editors' 'gen' subcommand on the prototype the editor holds (redit:
  *  the room itself, medit/oedit: their copy): gen [hint] | gen auto on|off |
  *  gen revert [vnum]. 'gen [hint]' sends that copy, so the model starts
