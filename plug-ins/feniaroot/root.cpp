@@ -785,6 +785,13 @@ NMI_INVOKE(Root, discord_clan, "(msg): послать сообщение в об
     return Register( );
 }
 
+NMI_INVOKE(Root, notifyAdmins, "(subject, body): письмо богам на dreamland.mud@gmail.com о том, что требует их решения (обычный текст, без цветов); не больше 30 писем в час; true если письмо в очереди")
+{
+    DLString subject = argnum2string( args, 1 );
+    DLString body = argnum2string( args, 2 );
+    return Register( send_admin_email( subject, body ) );
+}
+
 NMI_INVOKE(Root, discord_wiznet, "(msg): послать сообщение в приватный Discord #дрім-скрім")
 {
     DLString msg = args2string(args);

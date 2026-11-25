@@ -13,6 +13,7 @@
 #include "accountaudit.h"
 #include "json_utils.h"
 #include "wiznet.h"
+#include "messengers.h"
 #include "dreamland.h"
 #include "dldirectory.h"
 #include "dlfilestream.h"
@@ -329,6 +330,16 @@ static void kofi_notify(const DLString &txn, const Json::Value &entry, const cha
            kofi_str(p, "currency").c_str(),
            AccountManager::echoSafe(kofi_str(p, "from_name")).c_str(),
            txn.c_str());
+
+    // Same facts for the gods' inbox: every kofi_notify needs an immortal. The
+    // inbox is admin-only, like the wiznet line; still never the payer's email.
+    send_admin_email(DLString("Ko-fi payment ") + what,
+                     DLString("Ko-fi: ") + what + "\n"
+                     + "Status: " + kofi_str(entry, "status") + "\n"
+                     + "Payment: " + kofi_str(p, "type") + " " + kofi_str(p, "amount")
+                     + " " + kofi_str(p, "currency") + " from '" + kofi_str(p, "from_name") + "'\n"
+                     + "Txn: " + txn + "\n"
+                     + "In game: account kofi list\n");
 }
 
 static void kofi_audit(const char *event, const DLString &txn, const Json::Value &entry)

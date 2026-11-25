@@ -122,6 +122,9 @@ void Confirm::doRequest( Character *ch )
     wiznet( WIZ_CONFIRM, 0, 0,
             "%^C1 просит подтверждения своему персонажу ({y{hcconfirm show %s{x).", ch, ch->getNameC() );    
     send_telegram("Вниманию богов: кто-то попросил подтверждения своему персонажу.");
+    send_admin_email(DLString("Confirm request: ") + ch->getPC()->getName(),
+                     ch->getPC()->getName() + " asks the gods to confirm their character.\n"
+                     "In game: confirm show " + ch->getPC()->getName() + "\n");
 
     attr->update( ch->getPC() ); 
     PCharacterManager::saveMemory( ch->getPC( ) );
