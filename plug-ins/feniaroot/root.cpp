@@ -1910,7 +1910,7 @@ NMI_INVOKE(Root, craftRollWeapon, "(obj, ch, tier, minCm, maxCm[, force, profile
     return Register(atoi(obj->getProperty("measure_m").c_str()));
 }
 
-NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats, wclass, worstTier, profile, imbue]): применить rand_all [или rand_stat] к этому оружию для данного персонажа и tier; wclass фиксирует класс оружия, worstTier задает диапазон тиров, profile caster берет цены аффиксов для кастера, imbue true -- посох (wclass staff, тир rare+) с зарядами заклинания")
+NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats, wclass, worstTier, profile, imbue, noMagic]): применить rand_all [или rand_stat] к этому оружию для данного персонажа и tier; wclass фиксирует класс оружия, worstTier задает диапазон тиров, profile caster берет цены аффиксов для кастера, imbue true -- посох (wclass staff, тир rare+) с зарядами заклинания; noMagic true -- без аффиксов с пометкой magic в item_affixes.json (крафт члена Клана Ярости)")
 {
     ::Object *obj = argnum2item(args, 1);
     Character *ch = argnum2character(args, 2);
@@ -1920,6 +1920,7 @@ NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats, wclass, worstTier, pr
     int worstTier = args.size() > 5 ? argnum2number(args, 6) : bestTier;
     DLString profile = args.size() > 6 ? argnum2string(args, 7) : DLString::emptyString;
     bool imbue = args.size() > 7 ? argnum2boolean(args, 8) : false;
+    bool noMagic = args.size() > 8 && argnum2boolean(args, 9);
 
     if (obj->item_type != ITEM_WEAPON)
         throw Scripting::Exception("Item is not a weapon for randomize.");
@@ -1945,6 +1946,7 @@ NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats, wclass, worstTier, pr
             .player(ch->getPC())
             .caster(profile == "caster")
             .tier(tier)
+            .withoutMagic(noMagic)
             .randomizeStats();
     }
     else {
@@ -1963,6 +1965,7 @@ NMI_INVOKE(Root, randomizeWeapon, "(obj, ch, tier[, stats, wclass, worstTier, pr
             // the player-availability filter on purpose: the caller knows what it wants.
             .weaponClass(wclass)
             .tier(tier)
+            .withoutMagic(noMagic)
             .randomizeAll();
     }
 

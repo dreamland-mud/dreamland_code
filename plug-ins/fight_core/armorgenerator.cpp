@@ -397,7 +397,8 @@ bool ItemAffixRoller::candidateAllowed(const Json::Value &section, const Json::V
     if (crafted && section["no_craft"].asBool())
         return false;
 
-    // Battleragers refuse magic: their crafts cast no spells (worn buffs, procs, charges).
+    // Battleragers refuse magic: their crafts carry nothing the spellbane refuses
+    // (a spell cast or ITEM_MAGIC, item_affixes.json "magic").
     if (noMagic && (section["magic"].asBool() || affix["magic"].asBool()))
         return false;
 
