@@ -7,6 +7,7 @@
 #define __PLUGINMANAGER_H__
 
 #include <map>
+#include <list>
 
 #include "exception.h"
 #include "oneallocate.h"
@@ -30,6 +31,7 @@ public:
     void loadAll( bool keepGoing = false );
 
     void reload( const DLString &n );
+    void reloadMany( const std::list<DLString> &names );
     void reloadAll( );
     void reloadNonCritical( );
     void reloadChanged( );
@@ -38,6 +40,7 @@ public:
     void setReloadNonCriticalRequest( );
     void setReloadChangedRequest( );
     void setReloadOneRequest( const DLString &, int w = 0);
+    void setReloadManyRequest( const std::list<DLString> &names );
     void checkReloadRequest( );
 
     bool isAvailable( const DLString& ) const;

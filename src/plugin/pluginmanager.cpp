@@ -127,6 +127,18 @@ void PluginManager::reload( const DLString &n )
     loadAll( true );
 }
 
+/** Several plugins at once: unload every one (each takes its dependents with
+ *  it, and a name already gone as a dependent is a no-op), then load the whole
+ *  set back in one pass. Two plugins with new C++ never coexist old-with-new,
+ *  which reloading them one after the other cannot promise. */
+void PluginManager::reloadMany( const std::list<DLString> &names )
+{
+    for (std::list<DLString>::const_iterator n = names.begin( ); n != names.end( ); n++)
+        unload( *n );
+
+    loadAll( true );
+}
+
 void PluginManager::reloadAll( ) 
 {
     unloadAll( );
@@ -216,6 +228,18 @@ public:
     int what;
 };
 
+class PluginReloadManyRequest : public PluginReloadRequest {
+public:
+    PluginReloadManyRequest( const std::list<DLString> &n ) : names( n ) { }
+
+    virtual void process( )
+    {
+        PluginManager::getThis( )->reloadMany( names );
+    }
+
+    std::list<DLString> names;
+};
+
 void PluginManager::setReloadAllRequest( )
 {
     request = ::Pointer<PluginReloadAllRequest>( NEW );
@@ -231,6 +255,11 @@ void PluginManager::setReloadChangedRequest( )
 void PluginManager::setReloadOneRequest(const DLString &n, int w)
 {
     request = ::Pointer<PluginReloadOneRequest>(NEW, n, w);
+}
+
+void PluginManager::setReloadManyRequest( const std::list<DLString> &names )
+{
+    request = ::Pointer<PluginReloadManyRequest>( NEW, names );
 }
 
 void PluginManager::checkReloadRequest( ) 

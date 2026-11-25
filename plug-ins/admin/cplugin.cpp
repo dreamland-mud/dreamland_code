@@ -67,7 +67,7 @@ COMMAND(CPlugin, "plugin")
     else if (arg_is_list(arg))
         doList( ch );
     else if (arg_is(arg, "reload" ))
-        doReload( ch, arguments.getOneArgument( ) );
+        doReload( ch, arguments );
     else if(arg_is(arg, "load")) {
         PluginManager *manager = PluginManager::getThis( );
         manager->setReloadOneRequest(arguments, 1);
@@ -89,7 +89,7 @@ void CPlugin::usage( Character *ch )
     ch->pecho( 
         _("Использование: \r\n"
         "plugin list - список всех загруженных модулей.\r\n"
-        "plugin reload [all|changed|<name>] \r\n"
+        "plugin reload [all|changed|<name> [<name>...]] \r\n"
         "            - перегрузка модулей (всех, измененных или по имени)") );
 }
 
@@ -116,7 +116,23 @@ void CPlugin::doList( Character *ch )
 void CPlugin::doReload( Character *ch, DLString arg )
 {
     PluginManager *manager = PluginManager::getThis( );
-    
+    std::list<DLString> names = plugin_reload_names( arg );
+
+    if (names.size( ) > 1) {
+        // Several plugins in one pass: unload them all, load the set back once.
+        DLString unknown = plugin_reload_unknown( manager, names );
+        if (!unknown.empty( )) {
+            ch->pecho( "Plugin [%s] not found.", unknown.c_str( ) );
+            return;
+        }
+        manager->setReloadManyRequest( names );
+        plugin_reload_warning( );
+        ch->pecho( "Requesting reload for plugins [%s].", arg.c_str( ) );
+        return;
+    }
+
+    arg = names.empty( ) ? DLString::emptyString : names.front( );
+
     if (arg.empty( ))
         usage( ch );
     else if (arg_is_all(arg)) {
