@@ -123,6 +123,104 @@ UndefinedOneHit::UndefinedOneHit( Character *ch, Character *victim, bool seconda
     deathReason = offEnd ? "staff offend" : "melee";
 }
 
+/*
+ * Natural attacks of PC races (fight/natural_attacks.json). Each row names a
+ * passive race skill (race-aptitudes/<skill>.xml says which races have it) and an
+ * attack: a bare-handed plain swing of a PC who knows the skill may become that
+ * attack instead of a punch, e.g. felar sharp claws rake with "claw" (slash).
+ * Only the attack noun and damage type change, the bare-hands dice stay. Skill
+ * strikes never roll (they are not UndefinedOneHit), nor do NPCs: they already
+ * swing their race attacks (fight_core attacks.cpp mob_index_attacks).
+ *
+ * Rows are resolved to registry indices once at load, so a swing costs an index
+ * lookup per row. A skill not loaded yet keeps its index and fills in when its
+ * XML registers; one that never does is logged at the first swing that meets it.
+ */
+struct NaturalAttack {
+    DLString skillName;
+    int sn;
+    int attack;
+    int chance;
+    bool warned;
+};
+static std::vector<NaturalAttack> naturalAttacks;
+
+CONFIGURABLE_LOADED(fight, natural_attacks)
+{
+    naturalAttacks.clear( );
+
+    if (!value.isObject( ))
+        return;
+
+    // getMemberNames is sorted: rows are tried in alphabetical order.
+    for (auto &name: value.getMemberNames( )) {
+        if (name.empty( ) || name[0] == '_')
+            continue;
+
+        const Json::Value &row = value[name];
+        DLString attackName = row["attack"].asString( );
+        int attack = weapon_flags.value( attackName );
+        int chance = row["chance"].asInt( );
+
+        if (attack == NO_FLAG || attack == DAMW_NONE) {
+            LogStream::sendError( ) << "natural_attacks: " << name << ": unknown attack '" << attackName << "'" << endl;
+            continue;
+        }
+
+        if (chance < 1 || chance > 100) {
+            LogStream::sendError( ) << "natural_attacks: " << name << ": chance " << chance << " is outside 1..100" << endl;
+            continue;
+        }
+
+        naturalAttacks.push_back( { name, skillManager->lookup( name ), attack, chance, false } );
+    }
+}
+
+/* The natural attack a bare-handed PC swing becomes, or -1 to punch as usual.
+ * The row chance is the odds at 100% learned and scales with the skill. */
+static int natural_attack( Character *ch, Character *victim )
+{
+    for (auto &row: naturalAttacks) {
+        Skill *skill = skillManager->find( row.sn );
+
+        if (!skill || !skill->isValid( )) {
+            if (!row.warned)
+                LogStream::sendError( ) << "natural_attacks: no skill '" << row.skillName << "'" << endl;
+            row.warned = true;
+            continue;
+        }
+
+        int learned = skill->getEffective( ch );
+        if (learned <= 1)
+            continue;
+
+        if (number_percent( ) > row.chance * learned / 100)
+            continue;
+
+        skill->improve( ch, true, victim );
+        return row.attack;
+    }
+
+    return -1;
+}
+
+void UndefinedOneHit::init( )
+{
+    WeaponOneHit::init( );
+
+    if (wield || attackOverride >= 0 || ch->is_npc( ) || naturalAttacks.empty( ))
+        return;
+
+    int natural = natural_attack( ch, victim );
+    if (natural < 0)
+        return;
+
+    // Swing as the natural attack: init again so its damage class follows the
+    // same rule as any other attack.
+    setAttack( natural );
+    WeaponOneHit::init( );
+}
+
 bool UndefinedOneHit::canDamage( )
 {
     // Read before Damage::canDamage: its adjustFighting() puts the victim into the

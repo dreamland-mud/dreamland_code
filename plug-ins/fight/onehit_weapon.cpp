@@ -9,7 +9,6 @@
 #include "lex.h"
 
 #include "skill.h"
-#include "skillmanager.h"
 #include "spelltarget.h"
 #include "affect.h"
 #include "affecthandler.h"
@@ -33,7 +32,6 @@
 #include "magic.h"
 #include "occupations.h"
 #include "act.h"
-#include "configurable.h"
 
 #include "merc.h"
 #include "vnum.h"
@@ -62,70 +60,6 @@ void WeaponOneHit::setAttack( int attack )
     attackOverride = attack;
 }
 
-/*
- * Natural attacks of PC races (fight/natural_attacks.json). Each row is keyed by
- * a passive race skill (race-aptitudes/<skill>.xml says which races have it): a
- * bare-handed swing of a PC who knows the skill may become that attack instead
- * of a punch, e.g. felar claws rake with "claw" (slash). Only the attack noun and
- * damage type change, the bare-hands dice stay. NPCs never roll: they already
- * swing their race attacks (fight_core attacks.cpp mob_index_attacks).
- */
-struct NaturalAttack {
-    DLString skillName;
-    int attack;
-    int chance;
-};
-static std::vector<NaturalAttack> naturalAttacks;
-
-CONFIGURABLE_LOADED(fight, natural_attacks)
-{
-    naturalAttacks.clear( );
-
-    if (!value.isObject( ))
-        return;
-
-    for (auto &name: value.getMemberNames( )) {
-        if (name.empty( ) || name[0] == '_')
-            continue;
-
-        const Json::Value &row = value[name];
-        int attack = weapon_flags.value( row["attack"].asString( ) );
-        if (attack == NO_FLAG) {
-            LogStream::sendError( ) << "natural_attacks: " << name << ": unknown attack '"
-                                    << row["attack"].asString( ) << "'" << endl;
-            continue;
-        }
-
-        naturalAttacks.push_back( { name, attack, row["chance"].asInt( ) } );
-    }
-}
-
-/* The natural attack this bare-handed PC swing becomes, or -1 to punch as usual.
- * The row chance is the odds at 100% learned and scales with the skill. */
-static int natural_attack( Character *ch, Character *victim )
-{
-    if (ch->is_npc( ))
-        return -1;
-
-    for (auto &row: naturalAttacks) {
-        Skill *skill = skillManager->findExisting( row.skillName );
-        if (!skill)
-            continue;
-
-        int learned = skill->getEffective( ch );
-        if (learned <= 1)
-            continue;
-
-        if (number_percent( ) > row.chance * learned / 100)
-            continue;
-
-        skill->improve( ch, true, victim );
-        return row.attack;
-    }
-
-    return -1;
-}
-
 void WeaponOneHit::init( )
 {
     wield = get_wield( ch, secondary );
@@ -144,11 +78,6 @@ void WeaponOneHit::init( )
 
     if (attackOverride >= 0)
         attack = attackOverride;
-    else if (!wield) {
-        int natural = natural_attack( ch, victim );
-        if (natural >= 0)
-            attack = natural;
-    }
 
     dam_type = attack_table[attack].damage;
     
