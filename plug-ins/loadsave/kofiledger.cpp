@@ -199,6 +199,8 @@ static DLString kofi_email(const Json::Value &entry)
 
 static bool kofi_is_subscription(const Json::Value &payment)
 {
+    if (!payment.isObject())
+        return false;
     Json::Value sub = payment.get("is_subscription_payment", Json::Value());
     return (sub.isBool() && sub.asBool()) || kofi_str(payment, "type") == "Subscription";
 }
@@ -249,12 +251,15 @@ static DLString kofi_match_message(const DLString &msg)
     return DLString::emptyString;
 }
 
-// A code in the message wins over the payer's own identities: it is the payer
-// saying which account the money is for, which is how a gift reaches a friend.
+// On a one-off tip a code in the message wins over the payer's own identities:
+// it is the payer saying which account the money is for, which is how a gift
+// reaches a friend. A membership is always for the payer: their own Discord and
+// email go first and the code only matches a payer the game does not know yet,
+// so renewals (which carry no message) never split from the first payment.
 static DLString kofi_match(const Json::Value &p, DLString &how)
 {
     DLString coded = kofi_match_message(kofi_str(p, "message"));
-    if (!coded.empty()) {
+    if (!coded.empty() && !kofi_is_subscription(p)) {
         how = "message_code";
         return coded;
     }
@@ -285,7 +290,9 @@ static DLString kofi_match(const Json::Value &p, DLString &how)
         }
     }
 
-    return DLString::emptyString;
+    if (!coded.empty())
+        how = "message_code";
+    return coded;
 }
 
 // One wiznet line for admins who can act on it (wiznet also logs it as a notice).
