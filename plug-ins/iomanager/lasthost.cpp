@@ -207,66 +207,86 @@ protected:
 
 private:
     void sweep( bool apply, int keepDays );
+    void sweepOne( PCMemoryInterface *pci, bool apply, time_t cutoff, int &chars, int &undated,
+                   int &hostsDropped, int &devicesDropped, int &lastCleared, int &saved );
 };
 
 void HostRetentionTask::run( )
 {
-    const Json::Value &cfg = retentionConfig;
-    bool apply = cfg["apply"].isBool( ) && cfg["apply"].asBool( );
-    int keepDays = cfg["keep_days"].isInt( ) ? cfg["keep_days"].asInt( ) : 0;
-
-    // A missing or broken config must never delete anything.
-    if (keepDays < MIN_KEEP_DAYS) {
-        LogStream::sendError( ) << "Host retention: keep_days " << keepDays << " is below "
-                                << MIN_KEEP_DAYS << ", counting with 365 and writing nothing" << endl;
-        keepDays = 365;
-        apply = false;
-    }
-
+    // A missing or broken config must never delete anything, nor stop the boot:
+    // operator[] throws on a root that is not an object.
     try {
+        const Json::Value &cfg = retentionConfig;
+        bool apply = false;
+        int keepDays = 0;
+
+        if (cfg.isObject( )) {
+            apply = cfg["apply"].isBool( ) && cfg["apply"].asBool( );
+            keepDays = cfg["keep_days"].isInt( ) ? cfg["keep_days"].asInt( ) : 0;
+        }
+
+        if (keepDays < MIN_KEEP_DAYS) {
+            LogStream::sendError( ) << "Host retention: keep_days " << keepDays << " is below "
+                                    << MIN_KEEP_DAYS << " or config/host_retention.json is unreadable, "
+                                    << "counting with 365 and writing nothing" << endl;
+            keepDays = 365;
+            apply = false;
+        }
+
         sweep( apply, keepDays );
     } catch (const std::exception &e) {
         LogStream::sendError( ) << "Host retention: " << e.what( ) << endl;
     }
 }
 
+void HostRetentionTask::sweepOne( PCMemoryInterface *pci, bool apply, time_t cutoff, int &chars, int &undated,
+                                  int &hostsDropped, int &devicesDropped, int &lastCleared, int &saved )
+{
+    time_t seed = pci->getLastAccessTime( ).getTime( );
+    bool changed = false;
+
+    XMLAttributeLastHost::Pointer hosts = pci->getAttributes( ).findAttr<XMLAttributeLastHost>("lasthost");
+    XMLAttributeDevices::Pointer devices = pci->getAttributes( ).findAttr<XMLAttributeDevices>("devices");
+
+    // The last address is as old as its own row (owner's last login when undated).
+    if (!pci->getLastAccessHost( ).empty( )) {
+        time_t lastSeen = hosts ? hosts->seenOf( pci->getLastAccessHost( ), seed ) : seed;
+        if (lastSeen < cutoff) {
+            lastCleared++;
+            changed = true;
+            if (apply)
+                pci->setLastAccessHost( DLString::emptyString );
+        }
+    }
+
+    if (hosts) {
+        chars++;
+        changed = hosts->prune( seed, cutoff, apply, undated, hostsDropped ) || changed;
+    }
+
+    if (devices)
+        changed = devices->prune( seed, cutoff, apply, undated, devicesDropped ) || changed;
+
+    if (changed) {
+        if (apply)
+            PCharacterManager::saveMemory( pci );
+        saved++;
+    }
+}
+
 void HostRetentionTask::sweep( bool apply, int keepDays )
 {
     time_t cutoff = dreamland->getCurrentTime( ) - keepDays * (time_t)Date::SECOND_IN_DAY;
-    int chars = 0, undated = 0, hostsDropped = 0, devicesDropped = 0, lastCleared = 0, saved = 0;
+    int chars = 0, undated = 0, hostsDropped = 0, devicesDropped = 0, lastCleared = 0, saved = 0, failed = 0;
     clock_t started = clock( );
 
     for (auto &p: PCharacterManager::getPCM( )) {
-        PCMemoryInterface *pci = p.second;
-        time_t seed = pci->getLastAccessTime( ).getTime( );
-        bool changed = false;
-
-        XMLAttributeLastHost::Pointer hosts = pci->getAttributes( ).findAttr<XMLAttributeLastHost>("lasthost");
-        XMLAttributeDevices::Pointer devices = pci->getAttributes( ).findAttr<XMLAttributeDevices>("devices");
-
-        // The last address is as old as its own row (owner's last login when undated).
-        if (!pci->getLastAccessHost( ).empty( )) {
-            time_t lastSeen = hosts ? hosts->seenOf( pci->getLastAccessHost( ), seed ) : seed;
-            if (lastSeen < cutoff) {
-                lastCleared++;
-                changed = true;
-                if (apply)
-                    pci->setLastAccessHost( DLString::emptyString );
-            }
-        }
-
-        if (hosts) {
-            chars++;
-            changed = hosts->prune( seed, cutoff, apply, undated, hostsDropped ) || changed;
-        }
-
-        if (devices)
-            changed = devices->prune( seed, cutoff, apply, undated, devicesDropped ) || changed;
-
-        if (changed) {
-            if (apply)
-                PCharacterManager::saveMemory( pci );
-            saved++;
+        // One bad profile must not stop retention for everyone after it.
+        try {
+            sweepOne( p.second, apply, cutoff, chars, undated, hostsDropped, devicesDropped, lastCleared, saved );
+        } catch (const std::exception &e) {
+            failed++;
+            LogStream::sendError( ) << "Host retention: " << p.first << ": " << e.what( ) << endl;
         }
     }
 
@@ -276,7 +296,7 @@ void HostRetentionTask::sweep( bool apply, int keepDays )
         << chars << " players with addresses, " << undated << " undated rows, "
         << hostsDropped << " addresses and " << devicesDropped << " devices dropped, "
         << lastCleared << " last addresses cleared, " << saved << " pfiles " << (apply ? "saved" : "to save")
-        << ", " << (clock( ) - started) * 1000 / CLOCKS_PER_SEC << " ms cpu" << endl;
+        << ", " << failed << " failed, " << (clock( ) - started) * 1000 / CLOCKS_PER_SEC << " ms cpu" << endl;
 }
 
 PluginInitializer<HostRetentionTask> initHostRetention;
