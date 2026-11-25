@@ -95,7 +95,7 @@ static int proc_chance(int tierFloor)
  * ItemAffixRoller
  *-------------------------------------------------------------------------*/
 ItemAffixRoller::ItemAffixRoller(Object *obj, PCharacter *pch, int tier, const DLString &kind, const DLString &slot)
-        : crafted(false), rollsOverride(0), obj(obj), pch(pch), tier(tier), kind(kind), slot(slot), isCaster(false), align(ALIGN_NONE),
+        : crafted(false), rollsOverride(0), noMagic(false), obj(obj), pch(pch), tier(tier), kind(kind), slot(slot), isCaster(false), align(ALIGN_NONE),
           sigPool(false), chosenTotal(0), extraFlags(0, &extra_flags)
 {
 }
@@ -395,6 +395,11 @@ bool ItemAffixRoller::candidateAllowed(const Json::Value &section, const Json::V
         return false;
 
     if (crafted && section["no_craft"].asBool())
+        return false;
+
+    // Battleragers refuse magic: their crafts carry nothing the spellbane refuses
+    // (a spell cast or ITEM_MAGIC, item_affixes.json "magic").
+    if (noMagic && (section["magic"].asBool() || affix["magic"].asBool()))
         return false;
 
     if (affix.isMember("align") && align != ALIGN_NONE) {

@@ -40,6 +40,8 @@ struct WeaponGenerator {
     WeaponGenerator & caster(bool caster) { this->isCaster = caster; return *this; }
     /** A crafted weapon: the affix window in centi-M as given, no level curve. */
     WeaponGenerator & craftWindow(int minCm, int maxCm) { this->craftMin = minCm; this->craftMax = maxCm; return *this; }
+    /** Leave out the affixes marked "magic" (spellbane-refused): a battlerager crafted it. */
+    WeaponGenerator & withoutMagic(bool no) { this->noMagic = no; return *this; }
 
     // Main method to handle rand_stat logic, after all parameters have been set up by the calls above.
     WeaponGenerator& randomizeStats();
@@ -124,6 +126,7 @@ private:
     bool isCaster;
     // Crafted affix window in centi-M, -1 = the tier's own.
     int craftMin, craftMax;
+    bool noMagic;
 
     // Two-hander share on the M budget: base ave and damroll are scaled by it.
     bool twoHands;
