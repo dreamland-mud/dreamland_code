@@ -15,9 +15,10 @@
  * changes (checked at most once a minute). A missing or broken file is an
  * empty table, never an error. Flags only: nothing blocks on them.
  *
- * Both calls take one address or a lasthost-style chain "a, b" (a proxy's
+ * All calls take one address or a lasthost-style chain "a, b" (a proxy's
  * X-Forwarded-For): tag answers the strongest tag of any link, org joins the
- * provider of every link with " / " (provider names contain commas).
+ * provider of every link with " / " (provider names contain commas), lastHop
+ * reads only the last link.
  */
 namespace NetLists {
     // "tor", "vpn", "dc" or "" (precedence tor > vpn > dc).

@@ -852,12 +852,12 @@ Descriptor::wsHandleNeg(unsigned char *buf, int rc)
                     DLString proxyFor(websock.headers["X-Forwarded-For"]);
 
                     if(!proxyFor.empty()) {
-                        DLString hop = NetLists::lastHop( proxyFor );
+                        DLString hop;
 
                         if (!peer_is_local_proxy( this )) {
                             LogStream::sendWarning( ) << "WebSock: X-Forwarded-For from "
                                 << realip << " ignored, not a local proxy" << endl;
-                        } else if (hop.empty( )) {
+                        } else if ((hop = NetLists::lastHop( proxyFor )).empty( )) {
                             LogStream::sendWarning( ) << "WebSock: X-Forwarded-For '"
                                 << proxyFor << "' ends in no address, ignored" << endl;
                         } else {
