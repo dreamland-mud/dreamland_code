@@ -29,6 +29,7 @@
 #include "outofband.h"
 #include "backdoorhandler.h"
 #include "mssp.h"
+#include "netlists.h"
 #include "msp.h"
 
 
@@ -97,6 +98,23 @@ static char utf8_menu_choice( )
 const char *ttype_name( int ttype )
 {
     return TTYPE_NAMES[URANGE(TTYPE_NONE, ttype, TTYPE_MAX-1)];
+}
+
+/*
+ * A forwarded address (the telnet VIA option, the X-Forwarded-For header) is
+ * text the other end wrote. It is believed only when that other end is a proxy
+ * on this machine: nginx connects to the web socket ports from loopback. From
+ * any other peer the claim is dropped and the peer's own address stands, so a
+ * player cannot plant someone else's address in lasthost, alt links or bans.
+ */
+static bool peer_is_local_proxy( const Descriptor *d )
+{
+    in_addr addr;
+
+    if (!inet_aton( d->realip.c_str( ), &addr ))
+        return false;
+
+    return (ntohl( addr.s_addr ) >> 24) == 127;
 }
 
 bool Descriptor::checkStopSymbol( )
@@ -226,22 +244,27 @@ int Descriptor::inputTelnet( unsigned char i )
                     if(telnet.sn_ptr >= 5 && 
                             telnet.subneg[0] == TELOPT_VIA)
                     {
-                        telnet.subneg[telnet.sn_ptr] = 0;
-                        
-                        ViaRecord v;
-                        
-                        v.first = *(in_addr*)(telnet.subneg + 1);
-                        v.second = (char*)telnet.subneg + 1 + sizeof(in_addr);
-                        
-                        via.push_back(v);
-                        
-                        LogStream::sendError() 
-                            << "got via: " 
-                            << v.second << "(" << inet_ntoa(v.first) << ")" 
-                            << endl;
-                        
-                        if (banManager->checkVerbose( this, BAN_ALL )) 
-                            return -1;
+                        if (!peer_is_local_proxy( this )) {
+                            LogStream::sendWarning( ) << "telnet: VIA from "
+                                << realip << " ignored, not a local proxy" << endl;
+                        } else {
+                            telnet.subneg[telnet.sn_ptr] = 0;
+
+                            ViaRecord v;
+
+                            v.first = *(in_addr*)(telnet.subneg + 1);
+                            v.second = (char*)telnet.subneg + 1 + sizeof(in_addr);
+
+                            via.push_back(v);
+
+                            LogStream::sendError()
+                                << "got via: "
+                                << v.second << "(" << inet_ntoa(v.first) << ")"
+                                << endl;
+
+                            if (banManager->checkVerbose( this, BAN_ALL ))
+                                return -1;
+                        }
                     }
 
                     if (telnet.sn_ptr >= 3 
@@ -829,18 +852,32 @@ Descriptor::wsHandleNeg(unsigned char *buf, int rc)
                     DLString proxyFor(websock.headers["X-Forwarded-For"]);
 
                     if(!proxyFor.empty()) {
-                        ViaRecord v;
-                        in_addr addr;
+                        DLString hop;
 
-                        if(inet_aton(proxyFor.c_str(), &addr))
-                            v.first = addr;
+                        if (!peer_is_local_proxy( this )) {
+                            LogStream::sendWarning( ) << "WebSock: X-Forwarded-For from "
+                                << realip << " ignored, not a local proxy" << endl;
+                        } else if ((hop = NetLists::lastHop( proxyFor )).empty( )) {
+                            LogStream::sendWarning( ) << "WebSock: X-Forwarded-For '"
+                                << proxyFor << "' ends in no address, ignored" << endl;
+                        } else {
+                            ViaRecord v;
 
-                        v.second = proxyFor;
-                        
-                        via.push_back(v);
+                            if (!inet_aton( hop.c_str( ), &v.first ))
+                                v.first.s_addr = 0;
 
-                        if (banManager->checkVerbose( this, BAN_ALL )) 
-                            return -1;
+                            v.second = hop;
+                            via.push_back(v);
+
+                            if (banManager->checkVerbose( this, BAN_ALL )) {
+                                // Send the ban notice now: closing the socket
+                                // drops whatever is still queued.
+                                LogStream::sendWarning( ) << "WebSock: banned address "
+                                    << hop << ", closing" << endl;
+                                process_output( this, false );
+                                return false;
+                            }
+                        }
                     }
 
                     // Generate unique client ID, to be used when creating secure clickable action links.

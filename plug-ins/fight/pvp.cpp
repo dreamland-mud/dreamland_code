@@ -55,8 +55,8 @@ bool pvp_count_kill(PCharacter *killer, PCharacter *victim)
     if (!killer->desc || !victim->desc)
         return false;
 
-    // The current host can be forged from the client side, so also refuse
-    // pairs that ever played from the same address.
+    // Same address now, or one they ever shared: either way it may be one
+    // player on two chars.
     if (DLString(killer->desc->getRealHost()) == victim->desc->getRealHost()
             || pvp_hosts_shared(killer, victim))
         return false;
