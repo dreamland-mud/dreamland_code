@@ -135,6 +135,11 @@ bool KofiLedger::load(const DLString &txn, Json::Value &entry)
     }
 }
 
+bool KofiLedger::isTestTxn(const DLString &txn)
+{
+    return txn.find("00000000-") == 0;
+}
+
 // Every parseable ledger entry. The ledger holds one file per payment, so a full
 // read stays small; callers are the immortal list and the one-time email index.
 static vector<Json::Value> kofi_scan()
@@ -168,6 +173,20 @@ static vector<Json::Value> kofi_scan()
     }
     dir.close();
     return all;
+}
+
+std::set<DLString> KofiLedger::paidAccounts()
+{
+    std::set<DLString> ids;
+    for (const Json::Value &e: kofi_scan()) {
+        DLString id = kofi_str(e, "account");
+        Json::Value months = e.get("months", Json::Value(0));
+        if (!id.empty() && kofi_str(e, "status") == "applied"
+                && months.isIntegral() && months.asInt64() > 0
+                && !isTestTxn(kofi_str(e, "txn")))
+            ids.insert(id);
+    }
+    return ids;
 }
 
 static long long kofi_received(const Json::Value &e)
@@ -353,6 +372,11 @@ static ApplyResult kofi_apply(const DLString &txn, Json::Value &entry, const DLS
                 entry["status"] = "pending";
             return APPLY_CREDIT_FAILED;
         }
+        // Real money landed: mark the account paid. A failed write here is
+        // repaired by the boot backfill once the entry reads applied.
+        if (!KofiLedger::isTestTxn(txn) && !AccountManager::setSupporterPaid(id))
+            LogStream::sendError() << "Ko-fi: txn " << txn << " could not mark "
+                << id << " paid" << endl;
     }
 
     entry["status"] = "applied";

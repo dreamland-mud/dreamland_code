@@ -32,6 +32,8 @@ resume.cpp \
 entrytoken.cpp \
 webmanip.cpp \
 lasthost.cpp \
+lastdevice.cpp \
+netlists.cpp \
 banflags.cpp \
 ban.cpp \
 impl.cpp \
@@ -48,6 +50,7 @@ serversocket.h \
 serversocketcontainer.h \
 backdoorhandler.h \
 lasthost.h \
+lastdevice.h \
 badnames.h \
 ban.h
 

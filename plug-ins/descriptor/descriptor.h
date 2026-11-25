@@ -193,6 +193,10 @@ public:
     // Wire bytes the socket has not accepted yet, sent before anything newer.
     // Append new members at the end: older offsets stay put.
     std::string         pendingOut;
+    // The web client's random per-browser id (client_device RPC), lowercase hex;
+    // empty for telnet or a browser with blocked storage. Kept per character in
+    // the "devices" attribute for the referral checks.
+    DLString            client_device;
     bool wsHandleNeg(unsigned char *buf, int rc);
     bool wsHandleFrame(unsigned char *buf, int rc);
     bool wsHandlePassThrough(unsigned char *buf, int rc);

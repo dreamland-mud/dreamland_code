@@ -4,6 +4,7 @@
 #define KOFILEDGER_H
 
 #include <list>
+#include <set>
 #include <jsoncpp/json/json.h>
 #include "dlstring.h"
 
@@ -41,6 +42,13 @@ namespace KofiLedger {
     long long monthSeconds();
 
     bool load(const DLString &txn, Json::Value &entry);
+
+    // Ko-fi's "send a test" webhook uses txn ids of this form: never real money.
+    bool isTestTxn(const DLString &txn);
+
+    // Accounts a real payment ever credited: applied entries with months > 0,
+    // test txns excluded. Feeds the boot backfill of the account "paid" flag.
+    std::set<DLString> paidAccounts();
 
     enum RecordResult { RECORD_OK, RECORD_DUPLICATE, RECORD_FAILED };
     // Store a webhook payment (fields already whitelisted, strings only), match it,

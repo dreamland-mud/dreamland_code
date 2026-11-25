@@ -50,6 +50,8 @@
 #include "json_utils_ext.h"
 #include "subclass.h"
 #include "lasthost.h"
+#include "lastdevice.h"
+#include "netlists.h"
 #include "roomutils.h"
 #include "merc.h"
 #include "damageflags.h"
@@ -1562,6 +1564,116 @@ NMI_INVOKE( Root, supporterUntil, "(name): до какого времени (с�
         return Register(0);
 
     return Register((int)AccountManager::supporterUntil(id));
+}
+
+NMI_INVOKE( Root, supporterPaid, "(name): true если аккаунт персонажа name хоть раз оплатил поддержку на Ko-fi настоящими деньгами (не реферальные месяцы)")
+{
+    DLString id = AccountManager::accountOf(args2string(args));
+
+    if (id.empty( ))
+        return Register(false);
+
+    return Register(AccountManager::supporterPaid(id));
+}
+
+NMI_INVOKE( Root, extendSupporter, "(id, days): продлить поддержку аккаунта id на days дней (отрицательное -- забрать, не раньше текущего момента). Не ставит отметку оплаты. true при успехе")
+{
+    DLString id = argnum2string(args, 1);
+    int days = argnum2number(args, 2);
+
+    if (id.empty( ) || !AccountManager::exists( id ))
+        return Register(false);
+
+    return Register(AccountManager::extendSupporter(id, (long long)days * 86400LL));
+}
+
+NMI_INVOKE( Root, accountId, "(name): id аккаунта персонажа name, пустая строка если не привязан")
+{
+    return Register(AccountManager::accountOf(args2string(args)));
+}
+
+// Discord snowflakes carry their creation time: milliseconds since the Discord
+// epoch (2015-01-01) in the bits above 22.
+static long long discord_created(const DLString &snowflake)
+{
+    if (snowflake.empty( ) || snowflake.find_first_not_of("0123456789") != DLString::npos)
+        return 0;
+    unsigned long long id = strtoull(snowflake.c_str( ), 0, 10);
+    return (long long)(((id >> 22) + 1420070400000ULL) / 1000ULL);
+}
+
+NMI_INVOKE( Root, accountInfo, "(id): структура (Map) аккаунта id: created (unix), identities (типы через запятую, например 'discord,email'), discordCreated (unix, 0 без дискорда), paid, until; null если аккаунта нет")
+{
+    DLString id = args2string(args);
+    Json::Value acc = AccountManager::get(id);
+
+    if (!acc.isObject( ))
+        return Register();
+
+    Json::Value created = acc.get("created", Json::Value());
+    DLString types;
+    long long discord = 0;
+    const Json::Value &identities = acc["identities"];
+    if (identities.isArray( ))
+        for (Json::Value::const_iterator i = identities.begin( ); i != identities.end( ); ++i) {
+            DLString type = (*i)["type"].asString( );
+            if (type == "discord" && discord == 0)
+                discord = discord_created((*i)["value"].asString( ));
+            if (type.empty( ) || (DLString(",") + types + ",").find("," + type + ",") != DLString::npos)
+                continue;
+            if (!types.empty( ))
+                types << ",";
+            types << type;
+        }
+
+    Register mapReg = Register::handler<IdContainer>();
+    IdContainer *map = mapReg.toHandler().getDynamicPointer<IdContainer>();
+    map->setField(IdRef("created"), created.isIntegral( ) ? (int)created.asInt64( ) : 0);
+    map->setField(IdRef("identities"), types);
+    map->setField(IdRef("discordCreated"), (int)discord);
+    map->setField(IdRef("paid"), AccountManager::supporterPaid(id));
+    map->setField(IdRef("until"), (int)AccountManager::supporterUntil(id));
+    return mapReg;
+}
+
+NMI_INVOKE( Root, hostsOf, "(name): список (List) IP адресов, с которых заходил персонаж name; пустой если нет")
+{
+    RegList::Pointer list(NEW);
+    PCMemoryInterface *pci = PCharacterManager::find(args2string(args));
+
+    if (pci) {
+        XMLAttributeLastHost::Pointer attr = pci->getAttributes().findAttr<XMLAttributeLastHost>("lasthost");
+        if (attr)
+            for (auto &h: attr->getHosts( ))
+                list->push_back(Register(h.first));
+    }
+
+    return wrap(list);
+}
+
+NMI_INVOKE( Root, devicesOf, "(name): список (List) id устройств веб-клиента, с которых заходил персонаж name; пустой если нет")
+{
+    RegList::Pointer list(NEW);
+    PCMemoryInterface *pci = PCharacterManager::find(args2string(args));
+
+    if (pci) {
+        XMLAttributeDevices::Pointer attr = pci->getAttributes().findAttr<XMLAttributeDevices>("devices");
+        if (attr)
+            for (auto &d: attr->getDevices( ))
+                list->push_back(Register(d.first));
+    }
+
+    return wrap(list);
+}
+
+NMI_INVOKE( Root, netTag, "(ip): 'tor', 'vpn', 'dc' (датацентр) или пустая строка -- по локальным спискам сетей")
+{
+    return Register(NetLists::tag(args2string(args)));
+}
+
+NMI_INVOKE( Root, netOrg, "(ip): провайдер адреса ip в виде 'AS<номер> <описание>' или пустая строка")
+{
+    return Register(NetLists::org(args2string(args)));
 }
 
 // Same reading as account_profile_enabled (comm/profileservlet.cpp): no

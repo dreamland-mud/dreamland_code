@@ -149,12 +149,20 @@ public:
     static bool vaultUnlocked(const DLString &id);
     static bool setVaultUnlocked(const DLString &id);
 
-    // Ko-fi supporter status (top-level "supporter": {"until": <unix>}). 0 when
-    // the account never supported or does not exist. extendSupporter pushes the
-    // date forward by `seconds` from max(now, until); a zero extension writes
-    // nothing. Refuses (RAM untouched) when the disk write fails.
+    // Ko-fi supporter status (top-level "supporter": {"until": <unix>, "paid": true}).
+    // 0 when the account never supported or does not exist. extendSupporter pushes
+    // the date forward by `seconds` from max(now, until); negative seconds claw
+    // time back from until, never below now. A call that changes nothing writes
+    // nothing. Refuses (RAM untouched) when the disk write fails. It never sets
+    // "paid": referral months are supporter time without a real payment.
     static time_t supporterUntil(const DLString &id);
     static bool extendSupporter(const DLString &id, long long seconds);
+
+    // True once a real Ko-fi payment credited the account (KofiLedger sets it,
+    // the boot pass backfills it from the ledger). Perks that need money, not
+    // just supporter time, check this.
+    static bool supporterPaid(const DLString &id);
+    static bool setSupporterPaid(const DLString &id);
 
     // Write text to path via a temp file + rename(). False (target untouched) on
     // any open, write, flush, close or rename failure. Shared with KofiLedger.

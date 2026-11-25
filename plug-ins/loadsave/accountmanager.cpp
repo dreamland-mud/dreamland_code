@@ -28,6 +28,7 @@
 #include "exceptiondbioeof.h"
 #include "logstream.h"
 #include "accountaudit.h"
+#include "kofiledger.h"
 
 using namespace std;
 
@@ -135,6 +136,15 @@ void AccountManager::load()
 
     dir.close();
     LogStream::sendNotice() << "Accounts: loaded " << count << "." << endl;
+
+    // Accounts credited before the "paid" flag existed get it from the ledger.
+    // Idempotent: only a missing flag is written.
+    int backfilled = 0;
+    for (const DLString &id: KofiLedger::paidAccounts())
+        if (exists(id) && !supporterPaid(id) && setSupporterPaid(id))
+            backfilled++;
+    if (backfilled > 0)
+        LogStream::sendNotice() << "Accounts: marked " << backfilled << " paid from the Ko-fi ledger." << endl;
 
     // Reconcile only when there is something to reconcile -- ships dark == no scan.
     // Probe with findAttr, NOT get_json_attribute: the latter goes through getAttr, which
@@ -699,18 +709,32 @@ time_t AccountManager::supporterUntil(const DLString &id)
 bool AccountManager::extendSupporter(const DLString &id, long long seconds)
 {
     map<DLString, Json::Value>::iterator i = accounts.find(id);
-    if (i == accounts.end() || seconds < 0)
+    if (i == accounts.end())
         return false;
-    if (seconds == 0)
-        return true;
 
     long long now = (long long)dreamland->getCurrentTime();
     long long until = (long long)supporterUntil(id);
-    long long base = until > now ? until : now;
+    long long target;
+
+    if (seconds >= 0) {
+        target = (until > now ? until : now) + seconds;
+    } else {
+        // A clawback past the end just ends support: never below now, and an
+        // already lapsed date stays as it is.
+        if (until <= now)
+            return true;
+        target = until + seconds;
+        if (target < now)
+            target = now;
+    }
+
+    if (target == until || seconds == 0)
+        return true;
 
     Json::Value old = i->second.get("supporter", Json::Value());
-    Json::Value sup(Json::objectValue);
-    sup["until"] = (Json::Int64)(base + seconds);
+    // Keep "paid" and any other supporter key: only the date moves.
+    Json::Value sup = old.isObject() ? old : Json::Value(Json::objectValue);
+    sup["until"] = (Json::Int64)target;
     i->second["supporter"] = sup;
 
     if (!saveAccount(id)) {
@@ -724,8 +748,47 @@ bool AccountManager::extendSupporter(const DLString &id, long long seconds)
     Json::Value fields;
     fields["id"] = id.c_str();
     fields["seconds"] = (Json::Int64)seconds;
-    fields["until"] = (Json::Int64)(base + seconds);
+    fields["until"] = (Json::Int64)target;
     AccountAudit::record("supporter", fields);
+    return true;
+}
+
+bool AccountManager::supporterPaid(const DLString &id)
+{
+    map<DLString, Json::Value>::iterator i = accounts.find(id);
+    if (i == accounts.end())
+        return false;
+    Json::Value sup = i->second.get("supporter", Json::Value());
+    if (!sup.isObject())
+        return false;
+    Json::Value paid = sup.get("paid", Json::Value());
+    return paid.isBool() && paid.asBool();
+}
+
+bool AccountManager::setSupporterPaid(const DLString &id)
+{
+    map<DLString, Json::Value>::iterator i = accounts.find(id);
+    if (i == accounts.end())
+        return false;
+    if (supporterPaid(id))
+        return true;
+
+    Json::Value old = i->second.get("supporter", Json::Value());
+    Json::Value sup = old.isObject() ? old : Json::Value(Json::objectValue);
+    sup["paid"] = true;
+    i->second["supporter"] = sup;
+
+    if (!saveAccount(id)) {
+        if (old.isNull())
+            i->second.removeMember("supporter");
+        else
+            i->second["supporter"] = old;
+        return false;
+    }
+
+    Json::Value fields;
+    fields["id"] = id.c_str();
+    AccountAudit::record("supporter_paid", fields);
     return true;
 }
 
