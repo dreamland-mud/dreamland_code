@@ -1807,7 +1807,7 @@ NMI_INVOKE(Root, randomizeNamedArmor, "(obj, ch, tier, slot[, profile]): ста�
     return Register(ok);
 }
 
-NMI_INVOKE(Root, craftRollArmor, "(obj, ch, tier, slot, minCm, maxCm[, force, profile, rolls]): случайные аффиксы на скрафченную броню в окне minCm..maxCm (centi-M, без кривой уровня); имена, AC и цвет остаются свои; force -- 'секция:значение[:стаки]' через пробел (пробел в значении -- '~'), берутся первыми и проходят мимо всех фильтров кроме тира; rolls -- свое число measure rolls (0 = по уровню и слоту); выбор пишется в property craft_picks; возвращает centi-M выпавшего или -1")
+NMI_INVOKE(Root, craftRollArmor, "(obj, ch, tier, slot, minCm, maxCm[, force, profile, rolls, noMagic]): случайные аффиксы на скрафченную броню в окне minCm..maxCm (centi-M, без кривой уровня); имена, AC и цвет остаются свои; force -- 'секция:значение[:стаки]' через пробел (пробел в значении -- '~'), берутся первыми и проходят мимо всех фильтров кроме тира; rolls -- свое число measure rolls (0 = по уровню и слоту); noMagic true -- без аффиксов с пометкой magic в item_affixes.json (крафт члена Клана Ярости), force их сохраняет; выбор пишется в property craft_picks; возвращает centi-M выпавшего или -1")
 {
     ::Object *obj = argnum2item(args, 1);
     Character *ch = argnum2character(args, 2);
@@ -1818,6 +1818,7 @@ NMI_INVOKE(Root, craftRollArmor, "(obj, ch, tier, slot, minCm, maxCm[, force, pr
     DLString force = args.size() > 6 ? argnum2string(args, 7) : DLString::emptyString;
     DLString profile = args.size() > 7 ? argnum2string(args, 8) : DLString::emptyString;
     int rolls = args.size() > 8 ? argnum2number(args, 9) : 0;
+    bool noMagic = args.size() > 9 && argnum2boolean(args, 10);
 
     // A crafted lantern or ring rolls like armor: its slot is priced by the same
     // model, and a crafted piece keeps its own values (no AC is written).
@@ -1836,6 +1837,7 @@ NMI_INVOKE(Root, craftRollArmor, "(obj, ch, tier, slot, minCm, maxCm[, force, pr
     ArmorGenerator gen(obj, ch->getPC(), tier, slot);
     bool ok = gen.craft(minCm, maxCm, force)
                 .measureRolls(rolls)
+                .withoutMagic(noMagic)
                 .caster(profile == "caster")
                 .alignment(ch->alignment)
                 .run();
@@ -1851,7 +1853,7 @@ NMI_INVOKE(Root, itemWindowCurve, "(level, kind[, profile]): множитель 
     return Register((int)(affix_window_curve(level, kind, profile == "caster") * 1000 + 0.5));
 }
 
-NMI_INVOKE(Root, craftRollWeapon, "(obj, ch, tier, minCm, maxCm[, force, profile]): rand_stat для скрафченного оружия с окном аффиксов minCm..maxCm (centi-M, без кривой уровня, двуручное x1.75); руки берутся у прототипа; флаги, которые не дал прошлый бросок (закалка), остаются; force -- имена аффиксов через пробел, берутся первыми; возвращает measure_m")
+NMI_INVOKE(Root, craftRollWeapon, "(obj, ch, tier, minCm, maxCm[, force, profile, noMagic]): rand_stat для скрафченного оружия с окном аффиксов minCm..maxCm (centi-M, без кривой уровня, двуручное x1.75); руки берутся у прототипа; флаги, которые не дал прошлый бросок (закалка), остаются; force -- имена аффиксов через пробел, берутся первыми; noMagic true -- без аффиксов с пометкой magic в item_affixes.json (крафт члена Клана Ярости); возвращает measure_m")
 {
     ::Object *obj = argnum2item(args, 1);
     Character *ch = argnum2character(args, 2);
@@ -1860,6 +1862,7 @@ NMI_INVOKE(Root, craftRollWeapon, "(obj, ch, tier, minCm, maxCm[, force, profile
     int maxCm = argnum2number(args, 5);
     DLString force = args.size() > 5 ? argnum2string(args, 6) : DLString::emptyString;
     DLString profile = args.size() > 6 ? argnum2string(args, 7) : DLString::emptyString;
+    bool noMagic = args.size() > 7 && argnum2boolean(args, 8);
 
     if (obj->item_type != ITEM_WEAPON)
         throw Scripting::Exception("Item is not a weapon for a craft roll.");
@@ -1886,7 +1889,8 @@ NMI_INVOKE(Root, craftRollWeapon, "(obj, ch, tier, minCm, maxCm[, force, profile
         .player(ch->getPC())
         .caster(profile == "caster")
         .tier(tier)
-        .craftWindow(minCm, maxCm);
+        .craftWindow(minCm, maxCm)
+        .withoutMagic(noMagic);
     // A blueprint's hands are its own: never a jackpot two-hander off a one-handed sword.
     if (IS_SET(obj->pIndexData->value[4], WEAPON_TWO_HANDS))
         gen.addRequirement("two_hands");

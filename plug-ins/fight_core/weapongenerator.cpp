@@ -92,6 +92,7 @@ WeaponGenerator::WeaponGenerator()
     align = ALIGN_NONE;
     isCaster = false;
     craftMin = craftMax = -1;
+    noMagic = false;
     aveMult = damrollMult = 1;
     twoHands = twoHandsDecided = false;
     retainChance = 50;
@@ -445,6 +446,7 @@ public:
 
     void setCaster(bool caster) { isCaster = caster; }
     void setAlign(int a) { align = a; }
+    void setNoMagic(bool no) { noMagic = no; }
 
     /** minCm >= 0: a crafted weapon's own window in centi-M (two hands still
      *  scale it), no level curve. */
@@ -680,6 +682,7 @@ WeaponGenerator & WeaponGenerator::randomAffixes()
     WeaponAffixRoller roller(obj, pch, valTier, share);
     roller.setCaster(isCaster);
     roller.setAlign(align);
+    roller.setNoMagic(noMagic);
 
     // Same exclusions the points generator honours: the caller's, the class's and
     // the name's, metal for a druid, hr/dr steps that round to nothing here.

@@ -158,6 +158,9 @@ protected:
     std::set<DLString> forcedKeys;
     /** Measure rolls the caller counted (a jeweler's steeper factor), 0 = item_rolls. */
     int rollsOverride;
+    /** A battlerager's craft: sections and affixes marked "magic" (they cast
+     *  a spell) stay out of the pool. A crafted piece's forced picks still pass. */
+    bool noMagic;
 
     Object *obj;
     PCharacter *pch;
@@ -222,6 +225,8 @@ public:
     }
     /** Measure rolls to scale the stats with, when the caller counts them its own way. */
     ArmorGenerator & measureRolls(int rolls) { this->rollsOverride = rolls; return *this; }
+    /** Leave out the affixes marked "magic": a battlerager crafted it. */
+    ArmorGenerator & withoutMagic(bool no) { this->noMagic = no; return *this; }
     /** centi-M the rolled affixes cost. */
     int total() const { return chosenTotal; }
     /** Boss signature (legendary only): the dead boss's damage type and the
