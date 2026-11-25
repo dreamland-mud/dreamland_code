@@ -1,4 +1,5 @@
 #include "lasthost.h"
+#include "netlists.h"
 #include "logstream.h"
 #include "pcharactermanager.h"
 #include "pcharacter.h"
@@ -45,8 +46,17 @@ void XMLAttributeLastHost::showHosts(ostringstream &buf) const
 {
     Hosts::ValueList list = hosts.toSortedList();
 
-    for (Hosts::ValueList::const_iterator v = list.begin(); v != list.end(); v++) 
-        buf << fmt(0, "%16s %4d", v->first.c_str(), v->second) << endl;
+    for (Hosts::ValueList::const_iterator v = list.begin(); v != list.end(); v++) {
+        buf << fmt(0, "%16s %4d", v->first.c_str(), v->second);
+
+        DLString tag = NetLists::tag(v->first);
+        DLString org = NetLists::org(v->first);
+        if (!tag.empty())
+            buf << " {R" << tag << "{x";
+        if (!org.empty())
+            buf << " " << org;
+        buf << endl;
+    }
 }
 
 void XMLAttributeLastHostListenerPlugin::run(int oldState, int newState, Descriptor *d)

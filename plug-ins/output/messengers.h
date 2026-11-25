@@ -34,4 +34,14 @@ void send_telegram_no_escape(const DLString &content);
 // (so a caller can report "sent" honestly instead of assuming success).
 bool send_email(const DLString &to, const DLString &subject, const DLString &body);
 
+// Mail the gods' inbox (ADMIN_EMAIL) about something an immortal must act on
+// (a pending referral, an unmatched payment, a confirm request). Plain text, no
+// mudtags. Capped per hour so a hook that misfires cannot flood the inbox:
+// past the cap the mail is dropped and logged. True if queued.
+bool send_admin_email(const DLString &subject, const DLString &body);
+
+// Something an immortal must act on: the subject to the private Discord scream
+// channel (where the gods actually look) plus the full mail to ADMIN_EMAIL.
+void send_admin_alert(const DLString &subject, const DLString &body);
+
 #endif

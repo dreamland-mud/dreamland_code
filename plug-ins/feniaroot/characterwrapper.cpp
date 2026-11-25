@@ -551,6 +551,15 @@ NMI_GET( CharacterWrapper, client_src, "метка ?src= ссылки, по ко
     return target->desc->client_src;
 }
 
+NMI_GET( CharacterWrapper, client_device, "случайный id браузера веб-клиента (hex), пустая строка для телнета или без id" )
+{
+    checkTarget( );
+    CHK_NPC
+    if (!target->desc)
+        return "";
+    return target->desc->client_device;
+}
+
 NMI_GET( CharacterWrapper, webclient, "true если использует вебклиент" )
 {
     checkTarget( );

@@ -14,6 +14,7 @@
 
 #include "admincommand.h"
 #include "lasthost.h"
+#include "lastdevice.h"
 #include "pcharactermanager.h"
 #include "pcharacter.h"
 #include "race.h"
@@ -54,7 +55,13 @@ CMDADM(finger)
             if (attr) {
                 attr->showHosts(str);
             }
-            ch->send_to(str);
+
+            XMLAttributeDevices::Pointer devices = pci->getAttributes().findAttr<XMLAttributeDevices>("devices");
+            if (devices && !devices->getDevices().empty()) {
+                str << "Web client devices:" << endl;
+                devices->showDevices(str);
+            }
+            page_to_char(str.str().c_str(), ch);
             return;
         }
 

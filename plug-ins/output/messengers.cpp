@@ -160,6 +160,43 @@ bool send_email(const DLString &to, const DLString &subject, const DLString &bod
     }
 }
 
+// The gods' inbox. Same Gmail account the drainer (bin/iemail) sends from.
+static const char *ADMIN_EMAIL = "dreamland.mud@gmail.com";
+static const int ADMIN_EMAIL_PER_HOUR = 30;
+
+bool send_admin_email(const DLString &subject, const DLString &body)
+{
+    static time_t windowStart = 0;
+    static int sentInWindow = 0;
+
+    // A line break in a header makes the drainer (bin/iemail) die on this
+    // file at every run, and every mail queued behind it stops.
+    DLString oneLine = subject;
+    for (auto &c: oneLine)
+        if (c == '\r' || c == '\n')
+            c = ' ';
+
+    time_t now = dreamland->getCurrentTime();
+    if (now - windowStart >= 3600) {
+        windowStart = now;
+        sentInWindow = 0;
+    }
+
+    if (sentInWindow >= ADMIN_EMAIL_PER_HOUR) {
+        LogStream::sendWarning() << "Admin email dropped (hourly cap): " << oneLine << endl;
+        return false;
+    }
+
+    sentInWindow++;
+    return send_email(ADMIN_EMAIL, "[DreamLand] " + oneLine, body);
+}
+
+void send_admin_alert(const DLString &subject, const DLString &body)
+{
+    send_discord_wiznet(subject);
+    send_admin_email(subject, body);
+}
+
 /** Prepare string to use inside Discord JSON field. Strip tags and colors and trim to size. */
 static DLString discord_string(const DLString &source)
 {

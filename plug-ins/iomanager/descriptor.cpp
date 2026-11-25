@@ -2,6 +2,7 @@
  *
  * ruffina, 2004
  */
+#include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <string.h>
@@ -614,6 +615,18 @@ Descriptor::wsHandlePayload(const Json::Value &cmd)
                     label += l;
             }
         client_src = label;
+    } else if(name == "client_device") {
+        /* Character-less, like client_src: a random id the web client mints
+         * once per browser and sends on every fresh socket. Hex only, 16..64
+         * chars; anything else is ignored and the old value stays. */
+        DLString id = args.empty() ? DLString::emptyString : args.front();
+        bool ok = id.size() >= 16 && id.size() <= 64;
+        for (size_t i = 0; ok && i < id.size(); i++)
+            ok = isxdigit((unsigned char)id[i]);
+        if (ok) {
+            id.toLower();
+            client_device = id;
+        }
     } else if(character) {
         RpcCommandManager::getThis()->run(character, name, args);
     } else {
