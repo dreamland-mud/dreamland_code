@@ -255,7 +255,7 @@ static DLString kofi_match_message(const DLString &msg)
 // it is the payer saying which account the money is for, which is how a gift
 // reaches a friend. A membership is always for the payer: their own Discord and
 // email go first and the code only matches a payer the game does not know yet,
-// so renewals (which carry no message) never split from the first payment.
+// so renewals (which carry no message) do not split from the first payment.
 static DLString kofi_match(const Json::Value &p, DLString &how)
 {
     DLString coded = kofi_match_message(kofi_str(p, "message"));
