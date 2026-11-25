@@ -2,6 +2,7 @@
 #include "configurable.h"
 #include "lasthost.h"
 #include "lastdevice.h"
+#include "hostindex.h"
 #include "netlists.h"
 #include "logstream.h"
 #include "pcharactermanager.h"
@@ -29,29 +30,6 @@ void XMLAttributeLastHost::touchHost(const DLString &host, time_t now)
 bool XMLAttributeLastHost::hasHost(const DLString &host) const
 {
     return hosts.isAvailable(host);
-}
-
-const DLString &XMLAttributeLastHost::getMatchingHost(const DLString &hostPrefix) const
-{
-    Hosts::const_iterator h;
-    for (h = hosts.begin(); h != hosts.end(); h++)
-        if (hostPrefix.strPrefix(h->first))
-            return h->first;
-
-    return DLString::emptyString;
-}
-
-bool XMLAttributeLastHost::isUnique(const DLString &playerName, const DLString &host)
-{
-    for (auto &p: PCharacterManager::getPCM()) {
-        if (playerName != p.first) {
-            XMLAttributeLastHost::Pointer attr = p.second->getAttributes().findAttr<XMLAttributeLastHost>("lasthost");
-            if (attr && attr->hasHost(host))
-                return false;
-        }
-    }
-
-    return true;
 }
 
 bool XMLAttributeLastHost::prune(time_t seed, time_t cutoff, bool apply, int &seeded, int &dropped)
@@ -167,6 +145,7 @@ void XMLAttributeLastHostListenerPlugin::run(int oldState, int newState, Descrip
     pch->setLastAccessHost(host);
     XMLAttributeLastHost::Pointer attr = pch->getAttributes( ).getAttr<XMLAttributeLastHost>("lasthost");
     attr->addHost(host, now);
+    HostIndex::addHost(pch->getName(), host);
     pch->save();
 }
 

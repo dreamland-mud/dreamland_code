@@ -27,7 +27,6 @@ public:
         bool hasHost(const DLString &host) const;
         void showHosts(ostringstream &buf) const;
         const Hosts & getHosts() const { return hosts; }
-        const DLString &getMatchingHost(const DLString &hostPrefix) const;
 
         /** Undated rows get `seed`, rows last seen before `cutoff` go. True if anything
          *  changed; with apply false nothing is touched and it says what would change. */
@@ -35,9 +34,6 @@ public:
 
         /** Last-seen date of a row, `fallback` when it has none. */
         time_t seenOf(const DLString &host, time_t fallback) const;
-
-        /** Check if this player has a unique ip address */
-        static bool isUnique(const DLString &playerName, const DLString &host);
 
         /** The prune rule for any count map with a last-seen map beside it (hosts, web devices). */
         static bool pruneRows(Hosts &counts, Dates &dates, time_t seed, time_t cutoff, int &seeded, int &dropped);

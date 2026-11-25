@@ -7,7 +7,7 @@
 #include "commandinterpreter.h"
 #include "commandbase.h"
 #include "json/json.h"
-#include "lasthost.h"
+#include "hostindex.h"
 #include "websocketrpc.h"
 #include "lastlogstream.h"
 #include "logstream.h"
@@ -125,7 +125,7 @@ static bool create_log_entry(InterpretArguments &iargs)
     }
 
     DLString ip = iargs.ch->getPC()->getLastAccessHost();
-    bool unique = XMLAttributeLastHost::isUnique(iargs.ch->getPC()->getName(), ip);
+    bool unique = HostIndex::hostUnique(iargs.ch->getPC()->getName(), ip);
     log["ip"] = unique ? "new" : "old";
 
     try {

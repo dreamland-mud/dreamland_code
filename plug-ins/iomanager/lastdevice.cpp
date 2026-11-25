@@ -2,6 +2,7 @@
  */
 #include "lastdevice.h"
 #include "lasthost.h"
+#include "hostindex.h"
 #include "dreamland.h"
 #include "pcharacter.h"
 #include "descriptor.h"
@@ -72,5 +73,6 @@ void XMLAttributeDevicesListenerPlugin::run(int oldState, int newState, Descript
 
     XMLAttributeDevices::Pointer attr = pch->getAttributes().getAttr<XMLAttributeDevices>("devices");
     attr->addDevice(d->client_device, now);
+    HostIndex::addDevice(pch->getName(), d->client_device);
     pch->save();
 }
