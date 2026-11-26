@@ -72,6 +72,7 @@
 #include "pcharacter.h"
 #include "player_utils.h"
 #include "race.h"
+#include "transferlog.h"
 #include "object.h"
 #include "dlscheduler.h"
 #include "wiznet.h"
@@ -294,6 +295,11 @@ void auction_update (void)
                      auction->buyer,auction->item,0,TO_ROOM,POS_RESTING);
 
                 auction->seller->gold += auction->bet; /* give him the money */
+
+                Json::Value price;
+                price["price"] = auction->bet;
+                TransferLog::record( "auction", auction->seller, auction->buyer, auction->item, price );
+
                 oldact_p(_("Из дымки появляется аукционер и передает тебе вырученные деньги."),
                      auction->seller,auction->item,0,TO_CHAR,POS_DEAD);
                 oldact_p(_("$c1 получает вырученные деньги от прибывшего аукционера."),

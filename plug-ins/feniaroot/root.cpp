@@ -95,6 +95,7 @@
 #include "questmanager.h"
 #include "accountmanager.h"
 #include "accountaudit.h"
+#include "transferlog.h"
 #include "questregistrator.h"
 #include "questscrollhook.h"
 #include "behaviorwrapper.h"
@@ -835,6 +836,58 @@ NMI_INVOKE(Root, auditLog, "(event, fields): append {ts, event, src: fenia, ...f
     // Set after the map, so a script row can never pass for an engine one.
     fields["src"] = "fenia";
     AccountAudit::record( event, fields );
+    return Register( );
+}
+
+// One side of a transfer: a player, a player's name, or NONE / "" for a side
+// that is not a player (a clan treasury). The first side that stands in a room
+// gives the row its room.
+static DLString transfer_side( const Register &reg, int &room )
+{
+    if (reg.type == Register::NONE)
+        return DLString::emptyString;
+    if (reg.type == Register::STRING)
+        return arg2string( reg );
+
+    PCharacter *pch = arg2player( reg );
+    if (room == 0 && pch->in_room)
+        room = pch->in_room->vnum;
+    return pch->getName( );
+}
+
+NMI_INVOKE(Root, transferLog, "(kind, from, to, obj, fields): append a player-to-player transfer row to var/log/transfer.jsonl; kind is a-z and _, from/to a player, a name or NONE for a clan side, obj or NONE, fields a .Map() or NONE")
+{
+    if (args.size( ) < 3)
+        throw Scripting::NotEnoughArgumentsException( );
+
+    DLString kind = argnum2string( args, 1 );
+    if (kind.empty( ) || kind.size( ) > 20)
+        throw Scripting::Exception( "transferLog: kind must be 1-20 chars" );
+    for (DLString::size_type k = 0; k < kind.size( ); k++) {
+        char c = kind[k];
+        if (!((c >= 'a' && c <= 'z') || c == '_'))
+            throw Scripting::Exception( "transferLog: kind takes a-z and _ only" );
+    }
+
+    // The receiver's room first, as the C++ rows have it.
+    int room = 0;
+    DLString to = transfer_side( argnum( args, 3 ), room );
+    DLString from = transfer_side( argnum( args, 2 ), room );
+    if (from.empty( ) && to.empty( ))
+        throw Scripting::Exception( "transferLog: from and to are both empty" );
+
+    ::Object *obj = 0;
+    if (args.size( ) > 3 && argnum( args, 4 ).type != Register::NONE)
+        obj = argnum2item( args, 4 );
+
+    Json::Value fields;
+    if (args.size( ) > 4 && argnum( args, 5 ).type != Register::NONE) {
+        fields = JsonUtils::fromRegister( argnum( args, 5 ) );
+        if (!fields.isObject( ))
+            throw Scripting::Exception( "transferLog: fields must be a .Map()" );
+    }
+    fields["src"] = "fenia";
+    TransferLog::record( kind, from, to, room, obj, fields );
     return Register( );
 }
 

@@ -19,6 +19,7 @@
 #include "follow_utils.h"
 #include "merc.h"
 #include "def.h"
+#include "transferlog.h"
 #include "l10n.h"
 #include "fenia_utils.h"
 
@@ -96,6 +97,28 @@ void oprog_handoff_stamp( Object *obj, Character *ch )
     handoff_stamp_rec( obj, stamp );
 }
 
+// A container nobody let go of can still hold what a player put into it while
+// it lay on the floor. Taking the whole container takes those items too: one
+// transfer ledger row each (the mule alert stays on the top object only).
+static void handoff_ledger_contents( Object *container, Character *ch, time_t now )
+{
+    for (Object *o = container->contains; o; o = o->next_content) {
+        auto it = handoffStamps.find( o->getID( ) );
+        if (it == handoffStamps.end( )) {
+            handoff_ledger_contents( o, ch, now );
+            continue;
+        }
+
+        if (it->second.name == ch->getNameC( ) || now - it->second.when > HANDOFF_TTL)
+            continue;
+
+        Json::Value extra;
+        extra["ago"] = (int)(now - it->second.when);
+        TransferLog::record( "pickup", it->second.name, ch->getNameC( ),
+                             ch->in_room ? ch->in_room->vnum : 0, o, extra );
+    }
+}
+
 // Clears the stamps whoever takes the object (a scavenger mob too), so a stamp
 // always means "let go and not picked up since". Window: HANDOFF_TTL.
 static void handoff_check( Object *obj, Character *ch )
@@ -107,6 +130,8 @@ static void handoff_check( Object *obj, Character *ch )
     // by give carries nothing stale out of the previous floor stay.
     auto it = handoffStamps.find( obj->getID( ) );
     if (it == handoffStamps.end( )) {
+        if (!ch->is_npc( ))
+            handoff_ledger_contents( obj, ch, dreamland->getCurrentTime( ) );
         handoff_clear_rec( obj );
         return;
     }
@@ -120,6 +145,11 @@ static void handoff_check( Object *obj, Character *ch )
     time_t now = dreamland->getCurrentTime( );
     if (now - stamp.when > HANDOFF_TTL)
         return;
+
+    Json::Value extra;
+    extra["ago"] = (int)(now - stamp.when);
+    TransferLog::record( "pickup", stamp.name, ch->getNameC( ),
+                         ch->in_room ? ch->in_room->vnum : 0, obj, extra );
 
     gprog( "onHandoff", "COssi", ch, obj, stamp.name.c_str( ), stamp.host.c_str( ),
            (int)(now - stamp.when) );

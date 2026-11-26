@@ -57,6 +57,7 @@ accountmanager.cpp \
 linkingcode.cpp \
 emailcode.cpp \
 accountaudit.cpp \
+transferlog.cpp \
 kofiledger.cpp
 
 libloadsave_la_MOC = \

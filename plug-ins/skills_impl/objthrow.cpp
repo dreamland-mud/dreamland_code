@@ -41,6 +41,7 @@
 #include "act.h"
 #include "def.h"
 #include "l10n.h"
+#include "transferlog.h"
 
 CLAN(battlerager);
 PROF(warrior);
@@ -103,12 +104,14 @@ bool check_obj_dodge( Character *ch, Character *victim, Object *obj, int bonus )
         oldact(_("$C1 ловит руками $o4."),ch,obj,victim,TO_CHAR);
         oldact(_("$c1 ловит руками $o4."),victim,obj,ch,TO_NOTVICT);
         obj_to_char(obj,victim);
+        TransferLog::record("throw", ch, victim, obj);
     }
     else if (canCatchMissile) {
         oldact(_("Ты ловишь руками $o4."),ch,obj,victim,TO_VICT);
         oldact(_("$C1 ловит руками $o4."),ch,obj,victim,TO_CHAR);
         oldact(_("$c1 ловит руками $o4."),victim,obj,ch,TO_NOTVICT);
         obj_to_char(obj,victim);
+        TransferLog::record("throw", ch, victim, obj);
     } else {
         oldact(_("Ты уклоняешься от $o2."),ch,obj,victim,TO_VICT);
         oldact(_("$C1 уклоняется от $o2."),ch,obj,victim,TO_CHAR);
