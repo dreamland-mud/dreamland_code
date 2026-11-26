@@ -2,9 +2,8 @@
  *
  * ruffina, 2004
  */
-#include <iconv.h>
+#include <algorithm>
 #include <string.h>
-#include <memory>
 
 #include "defaultbufferhandler.h"
 #include "logstream.h"
@@ -19,6 +18,10 @@
 #include "colour.h"
 #include "l10n.h"
 #include "def.h"
+#include "iconvmap.h"
+
+static IconvMap utf2koi("utf-8", "koi8-u//IGNORE");
+static IconvMap koi2utf("koi8-u", "utf-8");
 
 DLString msg_spam_warning( Character *ch );
 
@@ -74,25 +77,17 @@ DefaultBufferHandler::convertCodepage(char *from, size_t from_length, char *to, 
         to[i] = 0;
         return from_length;
     } else {
-        static const char *fromcode = "utf-8";
-        static const char *tocode = "koi8-u";
-        iconv_t icnv_desc = iconv_open(tocode, fromcode);
+        // Same conversion as web client input, so a line (a password too)
+        // typed in a UTF-8 telnet client reaches the game as it would from
+        // the web: unmappable characters are dropped, the rest of the line kept.
+        // Every UTF-8 character becomes at most one KOI8 byte here, so the
+        // result never outgrows 'from'.
+        std::string koi = utf2koi(std::string(from, from_length));
+        size_t len = std::min(koi.size(), to_length);
 
-        if (icnv_desc == (iconv_t)(-1)) {
-            syserr("Failed to iconv_open %s to %s.", fromcode, tocode);
-            return -1;
-        }
-
-        size_t rest = to_length;
-        
-        if (iconv(icnv_desc, &from, &from_length, &to, &rest) < 0) {
-            syserr("Failed to convert characters from %s to %s.", fromcode, tocode);
-            return -1;
-        }
-
-        *to = '\0';
-        iconv_close(icnv_desc);
-        return to_length - rest;
+        memcpy(to, koi.data(), len);
+        to[len] = '\0';
+        return len;
     }
 }
 
@@ -148,11 +143,6 @@ DefaultBufferHandler::read( Descriptor *d )
 
     char koi8[line_length+2];
     line_length = convertCodepage(line, line_length, koi8, line_length);
-
-    if(line_length < 0) {
-        d->close( );
-        return false;
-    }
 
     // Cut off too long lines and notify the user.
     if(line_length >= MAX_INPUT_LENGTH - 2) {
@@ -275,10 +265,6 @@ DefaultBufferHandler::write( Descriptor *d, const char *txt )
     length = strlen(txt);
 
 
-    std::unique_ptr<char[]> txt_buf(new char[length + 1]);
-    strcpy(txt_buf.get(), txt);
-    char *txt_ptr = txt_buf.get();
-
     const unsigned char *to = russian_codepages[codepage].to;
 
     /*
@@ -337,31 +323,11 @@ DefaultBufferHandler::write( Descriptor *d, const char *txt )
      * utf-8 write
      */
     if (!to) {
-        static const char *tocode = "utf-8";
-        static const char *fromcode = "koi8-u";
-        iconv_t icnv_desc = iconv_open(tocode, fromcode);
+        // The buffer was grown for 6 bytes per input byte above; KOI8 needs 3 at most.
+        std::string utf = koi2utf(std::string(txt, length));
 
-        if (icnv_desc == (iconv_t)(-1)) {
-            syserr("Failed to iconv_open %s to %s.", fromcode, tocode);
-            d->close( );
-            return;
-        }
-        
-        size_t icnv_insize = length;
-        char icnv_outbuf[length * 6];
-        char *icnv_outptr = icnv_outbuf;
-        size_t icnv_outsize = sizeof(icnv_outbuf);
-
-        if (iconv(icnv_desc, &txt_ptr, &icnv_insize, &icnv_outptr, &icnv_outsize) < 0) {
-            syserr("Failed to convert characters from %s to %s, txt[%s].", fromcode, tocode, txt);
-            d->close( );
-            return;
-        }
-        
-        memmove(d->outbuf + d->outtop, icnv_outbuf, icnv_outptr - icnv_outbuf );
-        d->outtop += icnv_outptr - icnv_outbuf ;
-
-        iconv_close(icnv_desc);
+        memmove(d->outbuf + d->outtop, utf.data(), utf.size());
+        d->outtop += utf.size();
         return;
     }
 
@@ -402,38 +368,11 @@ DLString DefaultBufferHandler::convert(const char *txt)
 
     const unsigned char *to = russian_codepages[codepage].to;
 
-    char txt_buf[length + 1];
-    strcpy(txt_buf, txt);
-    char *txt_ptr = txt_buf;
-
     /*
      * utf-8 write
      */
     if (!to) {
-        DLString result;
-        static const char *tocode = "utf-8";
-        static const char *fromcode = "koi8-u";
-        iconv_t icnv_desc = iconv_open(tocode, fromcode);
-
-        if (icnv_desc == (iconv_t)(-1)) {
-            syserr("Failed to iconv_open %s to %s.", fromcode, tocode);
-            return result;
-        }
-    
-        size_t icnv_insize = length;
-        char icnv_outbuf[length * 6];
-        char *icnv_outptr = icnv_outbuf;
-        size_t icnv_outsize = sizeof(icnv_outbuf);
-
-        if (iconv(icnv_desc, &txt_ptr, &icnv_insize, &icnv_outptr, &icnv_outsize) < 0) {
-            syserr("Failed to convert characters from %s to %s, txt[%s].", fromcode, tocode, txt);
-            return result;
-        }
-
-        icnv_outbuf[icnv_outptr-icnv_outbuf] = 0;
-        result.assign(icnv_outbuf);    
-        iconv_close(icnv_desc);
-        return result;
+        return koi2utf(std::string(txt, length));
     }
 
     /*
