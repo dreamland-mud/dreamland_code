@@ -11,7 +11,6 @@
 class Character;
 class Object;
 
-bool check_obj_dodge( Character *ch, Character *victim, Object *obj, int bonus );
 Character * find_char( Character *ch, const char *argument, int door, int *range, std::ostringstream &errbuf );
 
 

@@ -324,11 +324,13 @@ static void put_money_container(Character *ch, int amount, const char *currencyN
         }
     }
     
-    // Merged coins are not all the putter's: only a fresh pile gets stamped.
+    // Merged coins are not all the putter's: a fresh pile gets the full stamp,
+    // a merged one a ledger-only stamp with what was added.
     bool coinsThere = false;
     for (Object *o = container->contains; o; o = o->next_content)
         if (o->item_type == ITEM_MONEY)
             coinsThere = true;
+    int addedGold = gold, addedSilver = silver;
 
     // Add money to the container or merge with existing coins.
     ch->silver -= silver;
@@ -337,8 +339,12 @@ static void put_money_container(Character *ch, int amount, const char *currencyN
     extract_obj(money);
     money = Money::create( gold, silver );
     obj_to_obj(money, container);
-    if (!coinsThere && container_unattended( container ))
-        oprog_handoff_stamp( money, ch );
+    if (container_unattended( container )) {
+        if (coinsThere)
+            oprog_handoff_stamp_merged( money, ch, addedGold, addedSilver );
+        else
+            oprog_handoff_stamp( money, ch );
+    }
 }
 
 CMDRUNP( put )

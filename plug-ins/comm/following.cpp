@@ -33,6 +33,7 @@
 #include "merc.h"
 #include "def.h"
 #include "l10n.h"
+#include "transferlog.h"
 
 CLAN(battlerager);
 CLAN(ruler);
@@ -455,6 +456,11 @@ CMDRUN( split )
             oldact( msgGroup.c_str(), ch, 0, gch, TO_VICT);
             gch->gold += share_gold;
             gch->silver += share_silver;
+
+            Json::Value coins;
+            coins["gold"] = share_gold;
+            coins["silver"] = share_silver;
+            TransferLog::record( "split", ch, gch, 0, coins );
         }
     }
 

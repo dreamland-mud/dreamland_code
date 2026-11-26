@@ -58,7 +58,8 @@ void TransferLog::record(const DLString &kind, const DLString &from, const DLStr
 
         if (obj) {
             row["vnum"] = obj->pIndexData ? obj->pIndexData->vnum : 0;
-            row["oid"] = Json::Int64(obj->getID());
+            // A string: a Fenia reader would cut a 64-bit number to 32 bits.
+            row["oid"] = std::to_string(obj->getID());
             row["lvl"] = obj->level;
             row["cost"] = obj->cost;
 

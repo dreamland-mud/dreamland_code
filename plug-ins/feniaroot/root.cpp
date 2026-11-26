@@ -846,8 +846,16 @@ static DLString transfer_side( const Register &reg, int &room )
 {
     if (reg.type == Register::NONE)
         return DLString::emptyString;
-    if (reg.type == Register::STRING)
-        return arg2string( reg );
+    if (reg.type == Register::STRING) {
+        // A name must be a player's, as a wrapper side must be a player.
+        DLString name = arg2string( reg );
+        if (name.empty( ))
+            return name;
+        PCMemoryInterface *pcm = PCharacterManager::find( name.capitalize( ) );
+        if (!pcm)
+            throw Scripting::Exception( "transferLog: no player named " + name );
+        return pcm->getName( );
+    }
 
     PCharacter *pch = arg2player( reg );
     if (room == 0 && pch->in_room)

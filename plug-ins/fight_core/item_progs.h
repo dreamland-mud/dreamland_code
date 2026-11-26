@@ -28,4 +28,8 @@ bool omprog_give( Object *obj, Character *ch, Character *victim );
 // In memory only: a reboot or plugin reload forgets every stamp.
 void oprog_handoff_stamp( Object *obj, Character *ch );
 
+// A coin pile merged with coins already in the container: stamped for the
+// transfer ledger only (the mule alert skips it), with what ch added.
+void oprog_handoff_stamp_merged( Object *money, Character *ch, int gold, int silver );
+
 #endif

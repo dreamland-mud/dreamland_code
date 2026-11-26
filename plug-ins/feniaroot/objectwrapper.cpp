@@ -757,6 +757,14 @@ NMI_INVOKE( ObjectWrapper, extract , "(): полностью уничтожит�
     return Register();
 }
 
+NMI_INVOKE( ObjectWrapper, handoffStamp, "(ch): mark the item as let go of by player ch, as drop and put do, for the mule check and the transfer ledger; mobs are ignored")
+{
+    checkTarget();
+    Character *ch = argnum2character(args, 1);
+    oprog_handoff_stamp( target, ch );
+    return Register();
+}
+
 NMI_INVOKE( ObjectWrapper, get_extra_descr , "(key): найти экстра-описание с ключевым словом key")
 {
     checkTarget();
