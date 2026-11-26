@@ -139,7 +139,7 @@ CMDRUN(alias)
             return;
         }
 
-        buf << "Определенные синонимы:" << endl;
+        buf << _("Определенные синонимы:").getMessage(viewerLang(pch)) << endl;
         
         for (i = aliases->begin( ); i != aliases->end( ); i++)
             buf << "    " << i->first << ":  " << aliasBodyForDisplay( i->second.getValue( ) ) << "{x" << endl;
