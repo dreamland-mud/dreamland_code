@@ -124,7 +124,7 @@ static DLString vault_type_label( int itype, lang_t lang )
 // label, exact or as a prefix ("кольцо" -> "кольцо для ключей").
 static int vault_type_lookup( const DLString &arg, lang_t lang )
 {
-    int t = item_table.value( arg );
+    int t = item_table.value( arg, true );     // exact: 'key' is key, not keyring
     if ( t != NO_FLAG )
         return t;
 
@@ -383,11 +383,11 @@ static DLString vault_type_summary_line( const std::vector<BankEntry> &entries, 
         if ( k > 0 )
             buf << "  ";
         buf << "{hc'" << cmdPrefix << " filter " << tally[k].first << "'"
-            << vault_upper( vault_type_label( item_table.value( tally[k].first ), lang ) )
+            << vault_upper( vault_type_label( item_table.value( tally[k].first, true ), lang ) )
             << " (" << tally[k].second << "){x";
 
         if ( web && web->active( ) ) {
-            DLString label = vault_type_label( item_table.value( tally[k].first ), lang )
+            DLString label = vault_type_label( item_table.value( tally[k].first, true ), lang )
                              + " (" + DLString( tally[k].second ) + ")";
             int row = web->row( label, tally[k].first,
                                 lmsg( lang, "filter by type", "фильтр по типу", "фільтр за типом" ) );
@@ -397,11 +397,180 @@ static DLString vault_type_summary_line( const std::vector<BankEntry> &entries, 
     return DLString( buf.str( ) );
 }
 
+/*-------------------------------------------------------------------------
+ * paging: every listing (list, find, filter, an ambiguous get) prints at most
+ * VAULT_PAGE_SIZE rows per call, so a huge clan vault never floods the client.
+ * Row numbers stay full-list indices.
+ *------------------------------------------------------------------------*/
+static const int VAULT_PAGE_SIZE = 100;
+
+// One paged view and the command that asks for another page of it.
+struct VaultPager {
+    DLString cmd;       // English stem a link sends: 'vault [*Owner] find sword'
+    DLString say;       // the same stem as the viewer types it
+    bool linkable;      // false when a player word holds a quote: plain hint only
+    int page;           // requested page, 1-based
+    DLString typed;     // the page word as typed, echoed when that page doesn't exist
+};
+
+// A word with a space must be quoted to survive as one argument again, and so
+// must one with '|', which the interpreter would split into two commands.
+static DLString vault_quote_arg( const DLString &arg )
+{
+    if ( arg.find_first_of( " |" ) == DLString::npos )
+        return arg;
+    return DLString( "\"" ) + arg + "\"";
+}
+
+// cmdWord/sayWord: the subcommand in English and in the viewer's language.
+// cmdArg/sayArg: the view's own argument (search word, type), empty for list.
+static VaultPager vault_pager( const DLString &cmdPrefix, lang_t lang,
+                               const DLString &cmdWord, const DLString &sayWord,
+                               const DLString &cmdArg, const DLString &sayArg )
+{
+    VaultPager pg;
+    pg.cmd = cmdPrefix + " " + cmdWord;
+    pg.say = vault_say_prefix( cmdPrefix, lang ) + " " + sayWord;
+    if ( !cmdArg.empty( ) )
+        pg.cmd = pg.cmd + " " + vault_quote_arg( cmdArg );
+    if ( !sayArg.empty( ) )
+        pg.say = pg.say + " " + vault_quote_arg( sayArg );
+    pg.linkable = cmdArg.find_first_of( "'\"" ) == DLString::npos
+                  && sayArg.find_first_of( "'\"" ) == DLString::npos;
+    pg.page = 1;
+    return pg;
+}
+
+static VaultPager vault_pager_list( const DLString &cmdPrefix, lang_t lang )
+{
+    return vault_pager( cmdPrefix, lang, "list", lmsg( lang, "list", "список", "список" ),
+                        DLString::emptyString, DLString::emptyString );
+}
+
+static VaultPager vault_pager_find( const DLString &cmdPrefix, lang_t lang, const DLString &kw )
+{
+    return vault_pager( cmdPrefix, lang, "find", lmsg( lang, "find", "найти", "знайти" ), kw, kw );
+}
+
+// The link sends the canonical type name. The hint shows the viewer's label
+// when typing it resolves back to the same type, else the canonical name too
+// (EN "tattoo" labels craft_tattoo but types as the religion-mark type).
+static VaultPager vault_pager_filter( const DLString &cmdPrefix, lang_t lang, int ft )
+{
+    DLString canonical = item_table.name( ft );
+    DLString label = vault_type_label( ft, lang );
+    DLString sayArg = ( vault_type_lookup( label, lang ) == ft ) ? label : canonical;
+    return vault_pager( cmdPrefix, lang, "filter", lmsg( lang, "filter", "фильтр", "фільтр" ),
+                        canonical, sayArg );
+}
+
+// Optional page argument: a number is the page, anything else means page 1.
+static void vault_pager_arg( VaultPager &pg, DLString &args )
+{
+    DLString arg = args.getOneArgument( );
+    pg.typed = arg;
+    pg.page = 1;
+    if ( !arg.isNumber( ) || arg == "-" )
+        return;
+    if ( arg.size( ) > 6 )          // keep atoi in range; far past any real last page
+        pg.page = 999999;
+    else
+        pg.page = atoi( arg.c_str( ) );
+}
+
+static int vault_page_count( int total )
+{
+    return ( total + VAULT_PAGE_SIZE - 1 ) / VAULT_PAGE_SIZE;
+}
+
+// '<stem> <page>' as a hint. The link label carries no quotes: a client that
+// refuses the cmd attribute sends the label instead, and that must still be the
+// working command, not a quote-led 'say'.
+static DLString vault_page_link( const VaultPager &pg, int page )
+{
+    if ( !pg.linkable )
+        return fmt( 0, "{y'%s %d'{x", pg.say.c_str( ), page );
+    return fmt( 0, "{y'{hc'%s %d'%s %d{hx'{x", pg.cmd.c_str( ), page, pg.say.c_str( ), page );
+}
+
+// Settle pg.page against 'total' rows. Past the end: with fallback show page 1
+// (find, where a trailing number may belong to the item name), otherwise print
+// one line naming the last page and return false.
+static bool vault_page_valid( Character *ch, int total, VaultPager &pg, lang_t lang, bool fallback )
+{
+    int pages = vault_page_count( total );
+    if ( pg.page >= 1 && pg.page <= pages )
+        return true;
+
+    if ( fallback ) {
+        pg.page = 1;
+        return true;
+    }
+
+    ch->pecho( lmsg( lang,
+        "There is no page %s. The last one is %s.",
+        "Страницы %s нет. Последняя -- %s.",
+        "Сторінки %s немає. Остання -- %s." ),
+        pg.typed.c_str( ), vault_page_link( pg, pages ).c_str( ) );
+    return false;
+}
+
+// Web list window title, set only when there is more than one page.
+static DLString vault_page_title( int total, const VaultPager &pg, lang_t lang )
+{
+    int pages = vault_page_count( total );
+    if ( pages <= 1 )
+        return DLString::emptyString;
+    return fmt( 0, lmsg( lang,
+        "Vault, page %d of %d",
+        "Хранилище, страница %d из %d",
+        "Сховище, сторінка %d з %d" ), pg.page, pages );
+}
+
+// "Page X of Y." right under a header, so a screen reader hears it before the rows.
+static void vault_page_header( Character *ch, int total, const VaultPager &pg, lang_t lang )
+{
+    int pages = vault_page_count( total );
+    if ( pages <= 1 )
+        return;
+    ch->pecho( lmsg( lang,
+        "Page %d of %d.",
+        "Страница %d из %d.",
+        "Сторінка %d з %d." ), pg.page, pages );
+}
+
+// The web list's own "next page" row: verb 'open' shows the answer as the next
+// list in the same window.
+static void vault_page_web_next( WebList &web, int total, const VaultPager &pg, lang_t lang )
+{
+    if ( !web.active( ) || !pg.linkable || pg.page >= vault_page_count( total ) )
+        return;
+    int row = web.row( lmsg( lang, "Next page", "Следующая страница", "Наступна сторінка" ), "next" );
+    web.action( row, "open", pg.cmd + " " + DLString( pg.page + 1 ) );
+}
+
+// "Page X of Y. Next: ..." -- only while more pages follow.
+static void vault_page_footer( Character *ch, int total, const VaultPager &pg, lang_t lang,
+                               const DLString &cmdPrefix )
+{
+    int pages = vault_page_count( total );
+    if ( pg.page >= pages )
+        return;
+
+    ch->pecho( lmsg( lang,
+        "Page %d of %d. Next: %s. Or narrow with {y'%s find <word>'{x.",
+        "Страница %d из %d. Дальше: %s. Или сузь через {y'%s найти <слово>'{x.",
+        "Сторінка %d з %d. Далі: %s. Або звузь через {y'%s знайти <слово>'{x." ),
+        pg.page, pages, vault_page_link( pg, pg.page + 1 ).c_str( ),
+        vault_say_prefix( cmdPrefix, lang ).c_str( ) );
+}
+
 // Full listing. Over 50 entries collapses to the per-type overview unless
-// forceFull (explicit 'vault list' / 'vault all').
+// forceFull (explicit 'vault list' / 'vault all'), which shows the page named
+// in pageArgs, VAULT_PAGE_SIZE rows at a time.
 static void vault_list( Character *ch, const std::vector<BankEntry> &entries,
                         lang_t lang, const DLString &ownerLabel, const DLString &cmdPrefix,
-                        bool forceFull, const DLString &kind )
+                        bool forceFull, DLString pageArgs, const DLString &kind )
 {
     bool isClan   = ( kind == "clan" );
     bool isShared = ( kind == "account" );
@@ -430,6 +599,13 @@ static void vault_list( Character *ch, const std::vector<BankEntry> &entries,
         return;
     }
 
+    int total = (int)entries.size( );
+    VaultPager pg = vault_pager_list( cmdPrefix, lang );
+    if ( forceFull )            // bare 'vault' at <= 50 entries is a single page
+        vault_pager_arg( pg, pageArgs );
+    if ( !vault_page_valid( ch, total, pg, lang, false ) )
+        return;
+
     // Count header -- amount-aware noun via %I (1 предмет / 3 предмета / 17 предметов).
     if ( !ownerLabel.empty( ) )
         ch->pecho( lmsg( lang,
@@ -456,7 +632,8 @@ static void vault_list( Character *ch, const std::vector<BankEntry> &entries,
             "У твоєму сховищі зберігається %d %Iпредмет|предмети|предметів:" ),
             (int)entries.size( ), (int)entries.size( ) );
 
-    WebList web( ch, "vault" );
+    WebList web( ch, "vault",
+                 forceFull ? vault_page_title( total, pg, lang ) : DLString::emptyString );
 
     if ( entries.size( ) > 50 && !forceFull ) {
         ch->pecho( lmsg( lang,
@@ -467,14 +644,18 @@ static void vault_list( Character *ch, const std::vector<BankEntry> &entries,
         ch->pecho( "%s", vault_type_summary_line( entries, lang, cmdPrefix, &web ).c_str( ) );
         web.send( );
         ch->pecho( lmsg( lang,
-            "({y'%s list'{x shows every entry.)",
-            "({y'%s список'{x покажет все записи.)",
-            "({y'%s список'{x покаже всі записи.)" ), vault_say_prefix( cmdPrefix, lang ).c_str( ) );
+            "({y'%s list'{x shows every entry, page by page.)",
+            "({y'%s список'{x покажет все записи по страницам.)",
+            "({y'%s список'{x покаже всі записи посторінково.)" ), vault_say_prefix( cmdPrefix, lang ).c_str( ) );
         return;
     }
 
-    for ( size_t i = 0; i < entries.size( ); i++ )
-        vault_show_entry( ch, (int)i + 1, entries[i], lang, cmdPrefix, &web );
+    vault_page_header( ch, total, pg, lang );
+    int from = ( pg.page - 1 ) * VAULT_PAGE_SIZE;
+    int to = std::min( total, from + VAULT_PAGE_SIZE );
+    for ( int i = from; i < to; i++ )
+        vault_show_entry( ch, i + 1, entries[i], lang, cmdPrefix, &web );
+    vault_page_web_next( web, total, pg, lang );
 
     ch->pecho( lmsg( lang,
         "Use {y'%s get <number|name>'{x to take one out, {y'%s find <word>'{x to search. By type:",
@@ -483,6 +664,7 @@ static void vault_list( Character *ch, const std::vector<BankEntry> &entries,
         vault_say_prefix( cmdPrefix, lang ).c_str( ), vault_say_prefix( cmdPrefix, lang ).c_str( ) );
     ch->pecho( "%s", vault_type_summary_line( entries, lang, cmdPrefix, &web ).c_str( ) );
     web.send( );
+    vault_page_footer( ch, total, pg, lang, cmdPrefix );
 }
 
 /*-------------------------------------------------------------------------
@@ -495,21 +677,35 @@ static const char *WORDS_FILTER[] = { "filter", "type", "фильтр", "філ�
 static const char *WORDS_LIST[]   = { "list", "all", "список", "все", "усе", 0 };
 
 // Print the entries at the given ORIGINAL full-list indices (so the row numbers
-// match what 'vault get <n>' expects), then the get hint. Used by find/filter.
+// match what 'vault get <n>' expects), then the get hint. Used by find, filter
+// and an ambiguous get. Shows pg.page of the hits, already settled by
+// vault_page_valid. webFrame false prints text only: a list window re-sends the
+// command that opened it after every Get, so only a command that is safe to
+// repeat (find, filter) may open one -- never 'vault get <word>'.
 static void vault_show_rows( Character *ch, const std::vector<BankEntry> &entries,
-                             const std::vector<int> &hitIdx, lang_t lang, const DLString &cmdPrefix )
+                             const std::vector<int> &hitIdx, lang_t lang, const DLString &cmdPrefix,
+                             const VaultPager &pg, bool webFrame )
 {
-    WebList web( ch, "vault" );
+    int total = (int)hitIdx.size( );
+    WebList web( ch, "vault", vault_page_title( total, pg, lang ) );
+    WebList *frame = webFrame ? &web : 0;
 
-    for ( size_t k = 0; k < hitIdx.size( ); k++ )
-        vault_show_entry( ch, hitIdx[k] + 1, entries[ hitIdx[k] ], lang, cmdPrefix, &web );
+    vault_page_header( ch, total, pg, lang );
+    int from = ( pg.page - 1 ) * VAULT_PAGE_SIZE;
+    int to = std::min( total, from + VAULT_PAGE_SIZE );
+    for ( int k = from; k < to; k++ )
+        vault_show_entry( ch, hitIdx[k] + 1, entries[ hitIdx[k] ], lang, cmdPrefix, frame );
 
-    web.send( );
+    if ( frame != 0 ) {
+        vault_page_web_next( *frame, total, pg, lang );
+        frame->send( );
+    }
 
     ch->pecho( lmsg( lang,
         "Take one out with {y'%s get <number>'{x.",
         "Достать: {y'%s взять <номер>'{x.",
         "Дістати: {y'%s взяти <номер>'{x." ), vault_say_prefix( cmdPrefix, lang ).c_str( ) );
+    vault_page_footer( ch, total, pg, lang, cmdPrefix );
 }
 
 /*-------------------------------------------------------------------------
@@ -676,6 +872,8 @@ static void vault_run_ops( Character *ch, const DLString &kind, const DLString &
             ch->pecho( lmsg( lang, "Find what?", "Найти что?", "Знайти що?" ) );
             return;
         }
+        VaultPager pg = vault_pager_find( cmdPrefix, lang, kw );
+        vault_pager_arg( pg, args );
 
         std::vector<BankEntry> entries;
         vault_browse_sorted( kind, key, entries, lang );
@@ -698,11 +896,14 @@ static void vault_run_ops( Character *ch, const DLString &kind, const DLString &
             return;
         }
 
+        // A trailing number past the last page may be part of the item's name.
+        vault_page_valid( ch, (int)hitIdx.size( ), pg, lang, true );
+
         ch->pecho( lmsg( lang,
             "Vault entries matching '%s':",
             "Записи хранилища по '%s':",
             "Записи сховища за '%s':" ), kw.c_str( ) );
-        vault_show_rows( ch, entries, hitIdx, lang, cmdPrefix );
+        vault_show_rows( ch, entries, hitIdx, lang, cmdPrefix, pg, true );
         return;
     }
 
@@ -716,7 +917,7 @@ static void vault_run_ops( Character *ch, const DLString &kind, const DLString &
         // No type given -> show the per-type overview of what's actually there.
         if ( typeArg.empty( ) ) {
             if ( entries.empty( ) ) {
-                vault_list( ch, entries, lang, ownerLabel, cmdPrefix, true, kind );
+                vault_list( ch, entries, lang, ownerLabel, cmdPrefix, true, DLString::emptyString, kind );
                 return;
             }
             ch->pecho( lmsg( lang,
@@ -751,23 +952,28 @@ static void vault_run_ops( Character *ch, const DLString &kind, const DLString &
             return;
         }
 
+        VaultPager pg = vault_pager_filter( cmdPrefix, lang, ft );
+        vault_pager_arg( pg, args );
+        if ( !vault_page_valid( ch, (int)hitIdx.size( ), pg, lang, false ) )
+            return;
+
         ch->pecho( lmsg( lang,
             "Vault entries of type %s:",
             "Записи хранилища типа %s:",
             "Записи сховища типу %s:" ), vault_type_label( ft, lang ).c_str( ) );
-        vault_show_rows( ch, entries, hitIdx, lang, cmdPrefix );
+        vault_show_rows( ch, entries, hitIdx, lang, cmdPrefix, pg, true );
         return;
     }
 
     /*---- vault list -------------------------------------------------------*/
     // Bare 'vault' collapses a >50 list to the per-type overview; an explicit
-    // 'vault list' / 'vault all' forces the full dump. arg_is_all catches every
+    // 'vault list [<page>]' / 'vault all [<page>]' pages the full list. arg_is_all catches every
     // localized "all" synonym (всі/усі/всё/всем/усім...) so a bare all-token
     // always LISTS -- bulk withdrawal stays reachable only via 'vault get all'.
     if ( sub.empty( ) || vault_word_in( sub, WORDS_LIST ) || arg_is_all( sub ) ) {
         std::vector<BankEntry> entries;
         vault_browse_sorted( kind, key, entries, lang );
-        vault_list( ch, entries, lang, ownerLabel, cmdPrefix, !sub.empty( ), kind );
+        vault_list( ch, entries, lang, ownerLabel, cmdPrefix, !sub.empty( ), args, kind );
         return;
     }
 
@@ -788,7 +994,7 @@ static void vault_run_ops( Character *ch, const DLString &kind, const DLString &
     std::vector<BankEntry> entries;
     vault_browse_sorted( kind, key, entries, lang );
     if ( entries.empty( ) ) {
-        vault_list( ch, entries, lang, ownerLabel, cmdPrefix, true, kind );   // prints the empty message
+        vault_list( ch, entries, lang, ownerLabel, cmdPrefix, true, DLString::emptyString, kind );   // prints the empty message
         return;
     }
 
@@ -900,8 +1106,9 @@ static void vault_run_ops( Character *ch, const DLString &kind, const DLString &
                 "Several entries match '%s' -- pick a number:",
                 "Несколько записей похожи на '%s' -- выбери номер:",
                 "Декілька записів схожі на '%s' -- обери номер:" ), target.c_str( ) );
-            for ( size_t k = 0; k < matchIdx.size( ); k++ )
-                vault_show_entry( ch, matchIdx[k] + 1, entries[ matchIdx[k] ], lang, cmdPrefix );
+            // Same hits as 'vault find <target>', so its pages continue this list.
+            VaultPager pg = vault_pager_find( cmdPrefix, lang, target );
+            vault_show_rows( ch, entries, matchIdx, lang, cmdPrefix, pg, false );
             return;
         }
 
