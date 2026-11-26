@@ -57,13 +57,17 @@ Character * TellChannel::findListener( Character *ch, const DLString &name ) con
 // global speech triggers stay say-only -- a tell is private. Dedicated
 // onTell handlers run before onSpeech and win when they return true; that
 // holds for behaviors too, so a behavior can tell a tell from a say.
+// A line nobody took goes last to the global onTell (the AI talker). An area
+// quest step that fired counts as taken, though it does not stop the chain.
+// A handled global onTell points the player's reply at the mob.
 static bool mprog_tell( Character *listener, Character *talker, const char *msg )
 {
     bool asSpeech = listener->is_npc( ) && IS_AWAKE(listener)
                     && listener->in_room == talker->in_room;
+    bool questTook = false;
 
     if (asSpeech)
-        aquest_trigger(listener, talker, "Speech", "CCs", listener, talker, msg);
+        questTook = aquest_trigger(listener, talker, "Speech", "CCs", listener, talker, msg);
 
     if (behavior_trigger(listener, "Tell", "CCs", listener, talker, msg))
         return true;
@@ -80,6 +84,14 @@ static bool mprog_tell( Character *listener, Character *talker, const char *msg 
     }
 
     BEHAVIOR_VOID_CALL( listener->getNPC( ), tell, talker, msg );
+
+    if (asSpeech && !questTook && !talker->is_npc( )
+        && gprog("onTell", "CCs", listener, talker, msg))
+    {
+        talker->reply = listener;
+        return true;
+    }
+
     return false;
 }
 
