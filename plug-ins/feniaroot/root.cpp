@@ -851,6 +851,13 @@ static DLString transfer_side( const Register &reg, int &room )
         DLString name = arg2string( reg );
         if (name.empty( ))
             return name;
+        // Latin letters only: find() also matches the Russian declensions
+        // of player names, which a mob keyword could hit.
+        for (DLString::size_type k = 0; k < name.size( ); k++) {
+            char c = name[k];
+            if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')))
+                throw Scripting::Exception( "transferLog: not a player name: " + name );
+        }
         PCMemoryInterface *pcm = PCharacterManager::find( name.capitalize( ) );
         if (!pcm)
             throw Scripting::Exception( "transferLog: no player named " + name );

@@ -52,7 +52,7 @@ static bool oprog_get_money( Character *ch, Object *obj )
 struct HandoffStamp {
     DLString name;
     DLString host;
-    time_t when;
+    time_t when = 0;
     // A coin pile merged with coins already in the container: only part of it
     // is the putter's. Ledger only, the mule alert skips it. gold and silver
     // are what the putter added.
@@ -106,6 +106,12 @@ static void handoff_stamp( Object *obj, Character *ch, const HandoffStamp &proto
 void oprog_handoff_stamp( Object *obj, Character *ch )
 {
     handoff_stamp( obj, ch, HandoffStamp( ) );
+}
+
+void oprog_handoff_clear( Object *obj )
+{
+    if (obj)
+        handoff_clear_rec( obj );
 }
 
 void oprog_handoff_stamp_merged( Object *money, Character *ch, int gold, int silver )

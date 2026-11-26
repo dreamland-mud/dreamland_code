@@ -765,6 +765,13 @@ NMI_INVOKE( ObjectWrapper, handoffStamp, "(ch): mark the item as let go of by pl
     return Register();
 }
 
+NMI_INVOKE( ObjectWrapper, handoffClear, "(): forget the item's let-go mark (and its contents'), for an item that reached someone without a get")
+{
+    checkTarget();
+    oprog_handoff_clear( target );
+    return Register();
+}
+
 NMI_INVOKE( ObjectWrapper, get_extra_descr , "(key): найти экстра-описание с ключевым словом key")
 {
     checkTarget();
