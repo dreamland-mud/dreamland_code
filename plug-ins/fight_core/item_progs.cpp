@@ -19,6 +19,7 @@
 #include "follow_utils.h"
 #include "merc.h"
 #include "def.h"
+#include "transferlog.h"
 #include "l10n.h"
 #include "fenia_utils.h"
 
@@ -51,7 +52,13 @@ static bool oprog_get_money( Character *ch, Object *obj )
 struct HandoffStamp {
     DLString name;
     DLString host;
-    time_t when;
+    time_t when = 0;
+    // A coin pile merged with coins already in the container: only part of it
+    // is the putter's. Ledger only, the mule alert skips it. gold and silver
+    // are what the putter added.
+    bool merged = false;
+    int gold = 0;
+    int silver = 0;
 };
 
 static std::map<long long, HandoffStamp> handoffStamps;
@@ -74,7 +81,7 @@ static void handoff_clear_rec( Object *obj )
         handoff_clear_rec( o );
 }
 
-void oprog_handoff_stamp( Object *obj, Character *ch )
+static void handoff_stamp( Object *obj, Character *ch, const HandoffStamp &proto )
 {
     if (!obj || !ch || ch->is_npc( ) || obj->extracted)
         return;
@@ -89,11 +96,65 @@ void oprog_handoff_stamp( Object *obj, Character *ch )
                 ++it;
     }
 
-    HandoffStamp stamp;
+    HandoffStamp stamp = proto;
     stamp.name = ch->getNameC( );
     stamp.host = ch->desc ? ch->desc->getRealHost( ) : DLString::emptyString;
     stamp.when = now;
     handoff_stamp_rec( obj, stamp );
+}
+
+void oprog_handoff_stamp( Object *obj, Character *ch )
+{
+    handoff_stamp( obj, ch, HandoffStamp( ) );
+}
+
+void oprog_handoff_clear( Object *obj )
+{
+    if (obj)
+        handoff_clear_rec( obj );
+}
+
+void oprog_handoff_stamp_merged( Object *money, Character *ch, int gold, int silver )
+{
+    HandoffStamp proto;
+    proto.merged = true;
+    proto.gold = gold;
+    proto.silver = silver;
+    handoff_stamp( money, ch, proto );
+}
+
+// One transfer ledger row: ch picked up obj, which stamp's player let go of.
+static void handoff_row( const HandoffStamp &stamp, Object *obj, Character *ch, time_t now )
+{
+    Json::Value extra;
+    extra["ago"] = (int)(now - stamp.when);
+    if (stamp.merged) {
+        extra["merged"] = true;
+        extra["added_gold"] = stamp.gold;
+        extra["added_silver"] = stamp.silver;
+    }
+    TransferLog::record( "pickup", stamp.name, ch->getNameC( ),
+                         ch->in_room ? ch->in_room->vnum : 0, obj, extra );
+}
+
+// What other players put into a container gets its own rows when the whole
+// container is taken: a live stamp naming neither the taker nor `covered` (the
+// player whose row already counts the container's contents).
+static void handoff_ledger_contents( Object *container, Character *ch, time_t now,
+                                     const DLString &covered )
+{
+    for (Object *o = container->contains; o; o = o->next_content) {
+        auto it = handoffStamps.find( o->getID( ) );
+        if (it != handoffStamps.end( )
+            && it->second.name != ch->getNameC( ) && it->second.name != covered
+            && now - it->second.when <= HANDOFF_TTL)
+        {
+            handoff_row( it->second, o, ch, now );
+            handoff_ledger_contents( o, ch, now, it->second.name );
+        }
+        else
+            handoff_ledger_contents( o, ch, now, covered );
+    }
 }
 
 // Clears the stamps whoever takes the object (a scavenger mob too), so a stamp
@@ -103,22 +164,31 @@ static void handoff_check( Object *obj, Character *ch )
     if (handoffStamps.empty( ))
         return;
 
-    // Clear the contents even when obj itself is unstamped: a bag handed over
-    // by give carries nothing stale out of the previous floor stay.
+    time_t now = dreamland->getCurrentTime( );
     auto it = handoffStamps.find( obj->getID( ) );
-    if (it == handoffStamps.end( )) {
-        handoff_clear_rec( obj );
-        return;
+
+    // Live and let go of by another player: the mule verdict and a ledger row.
+    HandoffStamp stamp;
+    bool handed = false;
+    if (it != handoffStamps.end( )) {
+        stamp = it->second;
+        handed = !ch->is_npc( ) && stamp.name != ch->getNameC( )
+                 && now - stamp.when <= HANDOFF_TTL;
     }
 
-    HandoffStamp stamp = it->second;
+    if (handed)
+        handoff_row( stamp, obj, ch, now );
+
+    // Before the stamps go: a bag the taker dropped himself, or one whose own
+    // stamp is old, can hold what someone else put in a minute ago.
+    if (!ch->is_npc( ))
+        handoff_ledger_contents( obj, ch, now, handed ? stamp.name : DLString::emptyString );
+
+    // Clear the contents too: a bag handed over by give carries nothing stale
+    // out of the previous floor stay.
     handoff_clear_rec( obj );
 
-    if (ch->is_npc( ) || stamp.name == ch->getNameC( ))
-        return;
-
-    time_t now = dreamland->getCurrentTime( );
-    if (now - stamp.when > HANDOFF_TTL)
+    if (!handed || stamp.merged)
         return;
 
     gprog( "onHandoff", "COssi", ch, obj, stamp.name.c_str( ), stamp.host.c_str( ),

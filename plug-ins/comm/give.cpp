@@ -19,6 +19,7 @@
 #include "clanreference.h"
 #include "arg_utils.h"
 #include "l10n.h"
+#include "transferlog.h"
 
 /*
  * 'give' command
@@ -130,6 +131,9 @@ static void give_obj_char( Character *ch, Object *obj, Character *victim, int mo
 
     obj_from_char( obj );
     obj_to_char( obj, victim );
+
+    // Before the Give triggers: a quest mob may extract what it was given.
+    TransferLog::record( "give", ch, victim, obj );
 
     switch (mode) {
     case GIVE_MODE_USUAL:
@@ -272,6 +276,11 @@ static void give_money_char( Character *ch, int gold, int silver, Character *vic
 
     ch->silver      -= silver;
     ch->gold        -= gold;
+
+    Json::Value coins;
+    coins["gold"] = gold;
+    coins["silver"] = silver;
+    TransferLog::record( "give", ch, victim, 0, coins );
     
     if (silver > 0) {
         DLString slv( silver );
