@@ -549,9 +549,9 @@ static void vault_list( Character *ch, const std::vector<BankEntry> &entries,
         ch->pecho( "%s", vault_type_summary_line( entries, lang, cmdPrefix, &web ).c_str( ) );
         web.send( );
         ch->pecho( lmsg( lang,
-            "({y'%s list'{x shows every entry.)",
-            "({y'%s список'{x покажет все записи.)",
-            "({y'%s список'{x покаже всі записи.)" ), vault_say_prefix( cmdPrefix, lang ).c_str( ) );
+            "({y'%s list'{x shows every entry, page by page.)",
+            "({y'%s список'{x покажет все записи по страницам.)",
+            "({y'%s список'{x покаже всі записи посторінково.)" ), vault_say_prefix( cmdPrefix, lang ).c_str( ) );
         return;
     }
 
