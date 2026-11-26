@@ -112,8 +112,15 @@ static bool mprog_tell( Character *listener, Character *talker, const char *msg 
             questTook = true;
     }
 
+    // behavior_trigger reads pIndexData, which extraction nulls.
+    if (listenerWatch.gone( ))
+        return false;
+
     if (behavior_trigger(listener, "Tell", "CCs", listener, talker, msg))
         return true;
+
+    if (listenerWatch.gone( ))
+        return false;
 
     if (behavior_trigger(listener, "Speech", "CCs", listener, talker, msg))
         return true;
