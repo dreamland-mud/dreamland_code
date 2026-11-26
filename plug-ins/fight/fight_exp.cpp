@@ -109,7 +109,7 @@ void player_help_note( PCharacter *helper, PCharacter *helped, const char *kind 
     if (!seen.insert( key ).second)
         return;
 
-    gprog( "onPlayerHelp", "CCs", helper, helped, kind );
+    gprog( "onPlayerHelp", "CCs", static_cast<Character *>( helper ), static_cast<Character *>( helped ), kind );
 }
 
 void group_gain( Character *ch, Character *victim, Character *realKiller )
