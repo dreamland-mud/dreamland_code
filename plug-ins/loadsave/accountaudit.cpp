@@ -13,18 +13,25 @@
 
 using namespace std;
 
-void AccountAudit::record(const DLString &event, const Json::Value &fields)
+void AccountAudit::append(const DLString &file, const DLString &event, const Json::Value &fields)
 {
+    if (file.empty() || file.find('/') != DLString::npos || file.find("..") != DLString::npos) {
+        LogStream::sendError() << "AccountAudit: bad trail name '" << file << "'" << endl;
+        return;
+    }
+
     try {
         Json::Value row;
         row["ts"] = Json::Int64(time(0));
         row["event"] = event;
 
+        // ts and event always come from here: a field never rewrites them.
         if (fields.isObject())
             for (Json::Value::const_iterator i = fields.begin(); i != fields.end(); ++i)
-                row[i.name()] = *i;
+                if (i.name() != "ts" && i.name() != "event")
+                    row[i.name()] = *i;
 
-        DLString path = DLFile(dreamland->getBasePath(), "var/log/account.jsonl").getPath();
+        DLString path = DLFile(dreamland->getBasePath(), "var/log/" + file).getPath();
         ofstream out(path.c_str(), ios::app);
         if (!out) {
             LogStream::sendError() << "AccountAudit: cannot open " << path << endl;
@@ -36,6 +43,11 @@ void AccountAudit::record(const DLString &event, const Json::Value &fields)
     } catch (const std::exception &e) {
         LogStream::sendError() << "AccountAudit: " << e.what() << endl;
     }
+}
+
+void AccountAudit::record(const DLString &event, const Json::Value &fields)
+{
+    append("account.jsonl", event, fields);
 }
 
 void AccountAudit::record(const DLString &event)

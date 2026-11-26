@@ -814,7 +814,7 @@ NMI_INVOKE( CharacterWrapper, acctBank, "(currency): баланс общего �
     return Register( AccountManager::bankBalance( acct, cur ) );
 }
 
-NMI_INVOKE( CharacterWrapper, acctBankAdd, "(gold, silver, qp): изменить общий банк аккаунта одной записью; false если без аккаунта, баланс ушел бы в минус или запись не удалась" )
+NMI_INVOKE( CharacterWrapper, acctBankAdd, "(gold, silver, qp[, actor, why]): изменить общий банк аккаунта одной записью; actor -- кто двигает деньги, why -- зачем (для журнала account.jsonl); false если без аккаунта, баланс ушел бы в минус или запись не удалась" )
 {
     checkTarget( );
     CHK_NPC
@@ -824,8 +824,20 @@ NMI_INVOKE( CharacterWrapper, acctBankAdd, "(gold, silver, qp): изменить
     DLString acct = bank_account_of( target->getPC( ) );
     if (acct.empty( ))
         return Register( false );
+
+    // Who and why go to the audit row only: the balance math ignores them.
+    Json::Value who;
+    who["char"] = target->getNameC( );
+    if (args.size( ) > 3 && argnum( args, 4 ).type != Register::NONE) {
+        Character *actor = arg2character( argnum( args, 4 ) );
+        if (actor != target)
+            who["actor"] = actor->getNameC( );
+    }
+    if (args.size( ) > 4 && argnum( args, 5 ).type != Register::NONE)
+        who["why"] = argnum2string( args, 5 ).c_str( );
+
     return Register( AccountManager::bankAdd( acct,
-        argnum2number( args, 1 ), argnum2number( args, 2 ), argnum2number( args, 3 ) ) );
+        argnum2number( args, 1 ), argnum2number( args, 2 ), argnum2number( args, 3 ), who ) );
 }
 NMI_INVOKE( CharacterWrapper, acctBankCap, "(): сколько золота можно держать в общем банке аккаунта; NONE без аккаунта" )
 {

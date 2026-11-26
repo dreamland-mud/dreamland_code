@@ -692,12 +692,24 @@ static DLString ruler_bank_account( PCharacter *pch )
         return acct;
 }
 
+// Who/why for the account audit row of a fine: whose bank, and the ruler
+// when the ruler is someone else.
+static Json::Value ruler_bank_who( Character *owner, Character *ruler )
+{
+        Json::Value who;
+        who["char"] = owner->getNameC( );
+        if ( ruler != owner )
+                who["actor"] = ruler->getNameC( );
+        who["why"] = "fine";
+        return who;
+}
+
 // Credit a fine: into the account's shared bank, or the pfile bank when the
 // char has no account or the account write failed -- the money is never lost.
-static void ruler_bank_credit( PCharacter *pch, int amount )
+static void ruler_bank_credit( PCharacter *pch, int amount, Character *ruler )
 {
         DLString acct = ruler_bank_account( pch );
-        if ( acct.empty( ) || !AccountManager::bankAdd( acct, amount, 0, 0 ) )
+        if ( acct.empty( ) || !AccountManager::bankAdd( acct, amount, 0, 0, ruler_bank_who( pch, ruler ) ) )
                 pch->bank_g += amount;
 }
 
@@ -808,7 +820,7 @@ SKILL_RUNP( fine )
             int fromPfile = min( victimPfileBank, value - fromPurse );
             int fromPool = value - fromPurse - fromPfile;
 
-            if ( fromPool > 0 && !AccountManager::bankAdd( victimAcct, -fromPool, 0, 0 ) )
+            if ( fromPool > 0 && !AccountManager::bankAdd( victimAcct, -fromPool, 0, 0, ruler_bank_who( victim, ch ) ) )
             {
                 ch->pecho(_("Банк не смог провести списание, попробуй позже."));
                 return;
@@ -854,7 +866,7 @@ SKILL_RUNP( fine )
 
   if ( recepient == 0 )
         {
-                ruler_bank_credit( ch->getPC( ), value2 );
+                ruler_bank_credit( ch->getPC( ), value2, ch );
 
                 oldact_p(_("Ты переводишь на свой счет несколько золотых монет.")
                         , ch, 0, 0, TO_CHAR, POS_RESTING );
@@ -863,7 +875,7 @@ SKILL_RUNP( fine )
         }
         else
         {
-                ruler_bank_credit( recepient->getPC( ), value2 );
+                ruler_bank_credit( recepient->getPC( ), value2, ch );
                 
                 oldact_p(_("Ты переводишь на счет $C4 несколько золотых монет.")
                         , ch, 0, recepient, TO_CHAR, POS_RESTING );

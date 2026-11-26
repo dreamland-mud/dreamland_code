@@ -22,7 +22,13 @@
  * because the audit file is unwritable.
  */
 namespace AccountAudit {
-    // Append {ts, event, <fields>}. `fields` is merged in when it is an object.
+    // Append {ts, event, <fields>} to var/log/<file>. `fields` is merged in when
+    // it is an object. `file` is a bare name ("transfer.jsonl"): an empty name or
+    // one with a path separator is refused and logged. Shared by every
+    // append-only trail, so they all get the same row shape and failure rules.
+    void append(const DLString &file, const DLString &event, const Json::Value &fields);
+
+    // The account trail, var/log/account.jsonl.
     void record(const DLString &event, const Json::Value &fields);
     void record(const DLString &event);   // event with no extra fields
 }
