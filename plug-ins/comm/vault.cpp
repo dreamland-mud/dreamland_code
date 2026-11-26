@@ -124,7 +124,7 @@ static DLString vault_type_label( int itype, lang_t lang )
 // label, exact or as a prefix ("кольцо" -> "кольцо для ключей").
 static int vault_type_lookup( const DLString &arg, lang_t lang )
 {
-    int t = item_table.value( arg );
+    int t = item_table.value( arg, true );     // exact: 'key' is key, not keyring
     if ( t != NO_FLAG )
         return t;
 
@@ -383,11 +383,11 @@ static DLString vault_type_summary_line( const std::vector<BankEntry> &entries, 
         if ( k > 0 )
             buf << "  ";
         buf << "{hc'" << cmdPrefix << " filter " << tally[k].first << "'"
-            << vault_upper( vault_type_label( item_table.value( tally[k].first ), lang ) )
+            << vault_upper( vault_type_label( item_table.value( tally[k].first, true ), lang ) )
             << " (" << tally[k].second << "){x";
 
         if ( web && web->active( ) ) {
-            DLString label = vault_type_label( item_table.value( tally[k].first ), lang )
+            DLString label = vault_type_label( item_table.value( tally[k].first, true ), lang )
                              + " (" + DLString( tally[k].second ) + ")";
             int row = web->row( label, tally[k].first,
                                 lmsg( lang, "filter by type", "фильтр по типу", "фільтр за типом" ) );
@@ -413,10 +413,11 @@ struct VaultPager {
     DLString typed;     // the page word as typed, echoed when that page doesn't exist
 };
 
-// A word with a space must be quoted to survive as one argument again.
+// A word with a space must be quoted to survive as one argument again, and so
+// must one with '|', which the interpreter would split into two commands.
 static DLString vault_quote_arg( const DLString &arg )
 {
-    if ( arg.find( ' ' ) == DLString::npos )
+    if ( arg.find_first_of( " |" ) == DLString::npos )
         return arg;
     return DLString( "\"" ) + arg + "\"";
 }
@@ -451,12 +452,16 @@ static VaultPager vault_pager_find( const DLString &cmdPrefix, lang_t lang, cons
     return vault_pager( cmdPrefix, lang, "find", lmsg( lang, "find", "найти", "знайти" ), kw, kw );
 }
 
-// The link sends the canonical type name, the hint shows the viewer's label;
-// vault_type_lookup takes either.
+// The link sends the canonical type name. The hint shows the viewer's label
+// when typing it resolves back to the same type, else the canonical name too
+// (EN "tattoo" labels craft_tattoo but types as the religion-mark type).
 static VaultPager vault_pager_filter( const DLString &cmdPrefix, lang_t lang, int ft )
 {
+    DLString canonical = item_table.name( ft );
+    DLString label = vault_type_label( ft, lang );
+    DLString sayArg = ( vault_type_lookup( label, lang ) == ft ) ? label : canonical;
     return vault_pager( cmdPrefix, lang, "filter", lmsg( lang, "filter", "фильтр", "фільтр" ),
-                        item_table.name( ft ), vault_type_label( ft, lang ) );
+                        canonical, sayArg );
 }
 
 // Optional page argument: a number is the page, anything else means page 1.
@@ -674,22 +679,27 @@ static const char *WORDS_LIST[]   = { "list", "all", "список", "все", "
 // Print the entries at the given ORIGINAL full-list indices (so the row numbers
 // match what 'vault get <n>' expects), then the get hint. Used by find, filter
 // and an ambiguous get. Shows pg.page of the hits, already settled by
-// vault_page_valid.
+// vault_page_valid. webFrame false prints text only: a list window re-sends the
+// command that opened it after every Get, so only a command that is safe to
+// repeat (find, filter) may open one -- never 'vault get <word>'.
 static void vault_show_rows( Character *ch, const std::vector<BankEntry> &entries,
                              const std::vector<int> &hitIdx, lang_t lang, const DLString &cmdPrefix,
-                             const VaultPager &pg )
+                             const VaultPager &pg, bool webFrame )
 {
     int total = (int)hitIdx.size( );
     WebList web( ch, "vault", vault_page_title( total, pg, lang ) );
+    WebList *frame = webFrame ? &web : 0;
 
     vault_page_header( ch, total, pg, lang );
     int from = ( pg.page - 1 ) * VAULT_PAGE_SIZE;
     int to = std::min( total, from + VAULT_PAGE_SIZE );
     for ( int k = from; k < to; k++ )
-        vault_show_entry( ch, hitIdx[k] + 1, entries[ hitIdx[k] ], lang, cmdPrefix, &web );
-    vault_page_web_next( web, total, pg, lang );
+        vault_show_entry( ch, hitIdx[k] + 1, entries[ hitIdx[k] ], lang, cmdPrefix, frame );
 
-    web.send( );
+    if ( frame != 0 ) {
+        vault_page_web_next( *frame, total, pg, lang );
+        frame->send( );
+    }
 
     ch->pecho( lmsg( lang,
         "Take one out with {y'%s get <number>'{x.",
@@ -893,7 +903,7 @@ static void vault_run_ops( Character *ch, const DLString &kind, const DLString &
             "Vault entries matching '%s':",
             "Записи хранилища по '%s':",
             "Записи сховища за '%s':" ), kw.c_str( ) );
-        vault_show_rows( ch, entries, hitIdx, lang, cmdPrefix, pg );
+        vault_show_rows( ch, entries, hitIdx, lang, cmdPrefix, pg, true );
         return;
     }
 
@@ -951,7 +961,7 @@ static void vault_run_ops( Character *ch, const DLString &kind, const DLString &
             "Vault entries of type %s:",
             "Записи хранилища типа %s:",
             "Записи сховища типу %s:" ), vault_type_label( ft, lang ).c_str( ) );
-        vault_show_rows( ch, entries, hitIdx, lang, cmdPrefix, pg );
+        vault_show_rows( ch, entries, hitIdx, lang, cmdPrefix, pg, true );
         return;
     }
 
@@ -1098,7 +1108,7 @@ static void vault_run_ops( Character *ch, const DLString &kind, const DLString &
                 "Декілька записів схожі на '%s' -- обери номер:" ), target.c_str( ) );
             // Same hits as 'vault find <target>', so its pages continue this list.
             VaultPager pg = vault_pager_find( cmdPrefix, lang, target );
-            vault_show_rows( ch, entries, matchIdx, lang, cmdPrefix, pg );
+            vault_show_rows( ch, entries, matchIdx, lang, cmdPrefix, pg, false );
             return;
         }
 
