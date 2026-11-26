@@ -815,7 +815,7 @@ NMI_INVOKE(Root, logNotice, "(msg): написать msg в лог сервер�
     return Register( );
 }
 
-NMI_INVOKE(Root, auditLog, "(event, fields): записать строку {ts, event, src: fenia, ...fields} в журнал var/log/account.jsonl; event -- латиница, цифры и _, fields -- структура .Map() или NONE")
+NMI_INVOKE(Root, auditLog, "(event, fields): append {ts, event, src: fenia, ...fields} to var/log/account.jsonl; event is a-z, 0-9 and _, fields a .Map() or NONE")
 {
     DLString event = argnum2string( args, 1 );
     if (event.empty( ) || event.size( ) > 40)

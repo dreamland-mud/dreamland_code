@@ -175,12 +175,11 @@ public:
     // refuses (changing nothing) when any balance would go negative or overflow
     // int, or when the disk write fails -- RAM never claims what disk lacks.
     static int bankBalance(const DLString &id, const DLString &currency);
-    static bool bankAdd(const DLString &id, int gold, int silver, int qp);
-    // Same, and `who` (an object) is merged into the audit row: "char" whose
-    // bank it is, "actor" who moved the money when that is someone else, "why"
-    // (deposit, withdraw, transfer, fold, fine). Without it a row only says that
-    // the account's balance changed.
-    static bool bankAdd(const DLString &id, int gold, int silver, int qp, const Json::Value &who);
+    // The audit row names `charName` (whose bank), `actorName` (who moved the
+    // money, left out when empty or the same char) and `why` (deposit,
+    // withdraw, transfer, fold, fine).
+    static bool bankAdd(const DLString &id, int gold, int silver, int qp,
+                        const DLString &charName, const DLString &actorName, const DLString &why);
     // Deposit ceiling in gold: a base plus a slice per member character, so a
     // bigger account can park more. Silver caps at the same value (x100).
     // Only deposits check it; folds and fines may run a pool past it.

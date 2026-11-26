@@ -6,12 +6,16 @@
 #include <fstream>
 
 #include "accountaudit.h"
+#include "iconvmap.h"
 #include "json_utils.h"
 #include "dreamland.h"
 #include "dlfile.h"
 #include "logstream.h"
 
 using namespace std;
+
+// The engine holds text as KOI8; the trails are read as UTF-8 JSON lines.
+static IconvMap koi2utf("koi8-u", "utf-8");
 
 void AccountAudit::append(const DLString &file, const DLString &event, const Json::Value &fields)
 {
@@ -39,7 +43,7 @@ void AccountAudit::append(const DLString &file, const DLString &event, const Jso
         }
         // JsonUtils::toString (FastWriter) already ends the line with '\n', so no
         // endl -- that would leave a blank line between every two records.
-        out << JsonUtils::toString(row);
+        out << koi2utf(JsonUtils::toString(row));
     } catch (const std::exception &e) {
         LogStream::sendError() << "AccountAudit: " << e.what() << endl;
     }

@@ -814,7 +814,7 @@ NMI_INVOKE( CharacterWrapper, acctBank, "(currency): баланс общего �
     return Register( AccountManager::bankBalance( acct, cur ) );
 }
 
-NMI_INVOKE( CharacterWrapper, acctBankAdd, "(gold, silver, qp[, actor, why]): изменить общий банк аккаунта одной записью; actor -- кто двигает деньги, why -- зачем (для журнала account.jsonl); false если без аккаунта, баланс ушел бы в минус или запись не удалась" )
+NMI_INVOKE( CharacterWrapper, acctBankAdd, "(gold, silver, qp[, actor, why]): change the account's shared bank in one write; actor (who moves the money) and why go to the account.jsonl row only; false without an account, when a balance would go negative or the write failed" )
 {
     checkTarget( );
     CHK_NPC
@@ -825,19 +825,16 @@ NMI_INVOKE( CharacterWrapper, acctBankAdd, "(gold, silver, qp[, actor, why]): и
     if (acct.empty( ))
         return Register( false );
 
-    // Who and why go to the audit row only: the balance math ignores them.
-    Json::Value who;
-    who["char"] = target->getNameC( );
-    if (args.size( ) > 3 && argnum( args, 4 ).type != Register::NONE) {
-        Character *actor = arg2character( argnum( args, 4 ) );
-        if (actor != target)
-            who["actor"] = actor->getNameC( );
-    }
+    // Actor and why go to the audit row only: the balance math ignores them.
+    DLString actorName, why;
+    if (args.size( ) > 3 && argnum( args, 4 ).type != Register::NONE)
+        actorName = arg2character( argnum( args, 4 ) )->getNameC( );
     if (args.size( ) > 4 && argnum( args, 5 ).type != Register::NONE)
-        who["why"] = argnum2string( args, 5 ).c_str( );
+        why = argnum2string( args, 5 );
 
     return Register( AccountManager::bankAdd( acct,
-        argnum2number( args, 1 ), argnum2number( args, 2 ), argnum2number( args, 3 ), who ) );
+        argnum2number( args, 1 ), argnum2number( args, 2 ), argnum2number( args, 3 ),
+        target->getNameC( ), actorName, why ) );
 }
 NMI_INVOKE( CharacterWrapper, acctBankCap, "(): сколько золота можно держать в общем банке аккаунта; NONE без аккаунта" )
 {
