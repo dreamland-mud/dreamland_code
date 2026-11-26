@@ -43,6 +43,37 @@ static const int UNDERWATER_FUMBLE_CHANCE = 25;
 
 bool mprog_spell( Character *victim, Character *caster, Skill::Pointer skill, bool before );
 void mprog_cast( Character *caster, SpellTarget::Pointer target, Skill::Pointer skill, bool before );
+void player_help_note( PCharacter *helper, PCharacter *helped, const char *kind );
+
+// A beneficial spell that ran tells the alt scorer who helped whom
+// (player_help_note, fight_exp.cpp): the target, or the player who owns a
+// targeted pet; a room-wide spell, every other player of the caster's group
+// in the room. Players casting only.
+static void cast_help_note( Character *ch, Spell::Pointer &spell, SpellTarget::Pointer &target )
+{
+    if (ch->is_npc( ) || spell->getSpellType( ) != SPELL_DEFENSIVE)
+        return;
+
+    PCharacter *helper = ch->getPC( );
+
+    if (target->type == SpellTarget::CHAR) {
+        Character *victim = target->victim;
+        if (!victim)
+            return;
+
+        Character *owner = victim->is_npc( ) ? victim->master : victim;
+        if (owner && !owner->is_npc( ) && owner != ch)
+            player_help_note( helper, owner->getPC( ), "cast" );
+        return;
+    }
+
+    if (target->type != SpellTarget::ROOM || !ch->in_room)
+        return;
+
+    for (Character *rch = ch->in_room->people; rch; rch = rch->next_in_room)
+        if (rch != ch && !rch->is_npc( ) && is_same_group( rch, ch ))
+            player_help_note( helper, rch->getPC( ), "cast" );
+}
 
 static bool string_has_separator(const DLString &s)
 {
@@ -369,6 +400,7 @@ CMDRUN( cast )
                     throw;
                 }
                 sound.landed( );
+                cast_help_note( ch, spell, target );
             }
 
             if (victim)
