@@ -3,8 +3,10 @@
  * player character and no telnet session.
  *
  * One session at a time, always in room 1 (it keeps the test mobs). Actions:
- *   start {level, race, class, sex?} -- build TestBot, raise it like 'advance',
- *       train stats to the race/class cap, full heal. Remembers what room 1 held.
+ *   start {level, race, class, sex?, newbie?} -- build TestBot, raise it like
+ *       'advance', train stats to the race/class cap, full heal. Remembers what
+ *       room 1 held. newbie=false records 51 quest wins, so Player::isNewbie
+ *       (and Fenia ch.newbie) is false and newbie-gated rules (the law) apply.
  *   cmd {commands: [..]}  -- run each through interpret(), return the output.
  *   read                  -- output gathered since the last call (fight rounds).
  *   stop                  -- extract the actor and its gear, and purge every mob
@@ -24,6 +26,7 @@
 #include "sandboxservlet.h"
 #include "execcapture.h"
 #include "commonattributes.h"
+#include "xmlattributestatistic.h"
 #include "dlscheduler.h"
 #include "iconvmap.h"
 #include "pcharacter.h"
@@ -128,7 +131,7 @@ static DLString sandbox_stop()
 }
 
 static DLString sandbox_start(Room *room, int level, const DLString &race,
-                              const DLString &prof, int sex)
+                              const DLString &prof, int sex, bool newbie)
 {
     session = new SandboxSession();
     session->capture = new ExecCaptureBuffer();
@@ -155,6 +158,9 @@ static DLString sandbox_start(Room *room, int level, const DLString &race,
     // No exp: a level-up would announce TestBot on infonet, Discord and Telegram.
     ch->getAttributes().getAttr<XMLEmptyAttribute>("noexp");
     ch->lines = 0;
+    // One past the isNewbie limit of 50 wins. Gone with the actor: it is never saved.
+    if (!newbie)
+        ch->getAttributes().getAttr<XMLAttributeStatistic>("questdata")->setVictories("sandbox", 51);
     d->associate(ch);           // early, so the raise below is captured too
     ch->setRace(race);
     ch->setProfession(prof);
@@ -274,7 +280,10 @@ SERVLET_HANDLE(api_sandbox, "/sandbox")
                 return;
             }
 
-            DLString out = sandbox_start(room, level, race->getName(), prof->getName(), sex);
+            const Json::Value &nb = params["args"]["newbie"];
+            bool newbie = !(nb.isBool() && !nb.asBool());
+
+            DLString out = sandbox_start(room, level, race->getName(), prof->getName(), sex, newbie);
             sandbox_reply(response, out, false);
             return;
         }
