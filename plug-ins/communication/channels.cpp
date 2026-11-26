@@ -19,6 +19,7 @@
 #include "room.h"
 #include "commandmanager.h"
 #include "areaquestutils.h"
+#include "xmlattributeareaquest.h"
 #include "act.h"
 
 #include "infonet.h"
@@ -52,22 +53,64 @@ Character * TellChannel::findListener( Character *ch, const DLString &name ) con
     return victim;
 }
 
+// A player on an area quest step that ends on speech at this mob is talking
+// to the quest, even while the end handler answers a line and declines it
+// (false means "step not done", so it cannot claim the line by returning true).
+static bool aquest_speech_pending( Character *mob, Character *ch )
+{
+    if (!mob->is_npc( ) || ch->is_npc( ))
+        return false;
+
+    WrapperBase *base = get_wrapper( mob->getNPC( )->pIndexData->wrapper );
+    if (!base)
+        return false;
+
+    auto attr = ch->getPC( )->getAttributes( ).findAttr<XMLAttributeAreaQuest>( "areaquest" );
+    if (!attr)
+        return false;
+
+    for (auto &aq: **attr) {
+        if (!aq.second.questActive( ))
+            continue;
+
+        AreaQuest *q = get_area_quest( aq.first );
+        if (!q)
+            continue;
+
+        int step = aq.second.step;
+        if (base->hasField( aquest_method_id( q, step, false, "onSpeech" ) )
+            || base->hasField( aquest_method_id( q, step, false, "postSpeech" ) ))
+            return true;
+    }
+
+    return false;
+}
+
 // A tell to a mob in the same room counts as speech addressed to it: area
 // quest steps and mob onSpeech handlers hear it like a say. Room, object and
 // global speech triggers stay say-only -- a tell is private. Dedicated
 // onTell handlers run before onSpeech and win when they return true; that
 // holds for behaviors too, so a behavior can tell a tell from a say.
-// A line nobody took goes last to the global onTell (the AI talker). An area
-// quest step that fired counts as taken, though it does not stop the chain.
-// A handled global onTell points the player's reply at the mob.
+//
+// A player's line nobody took goes last to the global onTell (the AI talker).
+// Taken means: a handler returned true, a quest step began or ended, or the
+// player is on a quest step that ends on speech at this mob. Handlers that
+// answer and return false, post handlers and the C++ behavior tell do not
+// count. When the global onTell returns true, the player's reply points at
+// the mob.
 static bool mprog_tell( Character *listener, Character *talker, const char *msg )
 {
     bool asSpeech = listener->is_npc( ) && IS_AWAKE(listener)
                     && listener->in_room == talker->in_room;
     bool questTook = false;
+    ExtractWatch listenerWatch( listener ), talkerWatch( talker );
 
-    if (asSpeech)
-        questTook = aquest_trigger(listener, talker, "Speech", "CCs", listener, talker, msg);
+    if (asSpeech) {
+        questTook = aquest_speech_pending( listener, talker );
+
+        if (aquest_trigger(listener, talker, "Speech", "CCs", listener, talker, msg))
+            questTook = true;
+    }
 
     if (behavior_trigger(listener, "Tell", "CCs", listener, talker, msg))
         return true;
@@ -85,14 +128,21 @@ static bool mprog_tell( Character *listener, Character *talker, const char *msg 
 
     BEHAVIOR_VOID_CALL( listener->getNPC( ), tell, talker, msg );
 
-    if (asSpeech && !questTook && !talker->is_npc( )
-        && gprog("onTell", "CCs", listener, talker, msg))
-    {
-        talker->reply = listener;
-        return true;
-    }
+    if (!asSpeech || questTook || talker->is_npc( ))
+        return false;
 
-    return false;
+    // Any script above may have extracted either side or moved them apart.
+    if (listenerWatch.gone( ) || talkerWatch.gone( )
+        || !IS_AWAKE(listener) || listener->in_room != talker->in_room)
+        return false;
+
+    if (!gprog("onTell", "CCs", listener, talker, msg))
+        return false;
+
+    if (!listenerWatch.gone( ) && !talkerWatch.gone( ))
+        talker->reply = listener;
+
+    return true;
 }
 
 void TellChannel::triggers( Character *ch, Character *victim, const DLString &msg ) const
