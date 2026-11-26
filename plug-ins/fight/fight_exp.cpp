@@ -34,6 +34,9 @@
 #include "skill_utils.h"
 #include "l10n.h"
 #include "fenia_utils.h"
+#include "dreamland.h"
+
+#include <set>
 
 PROF(samurai);
 BONUS(experience);
@@ -81,12 +84,41 @@ static bool can_influence_exp( PCharacter *gch, Character *leader )
     return true;
 }
 
+/*
+ * Help between two players for the alt scorer (Fenia global/onPlayerHelp,
+ * utils/player/alts). kind "cast": helper cast a beneficial spell on helped
+ * or on helped's pet. kind "kill": both stood in one group in the room when
+ * a mob died, helper is the one whose name sorts first. The scorer counts
+ * hours with help, so each pair and kind reaches Fenia once per clock hour.
+ */
+void player_help_note( PCharacter *helper, PCharacter *helped, const char *kind )
+{
+    static long hour = -1;
+    static std::set<DLString> seen;
+
+    if (!helper || !helped || helper == helped)
+        return;
+
+    long now = dreamland->getCurrentTime( ) / 3600;
+    if (now != hour) {
+        seen.clear( );
+        hour = now;
+    }
+
+    DLString key = DLString( kind ) + "|" + helper->getName( ) + "|" + helped->getName( );
+    if (!seen.insert( key ).second)
+        return;
+
+    gprog( "onPlayerHelp", "CCs", helper, helped, kind );
+}
+
 void group_gain( Character *ch, Character *victim, Character *realKiller )
 {
     Character *gch;
     Character *leader;
     int xp, mobcount, base_exp_bonus;
     std::list<PCharacter *> players;
+    std::list<PCharacter *> mates;
     std::list<PCharacter *>::iterator i;
     Character *killer = realKiller ? realKiller : ch;
 
@@ -113,8 +145,23 @@ void group_gain( Character *ch, Character *victim, Character *realKiller )
         if (is_same_group( gch, ch )) {
             if (gch->is_npc( ))
                 mobcount++;
-            else if (can_influence_exp( gch->getPC( ), leader ))
-                players.push_back( gch->getPC( ) );
+            else {
+                // Before the level-range filter: a power-leveller out of
+                // range earns nothing here and is exactly the pair to see.
+                mates.push_back( gch->getPC( ) );
+                if (can_influence_exp( gch->getPC( ), leader ))
+                    players.push_back( gch->getPC( ) );
+            }
+        }
+    }
+
+    for (i = mates.begin( ); i != mates.end( ); i++) {
+        std::list<PCharacter *>::iterator j = i;
+        for (j++; j != mates.end( ); j++) {
+            if ((*i)->getName( ) < (*j)->getName( ))
+                player_help_note( *i, *j, "kill" );
+            else
+                player_help_note( *j, *i, "kill" );
         }
     }
 
