@@ -94,6 +94,7 @@
 #include "autoquestwrapper.h"
 #include "questmanager.h"
 #include "accountmanager.h"
+#include "accountaudit.h"
 #include "questregistrator.h"
 #include "questscrollhook.h"
 #include "behaviorwrapper.h"
@@ -811,6 +812,29 @@ NMI_INVOKE(Root, logNotice, "(msg): написать msg в лог сервер�
 {
     DLString msg = args2string(args);
     LogStream::sendNotice() << "Fenia: " << msg << endl;
+    return Register( );
+}
+
+NMI_INVOKE(Root, auditLog, "(event, fields): append {ts, event, src: fenia, ...fields} to var/log/account.jsonl; event is a-z, 0-9 and _, fields a .Map() or NONE")
+{
+    DLString event = argnum2string( args, 1 );
+    if (event.empty( ) || event.size( ) > 40)
+        throw Scripting::Exception( "auditLog: event must be 1-40 chars" );
+    for (DLString::size_type k = 0; k < event.size( ); k++) {
+        char c = event[k];
+        if (!((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_'))
+            throw Scripting::Exception( "auditLog: event takes a-z, 0-9 and _ only" );
+    }
+
+    Json::Value fields;
+    if (args.size( ) > 1 && argnum( args, 2 ).type != Register::NONE) {
+        fields = JsonUtils::fromRegister( argnum( args, 2 ) );
+        if (!fields.isObject( ))
+            throw Scripting::Exception( "auditLog: fields must be a .Map()" );
+    }
+    // Set after the map, so a script row can never pass for an engine one.
+    fields["src"] = "fenia";
+    AccountAudit::record( event, fields );
     return Register( );
 }
 

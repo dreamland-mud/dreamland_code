@@ -805,7 +805,8 @@ int AccountManager::bankBalance(const DLString &id, const DLString &currency)
     return v.isInt() ? v.asInt() : 0;
 }
 
-bool AccountManager::bankAdd(const DLString &id, int gold, int silver, int qp)
+bool AccountManager::bankAdd(const DLString &id, int gold, int silver, int qp,
+                             const DLString &charName, const DLString &actorName, const DLString &why)
 {
     map<DLString, Json::Value>::iterator i = accounts.find(id);
     if (i == accounts.end())
@@ -838,6 +839,12 @@ bool AccountManager::bankAdd(const DLString &id, int gold, int silver, int qp)
     // Money and quest points move between characters here, so keep a trail an
     // abuse investigation can grep after the per-boot logs roll away.
     Json::Value fields;
+    if (!charName.empty())
+        fields["char"] = charName.c_str();
+    if (!actorName.empty() && actorName != charName)
+        fields["actor"] = actorName.c_str();
+    if (!why.empty())
+        fields["why"] = why.c_str();
     fields["id"] = id.c_str();
     fields["gold"] = gold;
     fields["silver"] = silver;
