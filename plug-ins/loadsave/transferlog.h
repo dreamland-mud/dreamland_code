@@ -27,6 +27,10 @@ class Object;
  * Engine fields are set after `extra`, so a caller can add fields but never
  * rewrite who, where or what.
  *
+ * Each row between two players also goes to the global Fenia trigger
+ * onPlayerTransfer(kind, from, to, limited, gold): limited counts the item's
+ * own limit and the limited items inside it, gold is coins plus silver / 100.
+ *
  * Best-effort like the account trail: a failure is logged, never thrown.
  */
 namespace TransferLog {

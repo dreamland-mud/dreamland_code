@@ -9,6 +9,7 @@
 #include "core/object.h"
 #include "room.h"
 #include "logstream.h"
+#include "fenia_utils.h"
 #include "merc.h"
 #include "def.h"
 
@@ -25,6 +26,15 @@ static void count_contents(Object *obj, int &inside, Json::Value &limited)
             limited.append(o->pIndexData->vnum);
         count_contents(o, inside, limited);
     }
+}
+
+// A whole number field of a row, 0 when absent or not a number.
+static int row_int(const Json::Value &row, const char *key)
+{
+    const Json::Value &v = row[key];
+    if (v.isNumeric() && v.isConvertibleTo(Json::intValue))
+        return v.asInt();
+    return 0;
 }
 
 // Keys only the engine writes: dropped from a caller's extra fields first.
@@ -82,6 +92,18 @@ void TransferLog::record(const DLString &kind, const DLString &from, const DLStr
         }
 
         AccountAudit::append("transfer.jsonl", kind, row);
+
+        // The alts pair record counts hand-overs between linked chars
+        // (global/onPlayerTransfer/alts). Plain values only: the object can
+        // be half-way between owners here.
+        if (!from.empty() && !to.empty() && gprog_registered("onPlayerTransfer")) {
+            const Json::Value &r = row;
+            int limited = r.isMember("limit") ? 1 : 0;
+            if (r.isMember("inside_limited"))
+                limited += r["inside_limited"].size();
+            int gold = row_int(r, "gold") + row_int(r, "silver") / 100;
+            gprog("onPlayerTransfer", "sssii", kind.c_str(), from.c_str(), to.c_str(), limited, gold);
+        }
     } catch (const std::exception &e) {
         LogStream::sendError() << "TransferLog: " << e.what() << endl;
     }
