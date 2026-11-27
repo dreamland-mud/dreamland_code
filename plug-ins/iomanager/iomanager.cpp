@@ -198,11 +198,9 @@ int IOManager::kickIdleLogins( int limit )
         if (d->connected != CON_NANNY && d->connected != CON_CODEPAGE)
             continue;
 
-        // Closing a nanny extracts its character; mid-remort that is a life.
-        if (d->character && !d->character->is_npc( )
-            && d->character->getPC( )->getAttributes( ).isAvailable( "remorting" ))
-            continue;
-
+        // A mid-remort nanny is kicked too: its pfile keeps "remorting", and
+        // every door (telnet, web entry, account switch, backdoor) resumes the
+        // interview from it, so only the interview progress is lost.
         if (idleSeconds( d ) < limit)
             continue;
 

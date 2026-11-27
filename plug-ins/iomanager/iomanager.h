@@ -35,7 +35,8 @@ public:
     // Close one descriptor the same way a dead line is closed.
     void kickDescriptor( Descriptor * );
     // Close every not-yet-logged-in descriptor silent for `limit` seconds or
-    // more; a character mid-remort is spared. Returns how many were closed.
+    // more, mid-remort ones included (the pfile resumes the interview).
+    // Returns how many were closed.
     int kickIdleLogins( int limit );
 
     // Login screens silent this long are dead lines: a phone that dropped its

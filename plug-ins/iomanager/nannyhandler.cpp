@@ -615,8 +615,8 @@ NMI_INVOKE( NannyHandler, mintPendingLink, "" )
  * a phone that locks drops the websocket without a FIN, and the server keeps the
  * descriptor until the hourly login sweep. Such a holder blocks every retry of the
  * same name with "already connected". It counts as abandoned when it is still in the
- * nanny, has no saved character (a new char reaches allList only at link), is not
- * mid-remort (closing that would extract a life) and has been silent for
+ * nanny, has no saved character (a new char reaches allList only at link; a
+ * mid-remort char is registered, so it never counts) and has been silent for
  * STALE_CREATION_IDLE seconds -- so a player actively creating keeps the name.
  */
 static const int STALE_CREATION_IDLE = 120;
@@ -629,9 +629,6 @@ static bool is_stale_creation( Descriptor *d )
     PCharacter *pc = d->character->getPC( );
 
     if (PCharacterManager::find( pc->getName( ) ))
-        return false;
-
-    if (pc->getAttributes( ).isAvailable( "remorting" ))
         return false;
 
     return IOManager::getThis( )->idleSeconds( d ) >= STALE_CREATION_IDLE;
