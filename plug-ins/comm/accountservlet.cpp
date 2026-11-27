@@ -9,7 +9,7 @@
  *   servlet_auth_account_web -- bot token OR the scoped web token (emailcode,
  *     emailverify, info, enter, kofi, linknew). None of these mint a password,
  *     and only linknew attaches a character: a hero a nanny session is still
- *     creating, holding a code minted for that creation, to an account the
+ *     creating under the name the code was minted for, to an account the
  *     caller's identity already owns. So a leak stays far below god. kofi writes state too: a leaked web
  *     token could forge Ko-fi payments and grant supporter time. Harmless while
  *     supporter is only a date -- revisit before it buys anything.
@@ -239,8 +239,10 @@ static bool account_read_identity(const Json::Value &params, HttpResponse &respo
 
 // A pendingCreation code outlives its creation: an abandoned session drops the
 // parked identity (extractNewbie) but not the code. Park only while a nanny session
-// still holds this unsaved name, or a later redeem would park it for the next
-// player who picks the name, and their hero would join the redeemer's account.
+// still holds this unsaved name, so a redeem after the abandon cannot wait for the
+// next player who picks the name. This checks the name, not the session: a stale
+// code redeemed while a new player creates the same name within the code's 10
+// minutes still parks. Closing that needs the code dropped with its session.
 static bool account_creation_alive(const DLString &charName)
 {
     DLString name = charName;
