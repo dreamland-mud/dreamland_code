@@ -8,9 +8,9 @@
  *     take the separate dreamland_ops.token, so a bot token leak never reaches them.
  *   servlet_auth_account_web -- bot token OR the scoped web token (emailcode,
  *     emailverify, info, enter, kofi, linknew). None of these mint a password,
- *     and only linknew attaches a character: a hero still in creation whose own
- *     client was handed the code, to an account the caller's identity already
- *     owns. So a leak stays far below god. kofi writes state too: a leaked web
+ *     and only linknew attaches a character: a hero a nanny session is still
+ *     creating, holding a code minted for that creation, to an account the
+ *     caller's identity already owns. So a leak stays far below god. kofi writes state too: a leaked web
  *     token could forge Ko-fi payments and grant supporter time. Harmless while
  *     supporter is only a date -- revisit before it buys anything.
  *
@@ -50,6 +50,7 @@
 #include "entrytoken.h"
 #include "messengers.h"
 #include "pcharacter.h"
+#include "descriptor.h"
 #include "pcharactermanager.h"
 #include "pcmemoryinterface.h"
 #include "profession.h"
@@ -236,6 +237,34 @@ static bool account_read_identity(const Json::Value &params, HttpResponse &respo
     return true;
 }
 
+// A pendingCreation code outlives its creation: an abandoned session drops the
+// parked identity (extractNewbie) but not the code. Park only while a nanny session
+// still holds this unsaved name, or a later redeem would park it for the next
+// player who picks the name, and their hero would join the redeemer's account.
+static bool account_creation_alive(const DLString &charName)
+{
+    DLString name = charName;
+    name.capitalize();
+
+    if (PCharacterManager::find(name))
+        return false;
+
+    for (Descriptor *d = descriptor_list; d != 0; d = d->next) {
+        if (d->connected != CON_NANNY || d->character == 0)
+            continue;
+
+        PCharacter *pc = d->character->getPC();
+        if (pc == 0)
+            continue;
+
+        DLString held = pc->getName();
+        held.capitalize();
+        if (held == name)
+            return true;
+    }
+    return false;
+}
+
 // ---- /account/redeem -------------------------------------------------------
 
 static void account_redeem(HttpRequest &request, HttpResponse &response)
@@ -272,6 +301,15 @@ static void account_redeem(HttpRequest &request, HttpResponse &response)
     // identity against the creating name; the nanny commits it once the character is
     // saved. No account is created here, so an abandoned creation leaves nothing.
     if (entry.pendingCreation) {
+        if (!account_creation_alive(entry.charName)) {
+            Json::Value a;
+            a["result"] = "creation_gone";
+            a["char"] = entry.charName;
+            a["identity"] = type + ":" + value;
+            AccountAudit::record("code_redeem", a);
+            servlet_response_400(response, "That character is no longer being created");
+            return;
+        }
         AccountManager::recordPendingAttach(entry.charName, type, value, display);
         Json::Value a;
         a["result"] = "pending_recorded";
@@ -795,19 +833,18 @@ static void account_emailverify(HttpRequest &request, HttpResponse &response)
 //  - only an identity that already owns an account: no account is ever created;
 //  - it only parks the identity for commitPendingAttach, which the nanny runs once
 //    the hero saves;
-//  - wrong codes are capped per identity and overall, so a session cannot hunt
-//    for someone else's code.
+//  - only while a nanny session still creates that name (account_creation_alive);
+//  - wrong codes are capped per identity, so a session cannot hunt for someone
+//    else's code.
 
 static const long LINKNEW_MISS_WINDOW = 3600;
 static const int LINKNEW_MISSES_PER_IDENTITY = 5;
-static const int LINKNEW_MISSES_GLOBAL = 100;
 
 struct LinknewMisses {
     int count;
     long windowStart;
 };
 static map<DLString, LinknewMisses> linknewMisses;   // "type:value" -> misses
-static LinknewMisses linknewGlobal = { 0, 0 };
 
 static bool linknew_capped(LinknewMisses &m, int cap, long nowT)
 {
@@ -873,9 +910,7 @@ static void account_linknew(HttpRequest &request, HttpResponse &response)
     if (linknewMisses.size() > 1000)
         linknew_purge(nowT);
     LinknewMisses &mine = linknewMisses[key];
-    if (linknew_capped(mine, LINKNEW_MISSES_PER_IDENTITY, nowT)
-        || linknew_capped(linknewGlobal, LINKNEW_MISSES_GLOBAL, nowT))
-    {
+    if (linknew_capped(mine, LINKNEW_MISSES_PER_IDENTITY, nowT)) {
         Json::Value a;
         a["result"] = "rate_limited";
         a["account"] = id;
@@ -885,12 +920,13 @@ static void account_linknew(HttpRequest &request, HttpResponse &response)
         return;
     }
 
-    // Peek first: a code that is missing, expired or not minted for a hero in
-    // creation counts as a miss and stays untouched.
+    // Peek first: a code that is missing, expired, not minted for a hero in
+    // creation, or whose creation is gone counts as a miss and stays untouched.
     LinkingCode::Entry entry;
-    if (!LinkingCode::peek(code, entry) || !entry.pendingCreation) {
+    if (!LinkingCode::peek(code, entry) || !entry.pendingCreation
+        || !account_creation_alive(entry.charName))
+    {
         mine.count++;
-        linknewGlobal.count++;
         Json::Value a;
         a["result"] = "invalid_or_expired";
         a["account"] = id;
