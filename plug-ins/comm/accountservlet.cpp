@@ -7,10 +7,12 @@
  *     dreamland_bot.token for these. Code-running endpoints (/api/exec, /api/eval)
  *     take the separate dreamland_ops.token, so a bot token leak never reaches them.
  *   servlet_auth_account_web -- bot token OR the scoped web token (emailcode,
- *     emailverify, info, enter, kofi). None of these mint a password or attach a
- *     character, so a leak stays far below god. kofi is the one that writes state:
- *     a leaked web token could forge Ko-fi payments and grant supporter time.
- *     Harmless while supporter is only a date -- revisit before it buys anything.
+ *     emailverify, info, enter, kofi, linknew). None of these mint a password,
+ *     and only linknew attaches a character: a hero a nanny session is still
+ *     creating under the name the code was minted for, to an account the
+ *     caller's identity already owns. So a leak stays far below god. kofi writes state too: a leaked web
+ *     token could forge Ko-fi payments and grant supporter time. Harmless while
+ *     supporter is only a date -- revisit before it buys anything.
  *
  * 5.1 HARD BLOCKER: dreamland_bot.token must NEVER be placed in the dreamland_web
  * config -- see the roadmap. The broker holds its own account_web.token, matched at
@@ -21,6 +23,7 @@
  *   /account/info        {identityType, value}                 -> account + chars
  *   /account/resetpw     {identityType, value, char}           -> temp password
  *   /account/enter       {identityType, value, char}           -> one-use entry token
+ *   /account/linknew     {code, identityType, value}           -> link a hero in creation
  *   /account/emailcode   {email}                               -> mail a login code
  *   /account/emailverify {email, code}                         -> verify + resolve
  *   /account/kofi        {txn, type, amount, currency, ...}    -> Ko-fi payment ledger
@@ -32,6 +35,8 @@
 #include <string>
 
 #include <sstream>
+#include <map>
+#include <ctime>
 #include <vector>
 #include <algorithm>
 
@@ -45,6 +50,7 @@
 #include "entrytoken.h"
 #include "messengers.h"
 #include "pcharacter.h"
+#include "descriptor.h"
 #include "pcharactermanager.h"
 #include "pcmemoryinterface.h"
 #include "profession.h"
@@ -127,10 +133,10 @@ static bool servlet_auth_account(Json::Value &params, HttpResponse &response)
 }
 
 // Web-capable seam: the endpoints the dreamland_web broker drives (emailcode,
-// emailverify, info, enter, kofi). Accepts the scoped web token as well as the god
-// token. None of these mint a password or attach a character, so the web token
-// stays far below god scope even if it leaks; kofi can grant supporter time (see
-// the file header).
+// emailverify, info, enter, kofi, linknew). Accepts the scoped web token as well as
+// the god token. None of these mint a password; linknew attaches only a hero in
+// creation to the caller's own account, so the web token stays far below god scope
+// even if it leaks; kofi can grant supporter time (see the file header).
 static bool servlet_auth_account_web(Json::Value &params, HttpResponse &response)
 {
     if (!params["bottype"].isString()) {
@@ -231,6 +237,36 @@ static bool account_read_identity(const Json::Value &params, HttpResponse &respo
     return true;
 }
 
+// A pendingCreation code outlives its creation: an abandoned session drops the
+// parked identity (extractNewbie) but not the code. Park only while a nanny session
+// still holds this unsaved name, so a redeem after the abandon cannot wait for the
+// next player who picks the name. This checks the name, not the session: a stale
+// code redeemed while a new player creates the same name within the code's 10
+// minutes still parks. Closing that needs the code dropped with its session.
+static bool account_creation_alive(const DLString &charName)
+{
+    DLString name = charName;
+    name.capitalize();
+
+    if (PCharacterManager::find(name))
+        return false;
+
+    for (Descriptor *d = descriptor_list; d != 0; d = d->next) {
+        if (d->connected != CON_NANNY || d->character == 0)
+            continue;
+
+        PCharacter *pc = d->character->getPC();
+        if (pc == 0)
+            continue;
+
+        DLString held = pc->getName();
+        held.capitalize();
+        if (held == name)
+            return true;
+    }
+    return false;
+}
+
 // ---- /account/redeem -------------------------------------------------------
 
 static void account_redeem(HttpRequest &request, HttpResponse &response)
@@ -267,6 +303,15 @@ static void account_redeem(HttpRequest &request, HttpResponse &response)
     // identity against the creating name; the nanny commits it once the character is
     // saved. No account is created here, so an abandoned creation leaves nothing.
     if (entry.pendingCreation) {
+        if (!account_creation_alive(entry.charName)) {
+            Json::Value a;
+            a["result"] = "creation_gone";
+            a["char"] = entry.charName;
+            a["identity"] = type + ":" + value;
+            AccountAudit::record("code_redeem", a);
+            servlet_response_400(response, "That character is no longer being created");
+            return;
+        }
         AccountManager::recordPendingAttach(entry.charName, type, value, display);
         Json::Value a;
         a["result"] = "pending_recorded";
@@ -779,6 +824,141 @@ static void account_emailverify(HttpRequest &request, HttpResponse &response)
     servlet_response_200_json(response, out);
 }
 
+// ---- /account/linknew ------------------------------------------------------
+//
+// The web roster's "Create character". The nanny hands the creating client a
+// pendingCreation linking code over that client's own websocket (account_code),
+// and the broker posts it here with the identity its session cookie proved. On the
+// web seam, so it is narrower than /account/redeem on purpose:
+//  - only a pendingCreation code: a saved character's `account link` code is
+//    neither consumed nor attached here;
+//  - only an identity that already owns an account: no account is ever created;
+//  - it only parks the identity for commitPendingAttach, which the nanny runs once
+//    the hero saves;
+//  - only while a nanny session still creates that name (account_creation_alive);
+//  - wrong codes are capped per identity, so a session cannot hunt for someone
+//    else's code.
+
+static const long LINKNEW_MISS_WINDOW = 3600;
+static const int LINKNEW_MISSES_PER_IDENTITY = 5;
+
+struct LinknewMisses {
+    int count;
+    long windowStart;
+};
+static map<DLString, LinknewMisses> linknewMisses;   // "type:value" -> misses
+
+static bool linknew_capped(LinknewMisses &m, int cap, long nowT)
+{
+    if (nowT - m.windowStart >= LINKNEW_MISS_WINDOW) {
+        m.count = 0;
+        m.windowStart = nowT;
+    }
+    return m.count >= cap;
+}
+
+static void linknew_purge(long nowT)
+{
+    for (map<DLString, LinknewMisses>::iterator i = linknewMisses.begin(); i != linknewMisses.end(); ) {
+        if (nowT - i->second.windowStart >= LINKNEW_MISS_WINDOW)
+            linknewMisses.erase(i++);
+        else
+            ++i;
+    }
+}
+
+// The display the account already stores for this identity, so the commit's
+// messenger refresh keeps the Discord/Telegram handle instead of blanking it.
+static DLString account_stored_display(const DLString &id, const DLString &type, const DLString &value)
+{
+    Json::Value account = AccountManager::get(id);
+    if (!account.isObject())
+        return DLString::emptyString;
+
+    const Json::Value &ids = account["identities"];
+    for (Json::Value::const_iterator i = ids.begin(); i != ids.end(); ++i) {
+        if ((*i).isObject()
+            && (*i)["type"].asString() == type
+            && (*i)["value"].asString() == value)
+            return (*i)["display"].asString();
+    }
+    return DLString::emptyString;
+}
+
+static void account_linknew(HttpRequest &request, HttpResponse &response)
+{
+    Json::Value params;
+    if (!servlet_parse_params(request, response, params))
+        return;
+    if (!servlet_auth_account_web(params, response))
+        return;
+
+    DLString code;
+    if (!servlet_get_arg(params, response, "code", code))
+        return;
+
+    DLString type, value;
+    if (!account_read_identity(params, response, type, value))
+        return;
+
+    DLString id = AccountManager::findByIdentity(type, value);
+    if (id.empty()) {
+        servlet_response_404(response, "No account for this identity");
+        return;
+    }
+
+    long nowT = (long)time(0);
+    DLString key = type + ":" + value;
+    if (linknewMisses.size() > 1000)
+        linknew_purge(nowT);
+    LinknewMisses &mine = linknewMisses[key];
+    if (linknew_capped(mine, LINKNEW_MISSES_PER_IDENTITY, nowT)) {
+        Json::Value a;
+        a["result"] = "rate_limited";
+        a["account"] = id;
+        a["identity_type"] = type;
+        AccountAudit::record("linknew", a);
+        servlet_response_400(response, "Too many wrong codes, try later");
+        return;
+    }
+
+    // Peek first: a code that is missing, expired, not minted for a hero in
+    // creation, or whose creation is gone counts as a miss and stays untouched.
+    LinkingCode::Entry entry;
+    if (!LinkingCode::peek(code, entry) || !entry.pendingCreation
+        || !account_creation_alive(entry.charName))
+    {
+        mine.count++;
+        Json::Value a;
+        a["result"] = "invalid_or_expired";
+        a["account"] = id;
+        a["identity_type"] = type;
+        AccountAudit::record("linknew", a);
+        servlet_response_400(response, "Invalid or expired code");
+        return;
+    }
+
+    if (!LinkingCode::redeem(code, entry)) {
+        servlet_response_400(response, "Invalid or expired code");
+        return;
+    }
+
+    AccountManager::recordPendingAttach(entry.charName, type, value,
+                                        account_stored_display(id, type, value));
+
+    Json::Value a;
+    a["result"] = "pending_recorded";
+    a["char"] = entry.charName;
+    a["account"] = id;
+    a["identity_type"] = type;
+    AccountAudit::record("linknew", a);
+
+    Json::Value body;
+    body["char"] = entry.charName;
+    body["pending"] = true;
+    servlet_response_200_json(response, body);
+}
+
 // ---- /account/kofi ---------------------------------------------------------
 //
 // One Ko-fi webhook payment, already verified (verification token) and
@@ -902,6 +1082,11 @@ SERVLET_HANDLE(api_account_emailcode, "/account/emailcode")
 SERVLET_HANDLE(api_account_emailverify, "/account/emailverify")
 {
     account_emailverify(request, response);
+}
+
+SERVLET_HANDLE(api_account_linknew, "/account/linknew")
+{
+    account_linknew(request, response);
 }
 
 SERVLET_HANDLE(api_account_kofi, "/account/kofi")
