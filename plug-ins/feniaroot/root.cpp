@@ -267,6 +267,11 @@ NMI_GET( Root, current_time, "текущее время в секундах")
     return Register((int)dreamland->getCurrentTime( ));
 }
 
+NMI_GET(Root, boot_time, "when the server process started, in seconds; changes with every reboot or crash restart")
+{
+    return Register((int)dreamland->getBootTime( ));
+}
+
 NMI_GET(Root, current_time_millis, "текущее время в миллисекундах") 
 {
     struct timeval now;
