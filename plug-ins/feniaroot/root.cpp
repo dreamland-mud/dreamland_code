@@ -267,7 +267,7 @@ NMI_GET( Root, current_time, "текущее время в секундах")
     return Register((int)dreamland->getCurrentTime( ));
 }
 
-NMI_GET(Root, boot_time, "time of the current boot, in seconds: a value stored before it differs after any reboot or crash restart") 
+NMI_GET(Root, boot_time, "when the server process started, in seconds; changes with every reboot or crash restart")
 {
     return Register((int)dreamland->getBootTime( ));
 }
