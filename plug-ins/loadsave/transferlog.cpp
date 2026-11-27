@@ -102,6 +102,10 @@ void TransferLog::record(const DLString &kind, const DLString &from, const DLStr
             if (r.isMember("inside_limited"))
                 limited += r["inside_limited"].size();
             int gold = row_int(r, "gold") + row_int(r, "silver") / 100;
+            // The winning bid (gold) goes from buyer to seller: the oldest
+            // way to move money between one's own chars.
+            if (kind == "auction")
+                gold += row_int(r, "price");
             gprog("onPlayerTransfer", "sssii", kind.c_str(), from.c_str(), to.c_str(), limited, gold);
         }
     } catch (const std::exception &e) {
