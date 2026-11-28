@@ -1692,6 +1692,16 @@ NMI_INVOKE( Root, extendSupporter, "(id, days): продлить поддерж�
     return Register(AccountManager::extendSupporter(id, (long long)days * 86400LL));
 }
 
+NMI_INVOKE( Root, setSupporterPaid, "(id): отметить, что аккаунт id оплатил поддержку настоящими деньгами (платеж мимо Ko-fi, например monobank). Срок не меняет. true при успехе")
+{
+    DLString id = argnum2string(args, 1);
+
+    if (id.empty( ) || !AccountManager::exists( id ))
+        return Register(false);
+
+    return Register(AccountManager::setSupporterPaid(id));
+}
+
 NMI_INVOKE( Root, accountId, "(name): id аккаунта персонажа name, пустая строка если не привязан")
 {
     return Register(AccountManager::accountOf(args2string(args)));
