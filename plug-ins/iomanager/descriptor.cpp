@@ -537,9 +537,22 @@ Descriptor::wsHandlePayload(const Json::Value &cmd)
         // The args vector above is already checked; reading the raw json a
         // second time would walk straight back into the crash.
         string arg = args.empty() ? string() : args.front().c_str();
-        for(string::iterator i = arg.begin();i != arg.end();i++)
-            if(inputChar(*i) < 0)
+        for(string::iterator i = arg.begin();i != arg.end();i++) {
+            unsigned char c = *i;
+
+            // A browser never types control bytes, but a crafted link or frame
+            // can carry them, and the line reader obeys backspace: a click that
+            // looked like 'look <word>' could erase its own prefix and run
+            // another command. Keep line breaks (multi-line paste), make a tab
+            // a space, drop the rest.
+            if (c == '\t')
+                c = ' ';
+            else if ((c < ' ' && c != '\n' && c != '\r') || c == 0x7f)
+                continue;
+
+            if(inputChar(c) < 0)
                 return false;
+        }
     } else if(name == "resume") {
         /* Also character-less, and necessarily so: this is what a returning web
          * client sends INSTEAD of logging in. The token never goes through
@@ -881,7 +894,9 @@ Descriptor::wsHandleNeg(unsigned char *buf, int rc)
                     }
 
                     // Generate unique client ID, to be used when creating secure clickable action links.
-                    websock.nonce = create_nonce(8);
+                    // It is the only thing that stops player text from forging an any-command link
+                    // in the web client, so it must not be predictable: create_nonce() is rand().
+                    websock.nonce = create_secure_nonce(8);
 
                     LogStream::sendError( ) << "WebSock: Success! ID " << websock.nonce << endl;
                     sendVersion(this);
