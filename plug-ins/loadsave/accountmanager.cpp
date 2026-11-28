@@ -29,6 +29,7 @@
 #include "logstream.h"
 #include "accountaudit.h"
 #include "kofiledger.h"
+#include "save_bank.h"
 
 using namespace std;
 
@@ -993,6 +994,120 @@ void AccountManager::setMessengerIdentity(const DLString &id, const DLString &ty
             PCharacterManager::saveMemory(pc);
         }
     }
+}
+
+DLString AccountManager::merge(const DLString &from, const DLString &into, const DLString &actor)
+{
+    if (from == into)
+        return "the two accounts are the same";
+    if (!exists(from))
+        return "no such account: " + from;
+    if (!exists(into))
+        return "no such account: " + into;
+
+    // Copies: removeIdentity below rewrites the live identities array.
+    Json::Value fromIds = get(from)["identities"];
+    Json::Value intoIds = get(into)["identities"];
+
+    for (Json::Value::const_iterator i = fromIds.begin(); i != fromIds.end(); ++i) {
+        if (!(*i).isObject())
+            continue;
+        DLString type = (*i)["type"].asString();
+        if (type != "telegram" && type != "discord")
+            continue;
+        for (Json::Value::const_iterator j = intoIds.begin(); j != intoIds.end(); ++j)
+            if ((*j).isObject() && (*j)["type"].asString() == type)
+                return "both accounts hold a " + type + " identity, detach one first";
+    }
+
+    // Money first, while nothing else has moved: a refusal here leaves both intact.
+    int gold = bankBalance(from, "gold"), silver = bankBalance(from, "silver"), qp = bankBalance(from, "qp");
+    if (gold || silver || qp) {
+        if (!bankAdd(into, gold, silver, qp, "", actor, "merge from " + from))
+            return "the bank of " + into + " refused the balances";
+        if (!bankAdd(from, -gold, -silver, -qp, "", actor, "merge into " + into)) {
+            bankAdd(into, -gold, -silver, -qp, "", actor, "merge rollback");
+            return "the bank of " + from + " could not be emptied";
+        }
+    }
+
+    int moved = 0;
+    for (Json::Value::const_iterator i = fromIds.begin(); i != fromIds.end(); ++i) {
+        if (!(*i).isObject())
+            continue;
+        DLString type = (*i)["type"].asString();
+        DLString value = (*i)["value"].asString();
+        DLString display = (*i)["display"].asString();
+        removeIdentity(type, value);
+        if (addIdentity(into, type, value, display))
+            moved++;
+        else {
+            addIdentity(from, type, value, display);
+            LogStream::sendError() << "Accounts: merge could not move " << type << " off " << from << endl;
+        }
+    }
+
+    std::list<DLString> chars = charsOf(from);
+    for (const DLString &name : chars)
+        attachChar(into, name);
+
+    bank_merge_owner("account", from, "account", into);
+
+    if (vaultUnlocked(from) && !vaultUnlocked(into))
+        setVaultUnlocked(into);
+
+    long long now = (long long)dreamland->getCurrentTime();
+    long long fromUntil = (long long)supporterUntil(from);
+    long long intoUntil = (long long)supporterUntil(into);
+    long long base = intoUntil > now ? intoUntil : now;
+    if (fromUntil > base)
+        extendSupporter(into, fromUntil - base);
+    if (supporterPaid(from))
+        setSupporterPaid(into);
+
+    // attachChar sets the link only: the new members need the account's messengers.
+    mirrorMessengersToAccountChars(into);
+
+    Json::Value f;
+    f["actor"] = actor.c_str();
+    f["from"] = from.c_str();
+    f["into"] = into.c_str();
+    f["identities"] = moved;
+    f["gold"] = gold;
+    f["silver"] = silver;
+    f["qp"] = qp;
+    Json::Value names(Json::arrayValue);
+    for (const DLString &name : chars)
+        names.append(name.c_str());
+    f["chars"] = names;
+
+    DLString left;
+    if (bank_has_entries("account", from))
+        left = "vault entries would not move, " + from + " kept with them";
+    else if (!get(from)["identities"].empty())
+        left = "an identity would not move, " + from + " kept with it";
+    if (!left.empty()) {
+        f["kept"] = true;
+        AccountAudit::record("merge", f);
+        return left;
+    }
+
+    accounts.erase(from);
+    for (map<DLString, DLString>::iterator i = identityIndex.begin(); i != identityIndex.end(); ) {
+        if (i->second == from)
+            identityIndex.erase(i++);
+        else
+            ++i;
+    }
+    try {
+        DLDirectory dir(dreamland->getDbDir(), ACCOUNT_TABLE);
+        ::unlink(DLFile(dir, from, ACCOUNT_EXT).getPath().c_str());
+    } catch (const std::exception &e) {
+        LogStream::sendError() << "Accounts: deleting " << from << " failed: " << e.what() << endl;
+    }
+
+    AccountAudit::record("merge", f);
+    return DLString::emptyString;
 }
 
 // Map ONE account-wide config key onto a character. Keys mirror the config option

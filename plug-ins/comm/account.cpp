@@ -559,7 +559,29 @@ static void account_admin(PCharacter *ch, DLString &args)
         return;
     }
 
-    ch->pecho("Usage: account admin list|info|attach|detach ...");
+    if (arg_oneof(sub, "merge")) {
+        DLString from = args.getOneArgument().toUpper();
+        DLString into = args.getOneArgument().toUpper();
+        if (from.empty() || into.empty()) {
+            ch->pecho("Usage: account admin merge <fromAccountId> <intoAccountId>");
+            return;
+        }
+        DLString err = AccountManager::merge(from, into, ch->getName());
+        if (!err.empty()) {
+            ch->pecho("Merge %1$s into %2$s stopped: %3$s.", from.c_str(), into.c_str(), err.c_str());
+            return;
+        }
+        DLString line;
+        for (const DLString &n : AccountManager::charsOf(into)) {
+            if (!line.empty())
+                line += ", ";
+            line += n;
+        }
+        ch->pecho("Merged %1$s into %2$s and deleted %1$s. Chars: %3$s.", from.c_str(), into.c_str(), line.c_str());
+        return;
+    }
+
+    ch->pecho("Usage: account admin list|info|attach|detach|merge ...");
 }
 
 // Switch to another character on the SAME account without a password. Account
