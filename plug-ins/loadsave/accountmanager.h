@@ -200,6 +200,15 @@ public:
                                      const DLString &value, const DLString &display);
     static bool removeIdentity(const DLString &type, const DLString &value);
 
+    // One person on two accounts: fold account `from` into `into`. Every member
+    // character, identity, bank balance, vault entry, the vault unlock and supporter
+    // time move to `into`, then `from` is deleted (record, index, file). Refuses up
+    // front, changing nothing, on an unknown or identical id, or when both accounts
+    // hold a messenger identity of the same type (one per account). If a vault entry
+    // will not move, `from` is kept with it so no item is orphaned. Returns "" when
+    // `from` is gone, else what stopped it. One "merge" audit row names the actor.
+    static DLString merge(const DLString &from, const DLString &into, const DLString &actor);
+
 private:
     // Apply a single account-wide config key to a character (maps the key to the
     // right flag/attribute). Shared by applyConfigToChar and propagateConfigKey.
